@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.2.0
+Date: ????
+  Bugfixes:
+    - Fixed crash when spidertron is picked up/destroyed whilst travelling to a waypoint
+    - Fixed that placing sequential waypoints too close to each other would cause all waypoints to disappear
+    - Fixed waypoints being reset during version upgrade
+    - Fixed waypoints icons not being cleared during version upgrade
+    - Fixed breaking out of patrol requires one extra click
+---------------------------------------------------------------------------------------------------
 Version: 1.1.0
 Date: 30 August 2020
   Features:

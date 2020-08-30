@@ -13,7 +13,6 @@ end
 script.on_event(defines.events.on_player_main_inventory_changed, function (event) convert_remotes_in_inventory(game.get_player(event.player_index).get_main_inventory()) end)
 
 local function on_remote_cycled(event)
-  log("Remote cycled")
   local player = game.get_player(event.player_index)
   local stack = player.cursor_stack
   if stack and stack.valid_for_read then

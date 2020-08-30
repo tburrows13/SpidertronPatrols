@@ -1,5 +1,15 @@
 require "util"
 
+function contains_key(array, element, remove)
+  for key, _ in pairs(array) do
+    if key == element then
+      if remove then table.remove(array, key) end
+      return true
+    end
+  end
+  return false
+end
+
 local on_spidertron_given_new_destination = script.generate_event_name()
 remote.add_interface("SpidertronWaypoints", {get_event_ids = function() return {on_spidertron_given_new_destination = on_spidertron_given_new_destination} end})
 
@@ -12,15 +22,22 @@ function get_waypoint_info(spidertron)
   return waypoint_info
 end
 
-function clear_spidertron_waypoints(spidertron)
-  -- Called on Shift-Click or whenever the current autopilot_destination is removed.
-  log("Clearing spidertron waypoints for unit number " .. spidertron.unit_number)
-  local waypoint_info = get_waypoint_info(spidertron)
+function clear_spidertron_waypoints(spidertron, unit_number)
+  -- Called on Shift-Click or whenever the current autopilot_destination is removed or when the spidertron is removed.
+  local waypoint_info
+  if spidertron then
+    waypoint_info = get_waypoint_info(spidertron)
+  else
+    waypoint_info = global.spidertron_waypoints[unit_number]
+    if not waypoint_info then return end
+  end
+  if not unit_number then unit_number = spidertron.unit_number end
+  log("Clearing spidertron waypoints for unit number " .. unit_number)
   for i, render_id in pairs(waypoint_info.render_ids) do
     rendering.destroy(render_id)
   end
-  spidertron.autopilot_destination = nil
-  global.spidertron_waypoints[spidertron.unit_number] = nil
+  if spidertron then spidertron.autopilot_destination = nil end
+  global.spidertron_waypoints[unit_number] = nil
 end
 
 script.on_event("clear-spidertron-waypoints",
@@ -67,22 +84,26 @@ script.on_event(defines.events.on_player_used_spider_remote,
     local on_patrol = global.spidertron_on_patrol[spidertron.unit_number]
 
     if not event.success then return end
+    local reg_id = script.register_on_entity_destroyed(spidertron)
+    global.registered_spidertrons[reg_id] = spidertron.unit_number
+
     if player.cursor_stack.name == "spidertron-remote" then
       if on_patrol then
-        clear_spidertron_waypoints(spidertron)
+        clear_spidertron_waypoints(nil, spidertron.unit_number)  -- Prevents it from overwriting autopilot_destination
+        waypoint_info = get_waypoint_info(spidertron)
         global.spidertron_on_patrol[spidertron.unit_number] = nil
       end
       if #waypoint_info.positions > 0 or util.distance(spidertron.position, spidertron.autopilot_destination) > 5 then
-      -- The spidertron has to be a suitable distance away, but only if this is the first (i.e. next) waypoint
-      log("Player used remote on position " .. util.positiontostr(position))
-      table.insert(waypoint_info.positions, position)
-      --table.insert(waypoint_info.render_ids, false)  -- Will be handled by update_text
-      spidertron.autopilot_destination = waypoint_info.positions[1]
-      if #waypoint_info.positions == 1 then
-        -- The spidertron was not already walking towards a waypoint
-        script.raise_event(on_spidertron_given_new_destination, {player_index = 1, vehicle = spidertron, position = waypoint_info.positions[1], success = true})
-      end
-      update_text(spidertron)
+        -- The spidertron has to be a suitable distance away, but only if this is the first (i.e. next) waypoint
+        log("Player used remote on position " .. util.positiontostr(position))
+        table.insert(waypoint_info.positions, position)
+        --table.insert(waypoint_info.render_ids, false)  -- Will be handled by update_text
+        spidertron.autopilot_destination = waypoint_info.positions[1]
+        if #waypoint_info.positions == 1 then
+          -- The spidertron was not already walking towards a waypoint
+          script.raise_event(on_spidertron_given_new_destination, {player_index = 1, vehicle = spidertron, position = waypoint_info.positions[1], success = true})
+        end
+        update_text(spidertron)
       end
 
     elseif player.cursor_stack.name == "spidertron-remote-patrol" then
@@ -113,7 +134,7 @@ function on_spidertron_reached_destination(spidertron, patrol_start)
     -- Add reached position to the back of the queue
     table.insert(waypoint_info.positions, removed_position)
   elseif not on_patrol then
-    render_id = table.remove(waypoint_info.render_ids, 1)
+    local render_id = table.remove(waypoint_info.render_ids, 1)
     rendering.destroy(render_id)
   end
   update_text(spidertron)
@@ -124,17 +145,17 @@ script.on_nth_tick(10,
     for _, waypoint_info in pairs(global.spidertron_waypoints) do
       local spidertron = waypoint_info.spidertron
       local waypoint_queue = waypoint_info.positions
-      local on_patrol = global.spidertron_on_patrol[spidertron.unit_number]
       if spidertron and spidertron.valid then
+        local on_patrol = global.spidertron_on_patrol[spidertron.unit_number]
         if #waypoint_queue > 0 then
           -- Check if we have arrived
           if util.distance(spidertron.position, waypoint_queue[1]) < 2 then
             -- The spidertron has reached its destination
             on_spidertron_reached_destination(spidertron)
-          end
 
           -- Check if we need to clear the queue because something has cancelled the current autopilot_destination
-          if on_patrol ~= "setup" and not spidertron.autopilot_destination then
+          -- Note that queue is only cleared when not within 2 tiles of destination
+          elseif on_patrol ~= "setup" and not spidertron.autopilot_destination then
             clear_spidertron_waypoints(spidertron)
           end
         end
@@ -143,24 +164,47 @@ script.on_nth_tick(10,
   end
 )
 
+script.on_event(defines.events.on_entity_destroyed,
+  function(event)
+    local unit_number = event.unit_number
+    local reg_id = event.registration_number
+    log("Entity destroyed with unit number " .. unit_number)
+    if contains_key(global.registered_spidertrons, reg_id, true) then
+      log("Clearing spidertron waypoints")
+      clear_spidertron_waypoints(nil, unit_number)
+      global.spidertron_on_patrol[unit_number] = nil
+    end
+  end
+)
+
 
 local function setup()
     global.spidertron_waypoints = {}
     global.spidertron_on_patrol = {}
+    global.registered_spidertrons = {}
   end
 
 local function config_changed_setup(changed_data)
   -- Only run when this mod was present in the previous save as well. Otherwise, on_init will run.
-  -- Case 1: SpidertronWaypoints has an entry in mod_changes.
-  --   Either because update (old_version ~= nil -> run setup) or addition (old_version == nil -> don't run setup because on_init will).
-  -- Case 2: SpidertronWaypoints does not have an entry in mod_changes. Therefore run setup.
-  log("Configuration changed data: " .. serpent.block(changed_data))
-  local this_mod_data = changed_data.mod_changes["SpidertronWaypoints"]
-  if (not this_mod_data) or (this_mod_data["old_version"]) then
-    log("Configuration changed setup running")
-    setup()
-  else
-    log("Configuration changed setup not running: not this_mod_data = " .. tostring(not this_mod_data) .. "; this_mod_data['old_version'] = " .. tostring(this_mod_data["old_version"]))
+  local old_version = changed_data.mod_changes["SpidertronWaypoints"]["old_version"]
+  log("Coming from old version: " .. old_version)
+  old_version = util.split(old_version, ".")
+  for i=1,#old_version do
+    old_version[i] = tonumber(old_version[i])
+  end
+
+  if old_version[1] == 1 then
+    if old_version[2] < 1 then
+      -- Run in >=1.1
+      global.spidertron_on_patrol = {}
+    end
+    if old_version[2] < 2 then
+      log("Running pre 1.2 migration")
+      -- Run in >=1.2
+      global.registered_spidertrons = {}
+      -- Clean up 1.1 bug
+      rendering.clear("SpidertronWaypoints")
+    end
   end
 end
 

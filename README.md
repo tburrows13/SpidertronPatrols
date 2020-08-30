@@ -16,12 +16,18 @@ Patrols
 Features
 -----
 
-- Click with the spidertron remote to add a waypoint
-- Shift-click to clear all waypoints for that spidertron
-- Shift-scroll whilst holding a remote to switch to a patrol remote
+- *Click* with the spidertron remote to add a waypoint
+- *Shift-click* to clear all waypoints for that spidertron
+- *Shift-scroll* whilst holding a remote to switch to a patrol remote
 - With patrol remote in hand, click to mark the position sequence
-- Click on the '1' to finish the sequence and the spidertron will start following it
-- Recommended to use patrols with https://mods.factorio.com/mod/EquipmentGridLogisticModule
+- Click on the **1** to finish the sequence and the spidertron will start following it
+
+-----
+Recommendations
+-----
+
+- Remove *Shift + Mouse wheel up* and *Shift + Mouse wheel down* from **Zoom in** and **Zoom out** controls
+- Use [Equipment Grid Logistic Module](https://mods.factorio.com/mod/EquipmentGridLogisticModule) to autofill your patrolling spidertrons
 
 -----
 Known Bugs / Limitations
