@@ -1,15 +1,48 @@
 Spidertron Waypoints
 ==================
 
-Have more control over your spidertrons with waypoints! Click with the remote to add a waypoint and shift-click to clear all waypoints.
+Have more control over your spidertrons with waypoints! Set up your spidertrons with one-time waypoints or permanent patrols.
 
-![Demonstration gif](https://i.imgur.com/lSvtJP8.gif)
+Waypoints
+-----
+![Waypoints gif](https://i.imgur.com/lSvtJP8.gif)
 
 -----
-Mod developers
+Patrols
+-----
+![Patrols gif](https://i.imgur.com/leZ8QTK.gif)
+
+-----
+Features
 -----
 
-For compatibility with other mods that use `on_player_used_spider_remote`, this mod provides a remote interface. The new event `on_spidertron_given_new_destination` is raised when a spidertron is being assigned to a new waypoint, and comes with an `event` table containing `player_index`, `vehicle`, `position`, and `success` (always set to true). Note that `event.player` does not exist. The following example should be placed in `on_init` and `on_load`:
+- Click with the spidertron remote to add a waypoint
+- Shift-click to clear all waypoints for that spidertron
+- Shift-scroll whilst holding a remote to switch to a patrol remote
+- With patrol remote in hand, click to mark the position sequence
+- Click on the '1' to finish the sequence and the spidertron will start following it
+- Recommended to use patrols with https://mods.factorio.com/mod/EquipmentGridLogisticModule
+
+-----
+Known Bugs / Limitations
+-----
+
+- If you place 2 sequential waypoints close to each other (<5 tiles apart) , all waypoints will be lost when the spidertron reaches that area. This is a limitation of the API, and [will be fixed in Factorio 1.1](https://forums.factorio.com/viewtopic.php?f=65&t=88668)
+- Spidertron remotes are removed from the quickbar when they are switched to patrol remotes
+
+-----
+Future Updates
+-----
+
+- Compatibility with [Spidertron squad control](https://mods.factorio.com/mod/Spider_Control) (you can follow the development of that [here](https://github.com/npc-strider/spidertron-squad-control/pull/1))
+- Allow pausing at certain waypoints
+- Better looking patrol remote (help would be appreciated!)
+
+-----
+Mod Compatibility
+-----
+
+For compatibility with other mods that use `on_player_used_spider_remote`, this mod provides a remote interface. The new event `on_spidertron_given_new_destination` is raised when a spidertron has been given a new `autopilot_target`, and comes with an `event` table containing `player_index`, `vehicle`, `position`, and `success` (always set to true). Note that `event.player` does not exist. The following example should be placed in `on_init` and `on_load`:
 
 ```
 if game.active_mods["SpidertronWaypoints"] then

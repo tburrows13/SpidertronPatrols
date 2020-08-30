@@ -3,7 +3,7 @@
     "version": "1.1.0",
     "title": "Spidertron Waypoints",
     "author": "Xorimuth",
-    "description": "Have more control over your spidertrons with waypoints! Click with the remote to add a waypoint and shift-click to clear all waypoints.",
+    "description": "Have more control over your spidertrons by using waypoints and patrols!",
     "factorio_version": "1.0",
-    "dependencies": ["base >= 1.0", "! SpidertronWeaponSwitcher"]
+    "dependencies": ["base >= 1.0", "! Spider_Control", "! SpidertronWeaponSwitcher"]
 }

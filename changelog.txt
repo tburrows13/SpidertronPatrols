@@ -1,9 +1,12 @@
 ---------------------------------------------------------------------------------------------------
-Version: 1.0.0
-Date: ????
-  Changes:
+Version: 1.1.0
+Date: 30 August 2020
+  Features:
+    - Shift-scroll whilst holding remote to switch to patrol remote
+    - Mod interface
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.0
 Date: 29 August 2020
   Features:
-    - Initial release
+    - Clicking remote places waypoints
+    - Shift-click anywhere to remove all waypoints
