@@ -30,6 +30,7 @@ local function convert_remote(stack, old_name, new_name, player)
   if stack and stack.valid_for_read and stack.name == old_name then
     local connected_spidertron = stack.connected_entity
     --local previous_quickbar = get_previous_quickbar(player)
+    --player.clean_cursor()
     stack.set_stack{name=new_name, count=1}
     stack.connected_entity = connected_spidertron
     --fill_in_quickbar(player, previous_quickbar, stack)
@@ -62,7 +63,7 @@ script.on_event(defines.events.on_lua_shortcut, function(event) shortcut_pressed
 script.on_event("waypoints-patrol-mode", function(event) shortcut_pressed(event.player_index, "waypoints-patrol-mode") end)
 script.on_event("waypoints-waypoint-mode", function(event) shortcut_pressed(event.player_index, "waypoints-waypoint-mode") end)
 
-local function on_remote_cycled(player_index, shortcut_name)
+local function press_if_holding_remote(player_index, shortcut_name)
   local player = game.get_player(player_index)
   local stack = player.cursor_stack
   if stack and stack.valid_for_read then
@@ -71,8 +72,13 @@ local function on_remote_cycled(player_index, shortcut_name)
     end
   end
 end
-script.on_event("remote-cycle-forwards", function(event) on_remote_cycled(event.player_index, "waypoints-patrol-mode") end)
-script.on_event("remote-cycle-backwards", function(event) on_remote_cycled(event.player_index, "waypoints-waypoint-mode") end)
+script.on_event("waypoints-patrol-mode-click", function(event) press_if_holding_remote(event.player_index, "waypoints-patrol-mode") end)
+script.on_event("waypoints-patrol-mode-scroll", function(event) press_if_holding_remote(event.player_index, "waypoints-patrol-mode") end)
+script.on_event("waypoints-waypoint-mode-click", function(event) press_if_holding_remote(event.player_index, "waypoints-waypoint-mode") end)
+script.on_event("waypoints-waypoint-mode-scroll", function(event) press_if_holding_remote(event.player_index, "waypoints-waypoint-mode") end)
+
+--script.on_event("pick-item-custom", function(event) game.print("Pickted item! " .. serpent.block(event)) end)
+
 
 local function convert_remotes_in_inventory(inventory)
   for i = 1,#inventory do

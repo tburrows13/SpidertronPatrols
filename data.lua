@@ -5,6 +5,9 @@ patrol_remote.name = "spidertron-remote-patrol"
 patrol_remote.icon = "__SpidertronWaypoints__/thumbnail.png"
 patrol_remote.icon_mipmaps = 1
 
+local temp_remote = table.deepcopy(data.raw["spidertron-remote"]["spidertron-remote"])
+temp_remote.name = "spidertron-remote-temp"
+
 if settings.startup["spidertron-waypoints-use-patrol-remote"] == "always" then
   data.raw["spidertron-remote"]["spidertron-remote"].icon = "__SpidertronWaypoints__/thumbnail.png"
   data.raw["spidertron-remote"]["spidertron-remote"].icon_mipmaps = 1
@@ -18,17 +21,5 @@ data:extend({
     name = "clear-spidertron-waypoints",
     key_sequence = "SHIFT + mouse-button-1",
   },
-  {
-    type = "custom-input",
-    name = "remote-cycle-forwards",
-    key_sequence = "",
-    linked_game_control = "cycle-blueprint-forwards"
-  },
-  {
-    type = "custom-input",
-    name = "remote-cycle-backwards",
-    key_sequence = "",
-    linked_game_control = "cycle-blueprint-backwards"
-  },
-  patrol_remote
+  patrol_remote, temp_remote
 })

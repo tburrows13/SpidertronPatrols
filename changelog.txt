@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.2.1
+Date: 31 Augest 2020
+  Features:
+    - Added additional controls: right click and shift right click to toggle waypoint and patrol modes
+---------------------------------------------------------------------------------------------------
 Version: 1.2.0
 Date: 31 August 2020
   Features:

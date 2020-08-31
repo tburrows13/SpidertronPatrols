@@ -17,9 +17,9 @@ Features
 -----
 
 - *Click* with the spidertron remote to add a waypoint
-- *Shift-click* to clear all waypoints for that spidertron
-- Toggle waypoint mode with *Alt + O*, via shortcut, or *Shift + Scroll Down* whilst holding a remote
-- Toggle patrol mode with *Alt + P*, via shortcut, or *Shift + Scroll Up* whilst holding a remote  
+- *Shift + Click* to clear all waypoints for that spidertron
+- Toggle waypoint mode with *Right Click* or *Shift + Scroll Down* whilst holding a remote, or *Alt + O* or via shortcut
+- Toggle patrol mode with *Shift + Right Click* or *Shift + Scroll Up* whilst holding a remote, or *Alt + P* or via shortcut
 - With patrol remote in hand, click to mark the position sequence
 - Click on the **1** to finish the sequence and the spidertron will start following it
 - Thank you to [danatron1](https://www.reddit.com/r/factorio/comments/iitlvi/i_made_a_mod_that_allows_you_to_set_waypoints/g3dzt1h) for creating the patrol remote icon (which also doubles up as a cool thumbnail!)
@@ -36,7 +36,9 @@ Recommendations
 Known Bugs / Limitations
 -----
 
-- Spidertron remotes are removed from the quickbar when they are switched to patrol remotes when **With patrol mode** is chosen in the startup settings (this setting can be changed at any time, but requires a game restart)
+- Spidertron remotes are removed from the quickbar when they are switched to patrol remotes when **With patrol mode** is chosen in the startup settings (this setting can be changed at any time, but requires a game restart - likely can't be remedied with the current mod API)
+- Waypoint markers cannot be seen in map view (requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=76539&p=510027))
+
 
 -----
 Future Updates
@@ -44,7 +46,6 @@ Future Updates
 
 - Compatibility with [Spidertron squad control](https://mods.factorio.com/mod/Spider_Control) (you can follow the development of that [here](https://github.com/npc-strider/spidertron-squad-control/pull/1))
 - Allow pausing at certain waypoints
-- Fix remotes being removed from quickbar when playing with both remote icons (I don't think that this is possible to fix with the current mod API)
 - Better looking shortcut icons (help would be appreciated!)
 
 -----
@@ -62,6 +63,7 @@ if game.active_mods["SpidertronWaypoints"] then
     script.on_event(on_spidertron_given_new_destination, function(event)
         -- Do stuff here instead of in `on_player_used_spider_remote`
     end)
+end
 ```
 
 Please let me know if you need help implementing this or if you need additional compatibility features.
