@@ -1,3 +1,17 @@
+require 'shortcut'
+
+local patrol_remote = table.deepcopy(data.raw["spidertron-remote"]["spidertron-remote"])
+patrol_remote.name = "spidertron-remote-patrol"
+patrol_remote.icon = "__SpidertronWaypoints__/thumbnail.png"
+patrol_remote.icon_mipmaps = 1
+
+if settings.startup["spidertron-waypoints-use-patrol-remote"] == "always" then
+  data.raw["spidertron-remote"]["spidertron-remote"].icon = "__SpidertronWaypoints__/thumbnail.png"
+  data.raw["spidertron-remote"]["spidertron-remote"].icon_mipmaps = 1
+  patrol_remote.hidden = true  -- Do these even do anything?
+  patrol_remote.enabled = false  -- no idea...
+end
+
 data:extend({
   {
     type = "custom-input",
@@ -16,14 +30,5 @@ data:extend({
     key_sequence = "",
     linked_game_control = "cycle-blueprint-backwards"
   },
-  {
-    type = "spidertron-remote",
-    name = "spidertron-remote-patrol",
-    icons = {{icon = "__base__/graphics/icons/spidertron-remote.png", tint = {r = 1}}},
-    icon_color_indicator_mask = "__base__/graphics/icons/spidertron-remote-mask.png",
-    icon_size = 64, icon_mipmaps = 4,
-    subgroup = "transport",
-    order = "b[personal-transport]-c[spidertron]-b[remote]",
-    stack_size = 1,
-  }
+  patrol_remote
 })

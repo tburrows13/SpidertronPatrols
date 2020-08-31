@@ -1,5 +1,15 @@
 require "util"
 
+function contains(array, element, remove)
+  for i, value in pairs(array) do
+    if value == element then
+      if remove then table.remove(array, i) end
+      return true
+    end
+  end
+  return false
+end
+
 function contains_key(array, element, remove)
   for key, _ in pairs(array) do
     if key == element then
@@ -12,6 +22,7 @@ end
 
 local on_spidertron_given_new_destination = script.generate_event_name()
 remote.add_interface("SpidertronWaypoints", {get_event_ids = function() return {on_spidertron_given_new_destination = on_spidertron_given_new_destination} end})
+
 
 function get_waypoint_info(spidertron)
   local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
@@ -60,13 +71,11 @@ function update_text(spidertron)
   -- Re-render all waypoints
   for i, position in pairs(waypoint_info.positions) do
     local render_id = waypoint_info.render_ids[i]
-    if render_id then
-      if rendering.is_valid(render_id) then
+    if render_id and rendering.is_valid(render_id) then
         if rendering.get_text(render_id) ~= i then
           -- Only update text
           rendering.set_text(render_id, i)
         end
-      end
     else
       -- We need to create the text
       waypoint_info.render_ids[i] = rendering.draw_text{text = tostring(i), surface = spidertron.surface, target = {position.x, position.y - 1.2}, color = spidertron.color, scale = 4, alignment = "center", time_to_live = 99999999}
@@ -87,8 +96,9 @@ script.on_event(defines.events.on_player_used_spider_remote,
     local reg_id = script.register_on_entity_destroyed(spidertron)
     global.registered_spidertrons[reg_id] = spidertron.unit_number
 
-    if player.cursor_stack.name == "spidertron-remote" then
-      if on_patrol then
+    if not player.is_shortcut_toggled("waypoints-patrol-mode") then
+      if on_patrol or not player.is_shortcut_toggled("waypoints-waypoint-mode") then
+        -- Clear all waypoints if we were previously patrolling or waypoints are off
         clear_spidertron_waypoints(nil, spidertron.unit_number)  -- Prevents it from overwriting autopilot_destination
         waypoint_info = get_waypoint_info(spidertron)
         global.spidertron_on_patrol[spidertron.unit_number] = nil
@@ -106,7 +116,7 @@ script.on_event(defines.events.on_player_used_spider_remote,
         update_text(spidertron)
       end
 
-    elseif player.cursor_stack.name == "spidertron-remote-patrol" then
+    else
       on_player_used_patrol_remote(player, spidertron, position)
     end
   end
@@ -139,6 +149,7 @@ function on_spidertron_reached_destination(spidertron, patrol_start)
   end
   update_text(spidertron)
 end
+
 
 script.on_nth_tick(10,
   function(event)
@@ -186,7 +197,14 @@ local function setup()
 
 local function config_changed_setup(changed_data)
   -- Only run when this mod was present in the previous save as well. Otherwise, on_init will run.
-  local old_version = changed_data.mod_changes["SpidertronWaypoints"]["old_version"]
+  local mod_changes = changed_data.mod_changes
+  local old_version
+  if mod_changes and mod_changes["SpidertronWaypoints"] and mod_changes["SpidertronWaypoints"]["old_version"] then
+    old_version = mod_changes["SpidertronWaypoints"]["old_version"]
+  else
+    return
+  end
+
   log("Coming from old version: " .. old_version)
   old_version = util.split(old_version, ".")
   for i=1,#old_version do

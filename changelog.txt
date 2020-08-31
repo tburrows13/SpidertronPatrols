@@ -1,6 +1,10 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.2.0
-Date: ????
+Date: 31 August 2020
+  Features:
+    - Added shortcut bar options for toggling patrol mode and waypoint mode
+    - New icon for patrol remote + thumbnail
+    - New setting to control whether it only appears in patrol mode, never, or always
   Bugfixes:
     - Fixed crash when spidertron is picked up/destroyed whilst travelling to a waypoint
     - Fixed that placing sequential waypoints too close to each other would cause all waypoints to disappear
