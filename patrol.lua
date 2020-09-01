@@ -41,7 +41,7 @@ local function convert_remote(stack, old_name, new_name, player)
       global.stored_remotes[stack.item_number] = inventory
       log("Added inventory for item number " .. stack.item_number)
 
-    elseif stack.name == "spidertron-remote-patrol-2" then
+    elseif stack.name == "spidertron-remote-patrol" then
       -- Retrieve the actual remote from the temp inventory
       local item_number = stack.item_number
       local inventory = global.stored_remotes[item_number]
@@ -69,9 +69,9 @@ local function shortcut_pressed(player_index, shortcut_name)
   if shortcut_name == "waypoints-patrol-mode" then
     -- Swap out remotes if need be
     if player.is_shortcut_toggled("waypoints-patrol-mode") then
-      convert_remote(stack, "spidertron-remote-patrol-2", "spidertron-remote", player)
+      convert_remote(stack, "spidertron-remote-patrol", "spidertron-remote", player)
     else
-      convert_remote(stack, "spidertron-remote", "spidertron-remote-patrol-2", player)
+      convert_remote(stack, "spidertron-remote", "spidertron-remote-patrol", player)
     end
   end
 
@@ -88,7 +88,7 @@ local function press_if_holding_remote(player_index, shortcut_name)
   local player = game.get_player(player_index)
   local stack = player.cursor_stack
   if stack and stack.valid_for_read then
-    if contains({"spidertron-remote", "spidertron-remote-patrol-2"}, stack.name) then
+    if contains({"spidertron-remote", "spidertron-remote-patrol"}, stack.name) then
       shortcut_pressed(player_index, shortcut_name)
     end
   end
@@ -104,7 +104,7 @@ script.on_event("waypoints-waypoint-mode-scroll", function(event) press_if_holdi
 local function convert_remotes_in_inventory(inventory)
   for i = 1,#inventory do
     local stack = inventory[i]
-    convert_remote(stack, "spidertron-remote-patrol-2", "spidertron-remote", inventory.player_owner)
+    convert_remote(stack, "spidertron-remote-patrol", "spidertron-remote", inventory.player_owner)
   end
 end
 script.on_event(defines.events.on_player_main_inventory_changed, function (event) convert_remotes_in_inventory(game.get_player(event.player_index).get_main_inventory()) end)
@@ -114,7 +114,7 @@ script.on_event(defines.events.on_player_cursor_stack_changed,
     local player = game.get_player(event.player_index)
     if player.is_shortcut_toggled("waypoints-patrol-mode") then
       -- Only convert to patrol remote if patrol mode is on
-      convert_remote(player.cursor_stack, "spidertron-remote", "spidertron-remote-patrol-2", player)
+      convert_remote(player.cursor_stack, "spidertron-remote", "spidertron-remote-patrol", player)
     end
   end
 )
@@ -124,7 +124,7 @@ script.on_event(defines.events.on_player_configured_spider_remote,
     local player = game.get_player(event.player_index)
     local remote = player.cursor_stack
     local spidertron = event.vehicle
-    if remote.name == "spidertron-remote-patrol-2" then
+    if remote.name == "spidertron-remote-patrol" then
       -- We need to update the actual stored remote
       global.stored_remotes[remote.item_number][1].connected_entity = spidertron
     end
@@ -138,7 +138,7 @@ script.on_event("waypoints-disconnect-remote",
     if remote and remote.valid_for_read and remote.type == "spidertron-remote" then
       remote.connected_entity = nil
 
-      if remote.name == "spidertron-remote-patrol-2" then
+      if remote.name == "spidertron-remote-patrol" then
         -- We need to update the stored remote
         global.stored_remotes[remote.item_number][1].connected_entity = nil
       end

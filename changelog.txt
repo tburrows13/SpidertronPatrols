@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.3.1
-Date: ????
+Date: 1 September 2020
+  Changes:
+    - Increased thumbnail resolution by upscaling patrol remote icon
   Bugfixes:
     - Fixed shift-click to build ghost being overwritten
 ---------------------------------------------------------------------------------------------------

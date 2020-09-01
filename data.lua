@@ -1,8 +1,8 @@
 require 'shortcut'
 
 local patrol_remote = table.deepcopy(data.raw["spidertron-remote"]["spidertron-remote"])
-patrol_remote.name = "spidertron-remote-patrol-2"
-patrol_remote.icon = "__SpidertronWaypoints__/thumbnail.png"
+patrol_remote.name = "spidertron-remote-patrol"
+patrol_remote.icon = "__SpidertronWaypoints__/graphics/patrol-remote.png"
 patrol_remote.icon_mipmaps = 1
 
 --[[if settings.startup["spidertron-waypoints-use-patrol-remote"] == "always" then
