@@ -36,8 +36,8 @@ Recommendations
 Known Bugs / Limitations
 -----
 
-- Spidertron remotes cannot be placed in the quickbar whilst in patrol mode
-- Waypoint markers cannot be seen in map view (requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=76539&p=510027))
+- Spidertron remotes cannot be placed in the quickbar whilst in patrol mode (requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=88867) - coming in 1.1)
+- Waypoint markers cannot be seen in map view (requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=76539&p=510027) - no dev response)
 
 -----
 Future Updates

@@ -20,10 +20,6 @@ function contains_key(array, element, remove)
   return false
 end
 
-local on_spidertron_given_new_destination = script.generate_event_name()
-remote.add_interface("SpidertronWaypoints", {get_event_ids = function() return {on_spidertron_given_new_destination = on_spidertron_given_new_destination} end})
-
-
 function get_waypoint_info(spidertron)
   local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
   if not waypoint_info then
@@ -65,6 +61,11 @@ script.on_event("clear-spidertron-waypoints",
 )
 --script.on_event(player)
 
+local on_spidertron_given_new_destination = script.generate_event_name()
+remote.add_interface("SpidertronWaypoints", {get_event_ids = function() return {on_spidertron_given_new_destination = on_spidertron_given_new_destination} end,
+                                             clear_waypoints = function(unit_number) clear_spidertron_waypoints(nil, unit_number) end})
+
+
 function update_text(spidertron)
   -- Updates numbered text on ground for given spidertron
   local waypoint_info = get_waypoint_info(spidertron)
@@ -96,12 +97,26 @@ script.on_event(defines.events.on_player_used_spider_remote,
     local reg_id = script.register_on_entity_destroyed(spidertron)
     global.registered_spidertrons[reg_id] = spidertron.unit_number
 
+    local remote_name = player.cursor_stack.name
+    -- Clear waypoints if remote is different to usual
+    if waypoint_info.remote and waypoint_info.remote ~= remote_name then
+      clear_spidertron_waypoints(nil, spidertron.unit_number)  -- Prevents it from overwriting autopilot_destination
+      waypoint_info = get_waypoint_info(spidertron)  -- Resets back to empty
+      global.spidertron_on_patrol[spidertron.unit_number] = nil
+    end
+    waypoint_info.remote = remote_name
+
+
     if not player.is_shortcut_toggled("waypoints-patrol-mode") then
       if on_patrol or not player.is_shortcut_toggled("waypoints-waypoint-mode") then
         -- Clear all waypoints if we were previously patrolling or waypoints are off
         clear_spidertron_waypoints(nil, spidertron.unit_number)  -- Prevents it from overwriting autopilot_destination
-        waypoint_info = get_waypoint_info(spidertron)
+        waypoint_info = get_waypoint_info(spidertron)  -- Resets back to empty
         global.spidertron_on_patrol[spidertron.unit_number] = nil
+
+        -- We are not dealing with it, but we still need to pass on that 
+        script.raise_event(on_spidertron_given_new_destination, {player_index = player.index, vehicle = spidertron, position = event.position, success = true, remote = remote_name})
+
       end
       if #waypoint_info.positions > 0 or util.distance(spidertron.position, spidertron.autopilot_destination) > 5 then
         -- The spidertron has to be a suitable distance away, but only if this is the first (i.e. next) waypoint
@@ -111,7 +126,7 @@ script.on_event(defines.events.on_player_used_spider_remote,
         spidertron.autopilot_destination = waypoint_info.positions[1]
         if #waypoint_info.positions == 1 then
           -- The spidertron was not already walking towards a waypoint
-          script.raise_event(on_spidertron_given_new_destination, {player_index = 1, vehicle = spidertron, position = waypoint_info.positions[1], success = true})
+          script.raise_event(on_spidertron_given_new_destination, {player_index = player.index, vehicle = spidertron, position = waypoint_info.positions[1], success = true, remote = remote_name})
         end
         update_text(spidertron)
       end
@@ -133,10 +148,10 @@ function on_spidertron_reached_destination(spidertron, patrol_start)
   end
 
   if #waypoint_info.positions > 0 then
-    if util.distance(spidertron.position, waypoint_info.positions[1]) > 5 then  -- Remove all lines like this in 1.1
+    if util.distance(spidertron.position, waypoint_info.positions[1]) > 5 then  -- I can remove all lines like this in Factorio 1.1
       spidertron.autopilot_destination = waypoint_info.positions[1]
       -- The spidertron is now walking towards a new waypoint
-      script.raise_event(on_spidertron_given_new_destination, {player_index = 1, vehicle = spidertron, position = waypoint_info.positions[1], success = true})
+      script.raise_event(on_spidertron_given_new_destination, {player_index = 1, vehicle = spidertron, position = waypoint_info.positions[1], success = true, remote = waypoint_info.remote})
     end
   end
 
@@ -160,7 +175,7 @@ script.on_nth_tick(10,
         local on_patrol = global.spidertron_on_patrol[spidertron.unit_number]
         if #waypoint_queue > 0 then
           -- Check if we have arrived
-          if util.distance(spidertron.position, waypoint_queue[1]) < 2 then
+          if util.distance(spidertron.position, waypoint_queue[1]) < 5 then
             -- The spidertron has reached its destination
             on_spidertron_reached_destination(spidertron)
 

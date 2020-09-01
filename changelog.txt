@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.3.2
+Date: ????
+  Features:
+    - Added `event.remote` parameter to remote interface event `on_spidertron_given_new_destination`
+    - Added remote interface function `clear_waypoints()`
+  Bugfixes:
+    - Fixed `on_spidertron_given_new_destination` not always getting called
+    - [Not yet implemented] Fixed waypoints sometimes being lost if too many are placed close together
+---------------------------------------------------------------------------------------------------
 Version: 1.3.1
 Date: 1 September 2020
   Changes:
