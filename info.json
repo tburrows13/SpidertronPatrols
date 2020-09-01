@@ -1,9 +1,9 @@
 {
     "name": "SpidertronWaypoints",
-    "version": "1.2.1",
+    "version": "1.3.0",
     "title": "Spidertron Waypoints",
     "author": "Xorimuth",
     "description": "Have more control over your spidertrons by using waypoints and creating patrols!",
     "factorio_version": "1.0",
-    "dependencies": ["base >= 1.0", "! Spider_Control", "! SpidertronWeaponSwitcher"]
+    "dependencies": ["base >= 1.0", "! Spider_Control", "! SpidertronWeaponSwitcher", "! Disconnect-Remote"]
 }

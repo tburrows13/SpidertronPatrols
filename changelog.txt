@@ -1,6 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.3.0
+Date: 1 September 2020
+  Features:
+    - Alt + Click to disconnect the remote in your hand
+  Changes:
+    - Removed alternate patrol remote icon setting because the bug that was the reason behind it is fixed
+  Bugfixes:
+    - Fixed remotes being removed from quickbar when in patrol mode
+---------------------------------------------------------------------------------------------------
 Version: 1.2.1
-Date: 31 Augest 2020
+Date: 31 August 2020
   Features:
     - Added additional controls: right click and shift right click to toggle waypoint and patrol modes
 ---------------------------------------------------------------------------------------------------

@@ -29,24 +29,24 @@ Recommendations
 -----
 
 - *Shift + Scroll* controls are derived from **Blueprint book next** and **Blueprint book previous**. If you have rebound these controls, this mod's shift-scrolling will not work
-- Remove *Shift + Mouse wheel up* and *Shift + Mouse wheel down* from **Zoom in** and **Zoom out** controls
+- Remove *Shift + Mouse wheel up* and *Shift + Mouse wheel down* from **Zoom in** and **Zoom out** controls if you are using the *Shift + Scroll* controls
 - Use [Equipment Grid Logistic Module](https://mods.factorio.com/mod/EquipmentGridLogisticModule) to autofill your patrolling spidertrons
 
 -----
 Known Bugs / Limitations
 -----
 
-- Spidertron remotes are removed from the quickbar when they are switched to patrol remotes when **With patrol mode** is chosen in the startup settings (this setting can be changed at any time, but requires a game restart - likely can't be remedied with the current mod API)
+- Spidertron remotes cannot be placed in the quickbar whilst in patrol mode
 - Waypoint markers cannot be seen in map view (requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=76539&p=510027))
-
 
 -----
 Future Updates
 -----
 
 - Compatibility with [Spidertron squad control](https://mods.factorio.com/mod/Spider_Control) (you can follow the development of that [here](https://github.com/npc-strider/spidertron-squad-control/pull/1))
-- Allow pausing at certain waypoints
-- Better looking shortcut icons (help would be appreciated!)
+- Allow customisable wait time at waypoints
+- Allow waiting at waypoint until a condition is met (eg no weapons fired for x seconds, inventory not changed for y seconds)
+- Better looking shortcut icons and a new remote icon, either for non-patrol waypoints or non-patrol non-waypoints (help would be appreciated!)
 
 -----
 Mod Compatibility
@@ -66,4 +66,7 @@ if game.active_mods["SpidertronWaypoints"] then
 end
 ```
 
+-----
+
+Thank you to [Qon](https://mods.factorio.com/user/Qon) for all of his design feedback and input!
 Please let me know if you need help implementing this or if you need additional compatibility features.

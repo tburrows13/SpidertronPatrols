@@ -193,6 +193,7 @@ local function setup()
     global.spidertron_waypoints = {}
     global.spidertron_on_patrol = {}
     global.registered_spidertrons = {}
+    global.stored_remotes = {}
   end
 
 local function config_changed_setup(changed_data)
@@ -222,6 +223,10 @@ local function config_changed_setup(changed_data)
       global.registered_spidertrons = {}
       -- Clean up 1.1 bug
       rendering.clear("SpidertronWaypoints")
+    end
+    if old_version[2] < 4 then
+      --Run in >=1.3.0
+      global.stored_remotes = {}
     end
   end
 end
