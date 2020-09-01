@@ -17,7 +17,7 @@ data:extend({
     type = "custom-input",
     name = "clear-spidertron-waypoints",
     key_sequence = "SHIFT + mouse-button-1",
-    consuming = "game-only"
+    consuming = "none"
   },
   {
     type = "custom-input",
