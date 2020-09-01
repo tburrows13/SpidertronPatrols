@@ -52,8 +52,6 @@ Future Updates
 Mod Compatibility
 -----
 
-The only base game prototype modification is changing `icon` and `icon_mipmaps` for `spidertron-remote` depending on a startup setting.
-
 For compatibility with other mods that use `on_player_used_spider_remote`, this mod provides a remote interface. The new event `on_spidertron_given_new_destination` is raised when a spidertron has been given a new `autopilot_target`, and comes with an `event` table containing `player_index`, `vehicle`, `position`, and `success` (always set to true). Note that `event.player` does not exist. The following example should be placed in `on_init` and `on_load`:
 
 ```
@@ -66,7 +64,9 @@ if game.active_mods["SpidertronWaypoints"] then
 end
 ```
 
+Let me know if you need help implementing this or if you need additional compatibility features.
+
 -----
 
+Please leave feedback and bug reports in the mod discussion tab.
 Thank you to [Qon](https://mods.factorio.com/user/Qon) for all of his design feedback and input!
-Please let me know if you need help implementing this or if you need additional compatibility features.
