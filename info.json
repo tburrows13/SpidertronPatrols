@@ -5,5 +5,5 @@
     "author": "Xorimuth",
     "description": "Have more control over your spidertrons by using waypoints and creating patrols!",
     "factorio_version": "1.0",
-    "dependencies": ["base >= 1.0", "! SpidertronWeaponSwitcher", "! Disconnect-Remote"]
+    "dependencies": ["base >= 1.0", "! SpidertronWeaponSwitcher", "! Disconnect-Remote", "! Spider_Control"]
 }

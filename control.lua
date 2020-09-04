@@ -106,9 +106,8 @@ script.on_event(defines.events.on_player_used_spider_remote,
     end
     waypoint_info.remote = remote_name
 
-
-    if not player.is_shortcut_toggled("waypoints-patrol-mode") then
-      if on_patrol or not player.is_shortcut_toggled("waypoints-waypoint-mode") then
+    if not player.is_shortcut_toggled("spidertron-remote-patrol") then
+      if on_patrol or not player.is_shortcut_toggled("spidertron-remote-waypoint") then
         -- Clear all waypoints if we were previously patrolling or waypoints are off
         clear_spidertron_waypoints(nil, spidertron.unit_number)  -- Prevents it from overwriting autopilot_destination
         waypoint_info = get_waypoint_info(spidertron)  -- Resets back to empty
@@ -203,6 +202,16 @@ script.on_event(defines.events.on_entity_destroyed,
   end
 )
 
+local function settings_changed()
+  global.scroll_modes = {"spidertron-remote"}
+  if settings.global["spidertron-waypoints-include-waypoint"].value then
+    table.insert(global.scroll_modes, "spidertron-remote-waypoint")
+  end
+  if settings.global["spidertron-waypoints-include-patrol"].value then
+    table.insert(global.scroll_modes, "spidertron-remote-patrol")
+  end
+end
+script.on_event(defines.events.on_runtime_mod_setting_changed, settings_changed)
 
 local function setup()
     global.spidertron_waypoints = {}
@@ -227,11 +236,9 @@ local function config_changed_setup(changed_data)
     old_version[i] = tonumber(old_version[i])
   end
 
+  global.spidertron_on_patrol = global.spidertron_on_patrol or {}
+  global.stored_remotes = global.stored_remotes or {}
   if old_version[1] == 1 then
-    if old_version[2] < 1 then
-      -- Run in >=1.1
-      global.spidertron_on_patrol = {}
-    end
     if old_version[2] < 2 then
       log("Running pre 1.2 migration")
       -- Run in >=1.2
@@ -239,11 +246,9 @@ local function config_changed_setup(changed_data)
       -- Clean up 1.1 bug
       rendering.clear("SpidertronWaypoints")
     end
-    if old_version[2] < 4 then
-      --Run in >=1.3.0
-      global.stored_remotes = {}
-    end
   end
+
+  settings_changed()
 end
 
 script.on_init(setup)

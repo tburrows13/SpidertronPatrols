@@ -1,12 +1,16 @@
 ---------------------------------------------------------------------------------------------------
-Version: 1.3.2
+Version: 1.4.0
 Date: ????
   Features:
+    - Major control rework - go to Settings > Controls > Mods to see the different control options
+    - New setting to allow removal of waypoint and/or patrol mode from the 
     - Added `event.remote` parameter to remote interface event `on_spidertron_given_new_destination`
     - Added remote interface function `clear_waypoints()`
+  Changes:
+    - Waypoint shortcut now toggles off when patrol shortcut is toggled on (this makes no functional difference)
   Bugfixes:
-    - Fixed `on_spidertron_given_new_destination` not always getting called
-    - [Not yet implemented] Fixed waypoints sometimes being lost if too many are placed close together
+    - Fixed remote interface `on_spidertron_given_new_destination` not always getting called
+    - Reduced chance of waypoints sometimes being lost if too many are placed close together
 ---------------------------------------------------------------------------------------------------
 Version: 1.3.1
 Date: 1 September 2020
