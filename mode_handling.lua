@@ -208,29 +208,3 @@ script.on_event("waypoints-disconnect-remote",
     end
   end
 )
-
-
-function on_player_used_patrol_remote(player, spidertron, position)
-  if global.spidertron_on_patrol[spidertron.unit_number] ~= "setup" then
-    clear_spidertron_waypoints(spidertron)
-    global.spidertron_on_patrol[spidertron.unit_number] = "setup"
-    on_patrol = true
-  end
-  local waypoint_info = get_waypoint_info(spidertron)
-  log("Player used patrol remote on position " .. util.positiontostr(position))
-  -- Check to see if the new position is close to the first position
-  local start_position = waypoint_info.positions[1]
-  if start_position and util.distance(position, start_position) < 5 then
-    -- Loop is complete
-    waypoint_info.positions[1] = start_position
-    rendering.destroy(waypoint_info.render_ids[1])
-    waypoint_info.render_ids[1] = nil
-    on_spidertron_reached_destination(spidertron, true)
-    global.spidertron_on_patrol[spidertron.unit_number] = "patrol"
-    log("Loop complete")
-  else
-    table.insert(waypoint_info.positions, position)
-    spidertron.autopilot_destination = nil
-  end
-  update_text(spidertron)  -- Inserts text at the position that we have just added
-end

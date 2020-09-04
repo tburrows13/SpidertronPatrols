@@ -1,24 +1,6 @@
 require "util"
-
-function contains(array, element, remove)
-  for i, value in pairs(array) do
-    if value == element then
-      if remove then table.remove(array, i) end
-      return true
-    end
-  end
-  return false
-end
-
-function contains_key(array, element, remove)
-  for key, _ in pairs(array) do
-    if key == element then
-      if remove then table.remove(array, key) end
-      return true
-    end
-  end
-  return false
-end
+require "utils"
+require "mode_handling"
 
 function get_waypoint_info(spidertron)
   local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
@@ -84,7 +66,6 @@ function update_text(spidertron)
   end
 end
 
-require 'patrol'
 script.on_event(defines.events.on_player_used_spider_remote,
   function(event)
     local player = game.get_player(event.player_index)
@@ -131,7 +112,29 @@ script.on_event(defines.events.on_player_used_spider_remote,
       end
 
     else
-      on_player_used_patrol_remote(player, spidertron, position)
+      -- We are in patrol mode
+      if global.spidertron_on_patrol[spidertron.unit_number] ~= "setup" then
+        clear_spidertron_waypoints(spidertron)
+        global.spidertron_on_patrol[spidertron.unit_number] = "setup"
+        on_patrol = true
+      end
+      log("Player used patrol remote on position " .. util.positiontostr(position))
+      -- Check to see if the new position is close to the first position
+      local start_position = waypoint_info.positions[1]
+      if start_position and util.distance(position, start_position) < 5 then
+        -- Loop is complete
+        waypoint_info.positions[1] = start_position
+        rendering.destroy(waypoint_info.render_ids[1])
+        waypoint_info.render_ids[1] = nil
+        on_spidertron_reached_destination(spidertron, true)
+        global.spidertron_on_patrol[spidertron.unit_number] = "patrol"
+        log("Loop complete")
+      else
+        -- Add to patrol
+        table.insert(waypoint_info.positions, position)
+        spidertron.autopilot_destination = nil
+      end
+      update_text(spidertron)  -- Inserts text at the position that we have just added
     end
   end
 )
