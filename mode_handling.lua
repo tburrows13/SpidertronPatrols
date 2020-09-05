@@ -1,5 +1,7 @@
 
---[[local function get_previous_quickbar(player)
+--[[
+-- Re-enable in Factorio 1.1  
+local function get_previous_quickbar(player)
   local quickbar_slots = {}
   for i = 1, 100 do
     quickbar_slots[i] = player.get_quick_bar_slot(i)
@@ -14,14 +16,8 @@ local function fill_in_quickbar(player, previous_quickbar, new_stack)
       player.set_quick_bar_slot(i, new_stack)
     end
   end
-end]]
-
-
---[[local function settings_changed()
-  global.use_patrol_remote = settings.startup["spidertron-waypoints-use-patrol-remote"].value
-
 end
-script.on_event(defines.events.on_runtime_mod_setting_changed, settings_changed)]]
+]]
 
 local function convert_remote(stack, new_name)
   if stack and stack.valid_for_read and stack.name ~= new_name then
