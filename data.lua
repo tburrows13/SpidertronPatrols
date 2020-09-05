@@ -41,13 +41,26 @@ data:extend({
   {
     type = "custom-input",
     name = "waypoints-disconnect-remote",
-    key_sequence = "ALT + mouse-button-1",
+    key_sequence = "CONTROL + mouse-button-1",
     consuming = "none",
     order = "ab"
+  },
+  {
+    type = "custom-input",
+    name = "waypoints-change-wait-conditions",
+    key_sequence = "Y",
+    consuming = "none",
+    order = "ac"
   },
   waypoint_remote,
   patrol_remote,
   direct_control,
   waypoint_control,
-  patrol_control
+  patrol_control,
+  {
+    type = "custom-input",
+    name = "waypoints-gui-confirm",
+    key_sequence = "RETURN",
+    order = "ad"
+  },
 })

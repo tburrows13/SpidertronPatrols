@@ -2,12 +2,14 @@
 Version: 1.4.0
 Date: ????
   Features:
-    - Major control rework - go to Settings > Controls > Mods to see the different control options
-    - New setting to allow removal of waypoint and/or patrol mode from the 
-    - Added `event.remote` parameter to remote interface event `on_spidertron_given_new_destination`
-    - Added remote interface function `clear_waypoints()`
+    - Configure wait duration for a waypoint after placing it by pressing Y
+    - Major controls rework - go to Settings > Controls > Mods to see the different control options
+    - New setting to allow removal of waypoint and/or patrol mode from the remote cycle
   Changes:
     - Waypoint shortcut now toggles off when patrol shortcut is toggled on (this makes no functional difference)
+  Remote Interface:
+    - Added `event.remote` parameter to remote interface event `on_spidertron_given_new_destination`
+    - Added remote interface function `clear_waypoints()`
   Bugfixes:
     - Fixed remote interface `on_spidertron_given_new_destination` not always getting called
     - Reduced chance of waypoints sometimes being lost if too many are placed close together
