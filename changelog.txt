@@ -1,6 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.4.1
+Date: 5 September 2020
+  Bugfixes:
+    - Fixed crash when shift-scrolling through a blueprint book
+---------------------------------------------------------------------------------------------------
 Version: 1.4.0
-Date: ????
+Date: 5 September 2020
   Features:
     - Configure wait duration for a waypoint after placing it by pressing Y
     - Major controls rework - go to Settings > Controls > Mods to see the different control options

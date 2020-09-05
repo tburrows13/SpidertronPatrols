@@ -1,6 +1,6 @@
 
 --[[
--- Re-enable in Factorio 1.1  
+-- Re-enable in Factorio 1.1
 local function get_previous_quickbar(player)
   local quickbar_slots = {}
   for i = 1, 100 do
@@ -13,7 +13,7 @@ local function fill_in_quickbar(player, previous_quickbar, new_stack)
   for i = 1, 100 do
     if previous_quickbar[i] and not player.get_quick_bar_slot(i) then
       -- The quickbar filter has been lost since last check, therefore it contained the replaced item
-      player.set_quick_bar_slot(i, new_stack)
+      player.set_quick_bar_slot(i, new_stack)  -- This line doesn't work in 1.0 because it doesn't keep new_stack.item_number
     end
   end
 end
@@ -121,24 +121,26 @@ end
 local function on_mode_scrolled(player_index, direction)
   local player = game.get_player(player_index)
   local stack = player.cursor_stack
+  if stack and stack.valid_for_read and stack.type == "spidertron-remote" then
 
-  local modes = global.scroll_modes
-  if #modes == 1 then
-    return
-  end
-  for i, mode in pairs(modes) do
-    if mode == stack.name then
-      index = i
-      break
+    local modes = global.scroll_modes
+    if #modes == 1 then
+      return
     end
-  end
-  if index then
-    local offset
-    -- Strange offsets because of 1-indexing
-    if direction == "forwards" then offset = 0 else offset = -2 end
-    local next_index = (index + offset) % #modes + 1
-    local next_mode = modes[next_index]
-    switch_to_mode(player_index, next_mode)
+    for i, mode in pairs(modes) do
+      if mode == stack.name then
+        index = i
+        break
+      end
+    end
+    if index then
+      local offset
+      -- Strange offsets because of 1-indexing
+      if direction == "forwards" then offset = 0 else offset = -2 end
+      local next_index = (index + offset) % #modes + 1
+      local next_mode = modes[next_index]
+      switch_to_mode(player_index, next_mode)
+    end
   end
 end
 script.on_event("waypoints-mode-scroll-forwards", function(event) on_mode_scrolled(event.player_index, "forwards") end)
