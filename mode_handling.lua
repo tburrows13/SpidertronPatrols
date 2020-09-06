@@ -87,7 +87,7 @@ local function switch_to_mode(player_index, mode, toggle)
   end
 
   convert_remote(stack, mode)
-
+  log("Player " .. player.name .. " switching to mode " .. mode)
   if mode == "spidertron-remote-waypoint" then
     player.set_shortcut_toggled("spidertron-remote-waypoint", true)
     player.set_shortcut_toggled("spidertron-remote-patrol", false)

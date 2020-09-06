@@ -39,6 +39,7 @@ global.last_wait_time: indexed by player.index
 function get_waypoint_info(spidertron)
   local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
   if not waypoint_info then
+    log("No waypoint info found. Creating blank table")
     global.spidertron_waypoints[spidertron.unit_number] = {spidertron = spidertron, waypoints = {}, render_ids = {}}  -- Entity, list of positions, list of render ids
     waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
   end
@@ -147,6 +148,7 @@ local function save_and_exit_gui(player, gui_elements)
 
   -- Set last waypoint's wait time to wait_time
   local waypoint = gui_elements.waypoint
+  log("Wait time set to " .. wait_time .. " at position " .. util.positiontostr(waypoint.position))
   waypoint.wait_time = tonumber(wait_time)
   global.last_wait_times[player.index] = wait_time
 end
@@ -252,7 +254,7 @@ script.on_event(defines.events.on_player_used_spider_remote,
       end
       if #waypoint_info.waypoints > 0 or util.distance(spidertron.position, spidertron.autopilot_destination) > 5 then
         -- The spidertron has to be a suitable distance away, but only if this is the first (i.e. next) waypoint
-        log("Player used remote on position " .. util.positiontostr(position))
+        log("Player used " .. remote_name .. " on position " .. util.positiontostr(position))
         table.insert(waypoint_info.waypoints, {position = position, wait_time = 0})
         --table.insert(waypoint_info.render_ids, false)  -- Will be handled by update_text
         spidertron.autopilot_destination = waypoint_info.waypoints[1].position
@@ -338,11 +340,11 @@ local function on_nth_tick(event)
     local spidertron = waypoint_info.spidertron
     local waypoint_queue = waypoint_info.waypoints
     if spidertron and spidertron.valid and not global.spidertrons_waiting[spidertron.unit_number] then
-      if #waypoint_queue > 0 then
-        local on_patrol = global.spidertron_on_patrol[spidertron.unit_number]
+      local on_patrol = global.spidertron_on_patrol[spidertron.unit_number]
+      if on_patrol ~= "setup" and #waypoint_queue > 0 then
         -- Check if we have arrived
         if util.distance(spidertron.position, waypoint_queue[1].position) < 5 then
-          -- The spidertron has reached its destination
+          -- The spidertron has reached its destination (if we aren't in patrol mode or we are but not in setup)
           local wait_time = waypoint_queue[1].wait_time
           if wait_time and wait_time > 0 then
             -- Add to wait queue
@@ -353,7 +355,7 @@ local function on_nth_tick(event)
 
         -- Check if we need to clear the queue because something has cancelled the current autopilot_destination
         -- Note that queue is only cleared when not within 2 tiles of destination
-        elseif on_patrol ~= "setup" and not spidertron.autopilot_destination then
+        elseif not spidertron.autopilot_destination then
           clear_spidertron_waypoints(spidertron)
         end
       end
