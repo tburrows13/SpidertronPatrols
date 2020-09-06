@@ -58,13 +58,13 @@ local scroll_backwards = {
 local scroll_forwards_key = {
   type = "custom-input",
   name = "waypoints-mode-scroll-forwards-key",
-  key_sequence = "",
+  key_sequence = "-",
   order="ba"
 }
 local scroll_backwards_key = {
   type = "custom-input",
   name = "waypoints-mode-scroll-backwards-key",
-  key_sequence = "",
+  key_sequence = "+",
   order="bb"
 }
 

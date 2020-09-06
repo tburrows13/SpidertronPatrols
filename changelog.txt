@@ -1,6 +1,9 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.4.2
 Date: 6 September 2020
+  Features:
+    - Alt + Click to complete a patrol assignment (as an alternative to reclicking on the first patrol waypoint again)
+    - Cycle forwards and backwards through remotes given default keys '+' and '-'
   Bugfixes:
     - Fixed weird behaviour and crash when starting patrol at the spidertron's location
     - Fixed interrupting a wait time would cause the spidertron to wait at the next waypoint instead
@@ -35,7 +38,7 @@ Date: 1 September 2020
 Version: 1.3.0
 Date: 1 September 2020
   Features:
-    - Alt + Click to disconnect the remote in your hand
+    - Control + Click to disconnect the remote in your hand
   Changes:
     - Removed alternate patrol remote icon setting because the bug that was the reason behind it is fixed
   Bugfixes:

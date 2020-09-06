@@ -16,13 +16,13 @@ Patrols
 Features
 -----
 
-- In waypoint mode, *click* with the spidertron remote to add a waypoint
-- In patrol mode, *click* to mark the position sequence, *click* on the **1** to finish the sequence and the spidertron will start following it
+- In waypoint mode, *Click* with the spidertron remote to add a waypoint
+- In patrol mode, *Click* to mark the position sequence, *Click* on the **1** or *Alt + Click* to finish the sequence and the spidertron will start following it
 - Press *Y* after placing a waypoint to set the wait duration for it
 - *Shift + Click* whilst holding a spidertron remote to clear all waypoints for that spidertron
 - *Control + Click* whilst holding a spidertron remote to disconnect it from its spidertron
 - Switch to direct, waypoint and patrol modes with *Shift + F*, *Shift + C*, *Shift + X* respectively (notice the 'circle' that they make around *WASD*!)
-- Cycle through all 3 modes with *Shift + Scroll* or configure your own hotkeys (you can remove modes from this cycle in the mod settings)
+- Cycle through all 3 modes with *Shift + Scroll* or *+* and *-* (you can remove modes from this cycle in the mod settings)
 - Enable the shortcuts in the shortcut bar to switch modes by mouse and easily view which mode is active
 - Thank you to [danatron1](https://www.reddit.com/r/factorio/comments/iitlvi/i_made_a_mod_that_allows_you_to_set_waypoints/g3dzt1h) for creating the patrol remote icon (which also doubles up as a cool thumbnail!)
 

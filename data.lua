@@ -47,10 +47,17 @@ data:extend({
   },
   {
     type = "custom-input",
+    name = "waypoints-complete-patrol",
+    key_sequence = "ALT + mouse-button-1",
+    consuming = "none",
+    order = "ac"
+  },
+  {
+    type = "custom-input",
     name = "waypoints-change-wait-conditions",
     key_sequence = "Y",
     consuming = "none",
-    order = "ac"
+    order = "ad"
   },
   waypoint_remote,
   patrol_remote,
@@ -61,6 +68,6 @@ data:extend({
     type = "custom-input",
     name = "waypoints-gui-confirm",
     key_sequence = "RETURN",
-    order = "ad"
+    order = "ae"
   },
 })

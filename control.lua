@@ -220,6 +220,31 @@ function update_text(spidertron)
   end
 end
 
+local function complete_patrol(spidertron)
+  -- Called when '1' clicked with the patrol remote or on ALT + Click
+  on_spidertron_reached_destination(spidertron, true)
+  global.spidertron_on_patrol[spidertron.unit_number] = "patrol"
+  log("Loop completed")
+end
+
+script.on_event("waypoints-complete-patrol",
+  function(event)
+    local player = game.get_player(event.player_index)
+    local remote = player.cursor_stack
+    if remote and remote.valid_for_read and remote.name == "spidertron-remote-patrol" then
+      local spidertron = remote.connected_entity
+      if spidertron then
+        local on_patrol = global.spidertron_on_patrol[spidertron.unit_number]
+        local waypoint_info = get_waypoint_info(spidertron)
+        if on_patrol and on_patrol == "setup" and waypoint_info.waypoints[1] then
+          -- We need to be in setup and there needs to be at least one waypoint
+          complete_patrol(spidertron)
+        end
+      end
+    end
+  end
+)
+
 local function on_player_used_spider_remote() end  -- For VSCode outline purposes
 script.on_event(defines.events.on_player_used_spider_remote,
   function(event)
@@ -282,9 +307,7 @@ script.on_event(defines.events.on_player_used_spider_remote,
         --waypoint_info.waypoints[1].position = start_position
         --rendering.destroy(waypoint_info.render_ids[1])
         --waypoint_info.render_ids[1] = nil
-        on_spidertron_reached_destination(spidertron, true)
-        global.spidertron_on_patrol[spidertron.unit_number] = "patrol"
-        log("Loop complete")
+        complete_patrol(spidertron)
       else
         -- Add to patrol
         table.insert(waypoint_info.waypoints, {position = position, wait_time = 0})
