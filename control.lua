@@ -62,6 +62,7 @@ function clear_spidertron_waypoints(spidertron, unit_number)
   end
   if spidertron then spidertron.autopilot_destination = nil end
   global.spidertron_waypoints[unit_number] = nil
+  global.spidertrons_waiting[unit_number] = nil
 end
 
 script.on_event("clear-spidertron-waypoints",
@@ -335,7 +336,7 @@ end
 script.on_nth_tick(60, handle_wait_timers)
 
 
-local function on_nth_tick(event)
+local function on_nth_tick()
   for _, waypoint_info in pairs(global.spidertron_waypoints) do
     local spidertron = waypoint_info.spidertron
     local waypoint_queue = waypoint_info.waypoints
