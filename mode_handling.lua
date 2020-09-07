@@ -73,6 +73,8 @@ end
 
 local function switch_to_mode(player_index, mode, toggle)
   -- Toggle the shortcuts
+  if not contains({"spidertron-remote", "spidertron-remote-waypoint", "spidertron-remote-patrol"}, mode) then return end
+
   local player = game.get_player(player_index)
   local stack = player.cursor_stack
 
