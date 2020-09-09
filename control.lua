@@ -59,6 +59,9 @@ function clear_spidertron_waypoints(spidertron, unit_number)
   log("Clearing spidertron waypoints for unit number " .. unit_number)
   for i, render_id in pairs(waypoint_info.render_ids) do
     rendering.destroy(render_id)
+    if global.sub_render_ids[render_id] then
+      rendering.destroy(global.sub_render_ids[render_id])
+    end
   end
   if spidertron then spidertron.autopilot_destination = nil end
   global.spidertron_waypoints[unit_number] = nil
@@ -77,6 +80,60 @@ script.on_event("clear-spidertron-waypoints",
     end
   end
 )
+
+function generate_sub_text(waypoint, spidertron)
+  local wait_data = global.spidertrons_waiting[spidertron.unit_number]
+
+  if waypoint.wait_time and waypoint.wait_time > 0 then
+    local string = tostring(waypoint.wait_time) .. "s"
+    if wait_data and wait_data.waypoint == waypoint then
+      string = tostring(wait_data.wait_time) .. "/" .. string
+    end
+    return string
+  end
+end
+
+function update_sub_text(waypoint, parent_render_id, spidertron)
+  -- TODO check if parent_render_id is valid
+  local render_id = global.sub_render_ids[parent_render_id]
+  local intended_text = generate_sub_text(waypoint, spidertron)
+  if render_id and rendering.is_valid(render_id) then
+    -- Check if we need to update it
+    local current_text = rendering.get_text(render_id)
+    if current_text ~= intended_text then
+      if intended_text then
+        rendering.set_text(render_id, intended_text)
+      else
+        rendering.destroy(render_id)
+      end
+    end
+  elseif intended_text then
+    -- Create new text
+    render_id = rendering.draw_text{text = intended_text, surface = spidertron.surface, target = {waypoint.position.x, waypoint.position.y+0.5}, color = spidertron.color, scale = 2, alignment = "center"}
+    global.sub_render_ids[parent_render_id] = render_id
+  end
+end
+
+function update_text(spidertron)
+  -- Updates numbered text on ground for given spidertron
+  local waypoint_info = get_waypoint_info(spidertron)
+  -- Re-render all waypoints
+  for i, waypoint in pairs(waypoint_info.waypoints) do
+    local render_id = waypoint_info.render_ids[i]
+    if render_id and rendering.is_valid(render_id) then
+      if rendering.get_text(render_id) ~= tostring(i) then
+        -- Only update text
+        rendering.set_text(render_id, i)
+      end
+    else
+      -- We need to create the text
+      render_id = rendering.draw_text{text = tostring(i), surface = spidertron.surface, target = {waypoint.position.x, waypoint.position.y - 1.2}, color = spidertron.color, scale = 4, alignment = "center"}
+      waypoint_info.render_ids[i] = render_id
+    end
+    update_sub_text(waypoint, render_id, spidertron)
+  end
+end
+
 
 script.on_event("waypoints-change-wait-conditions",
   function(event)
@@ -109,6 +166,7 @@ script.on_event("waypoints-change-wait-conditions",
           gui_elements.frame = frame
 
           gui_elements.waypoint = waypoint_info.waypoints[#waypoint_info.waypoints]
+          gui_elements.spidertron = waypoint_info.spidertron
           global.selection_gui[player.index] = gui_elements
 
           player.opened = frame
@@ -152,6 +210,9 @@ local function save_and_exit_gui(player, gui_elements)
   log("Wait time set to " .. wait_time .. " at position " .. util.positiontostr(waypoint.position))
   waypoint.wait_time = tonumber(wait_time)
   global.last_wait_times[player.index] = wait_time
+  if gui_elements.spidertron then  -- if condition for guis created in 1.4.3
+    update_text(gui_elements.spidertron)
+  end
 end
 
 script.on_event(defines.events.on_gui_click,
@@ -201,24 +262,6 @@ local on_spidertron_given_new_destination = script.generate_event_name()
 remote.add_interface("SpidertronWaypoints", {get_event_ids = function() return {on_spidertron_given_new_destination = on_spidertron_given_new_destination} end,
                                              clear_waypoints = function(unit_number) clear_spidertron_waypoints(nil, unit_number) end})
 
-
-function update_text(spidertron)
-  -- Updates numbered text on ground for given spidertron
-  local waypoint_info = get_waypoint_info(spidertron)
-  -- Re-render all waypoints
-  for i, waypoint in pairs(waypoint_info.waypoints) do
-    local render_id = waypoint_info.render_ids[i]
-    if render_id and rendering.is_valid(render_id) then
-        if rendering.get_text(render_id) ~= i then
-          -- Only update text
-          rendering.set_text(render_id, i)
-        end
-    else
-      -- We need to create the text
-      waypoint_info.render_ids[i] = rendering.draw_text{text = tostring(i), surface = spidertron.surface, target = {waypoint.position.x, waypoint.position.y - 1.2}, color = spidertron.color, scale = 4, alignment = "center", time_to_live = 99999999}
-    end
-  end
-end
 
 local function complete_patrol(spidertron)
   -- Called when '1' clicked with the patrol remote or on ALT + Click
@@ -326,6 +369,7 @@ function on_spidertron_reached_destination(spidertron, patrol_start)
   local removed_waypoint
   if not patrol_start then
     removed_waypoint = table.remove(waypoint_info.waypoints, 1)
+    removed_render_id = table.remove(waypoint_info.render_ids, 1)
   end
 
   if #waypoint_info.waypoints > 0 then
@@ -339,21 +383,25 @@ function on_spidertron_reached_destination(spidertron, patrol_start)
   if on_patrol and not patrol_start then
     -- Add reached position to the back of the queue
     table.insert(waypoint_info.waypoints, removed_waypoint)
+    table.insert(waypoint_info.render_ids, removed_render_id)
   elseif not on_patrol then
-    local render_id = table.remove(waypoint_info.render_ids, 1)
-    rendering.destroy(render_id)
+    rendering.destroy(removed_render_id)
+    if global.sub_render_ids[removed_render_id] then
+      rendering.destroy(global.sub_render_ids[removed_render_id])
+    end
   end
   update_text(spidertron)
 end
 
 function handle_wait_timers()
   for unit_number, wait_data in pairs(global.spidertrons_waiting) do
-    if wait_data.wait_time < 0 then
+    if wait_data.wait_time <= 1 then
       on_spidertron_reached_destination(wait_data.spidertron)
       global.spidertrons_waiting[unit_number] = nil
     else
       wait_data.wait_time = wait_data.wait_time - 1
     end
+    update_text(wait_data.spidertron)
   end
 end
 script.on_nth_tick(60, handle_wait_timers)
@@ -372,7 +420,8 @@ local function on_nth_tick()
           local wait_time = waypoint_queue[1].wait_time
           if wait_time and wait_time > 0 then
             -- Add to wait queue
-            global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time}
+            global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time, waypoint = waypoint_queue[1]}
+            update_text(spidertron)
           else
             on_spidertron_reached_destination(spidertron)
           end
@@ -420,6 +469,7 @@ local function setup()
     global.selection_gui = {}
     global.last_wait_times = {}
     global.spidertrons_waiting = {}
+    global.sub_render_ids = {}
     settings_changed()
   end
 
@@ -444,6 +494,7 @@ local function config_changed_setup(changed_data)
   global.selection_gui = global.selection_gui or {}
   global.last_wait_times = global.last_wait_times or {}
   global.spidertrons_waiting = global.spidertrons_waiting or {}
+  global.sub_render_ids = global.sub_render_ids or {}
   if old_version[1] == 1 then
     if old_version[2] < 2 then
       log("Running pre 1.2 migration")

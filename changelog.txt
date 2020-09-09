@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.5.0
+Date: 9 September 2020
+  Features:
+    - Now shows total and remaining wait time under each waypoint
+---------------------------------------------------------------------------------------------------
 Version: 1.4.3
 Date: 7 September 2020
   Bugfixes:

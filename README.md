@@ -45,11 +45,9 @@ Known Bugs / Limitations
 Future Updates
 -----
 
-- Show total and remaining wait time under each waypoint
 - Allow waiting at waypoint until a condition is met (eg no weapons fired for x seconds, inventory not changed for y seconds)
-- *Alt + Click* to complete patrol setup (as an alternative to clicking on **1**)
 - Compatibility with [Spidertron squad control](https://mods.factorio.com/mod/Spider_Control) (you can follow the development of that [here](https://github.com/npc-strider/spidertron-squad-control/pull/2))
-- New waypoint remote icon and better looking shortcut icons (help would be appreciated!)
+- New waypoint remote icon and better looking shortcut icons (help would be appreciated - I have no graphic skills!)
 - Improved remote interface that allows other mods to send a spidertron and a list of waypoints for it to visit
 
 -----

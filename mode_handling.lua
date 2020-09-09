@@ -129,6 +129,7 @@ local function on_mode_scrolled(player_index, direction)
     if #modes == 1 then
       return
     end
+    local index
     for i, mode in pairs(modes) do
       if mode == stack.name then
         index = i
