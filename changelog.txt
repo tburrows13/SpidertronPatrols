@@ -3,6 +3,7 @@ Version: 1.5.0
 Date: 9 September 2020
   Features:
     - Now shows total and remaining wait time under each waypoint
+    - New modding remote interface (see readme for documentation)
 ---------------------------------------------------------------------------------------------------
 Version: 1.4.3
 Date: 7 September 2020
@@ -29,11 +30,10 @@ Date: 5 September 2020
     - Configure wait duration for a waypoint after placing it by pressing Y
     - Major controls rework - go to Settings > Controls > Mods to see the different control options
     - New setting to allow removal of waypoint and/or patrol mode from the remote cycle
-  Changes:
-    - Waypoint shortcut now toggles off when patrol shortcut is toggled on (this makes no functional difference)
-  Remote Interface:
     - Added `event.remote` parameter to remote interface event `on_spidertron_given_new_destination`
     - Added remote interface function `clear_waypoints()`
+  Changes:
+    - Waypoint shortcut now toggles off when patrol shortcut is toggled on (this makes no functional difference)
   Bugfixes:
     - Fixed remote interface `on_spidertron_given_new_destination` not always getting called
     - Reduced chance of waypoints sometimes being lost if too many are placed close together
