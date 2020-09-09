@@ -66,15 +66,17 @@ if game.active_mods["SpidertronWaypoints"] then
 end
 ```
 
-Additionally, there are remote functions that allow other mods to use waypoints and patrols
+
+Additionally, there are remote functions that allow other mods to use waypoints and patrols:
 
 `clear_waypoints(unit_number)`
 Clears all waypoints for the spidertron associated with `unit_number`
 
 `assign_waypoints(spidertron, waypoints)`
+Sends the spidertron to each waypoint sequentially
 Parameters
-    spidertron :: LuaEntity
-    waypoints :: table with keys position (Position) and wait_time (int)
+`spidertron` :: LuaEntity
+`waypoints` :: array of tables with keys `position` (Position) and `wait_time` (int)
 
 `assign_patrol(spidertron, waypoints)`
 Same as `assign_waypoints`, but creates and starts a persistent patrol
