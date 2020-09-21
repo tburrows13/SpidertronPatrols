@@ -460,7 +460,6 @@ script.on_event(defines.events.on_entity_destroyed,
   function(event)
     local unit_number = event.unit_number
     local reg_id = event.registration_number
-    log("Entity destroyed with unit number " .. unit_number)
     if contains_key(global.registered_spidertrons, reg_id, true) then
       log("Clearing spidertron waypoints")
       clear_spidertron_waypoints(nil, unit_number)
