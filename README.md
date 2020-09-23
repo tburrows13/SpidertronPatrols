@@ -12,6 +12,10 @@ Patrols
 -----
 ![Patrols gif](https://i.imgur.com/leZ8QTK.gif)
 
+You can see Xterminator's Mod Spotlight here:
+
+[![Xterminator Mod Spotlight](https://img.youtube.com/vi/RggwfbKXqoQ/0.jpg)](https://www.youtube.com/watch?v=RggwfbKXqoQ)
+
 -----
 Features
 -----
@@ -57,7 +61,7 @@ For compatibility with other mods that use `on_player_used_spider_remote`, this 
 
 ```
 if game.active_mods["SpidertronWaypoints"] then
-    local event_ids = remote.call("SpidertronWaypoints", "get_event_ids")
+    local event_ids = remote.call("SpidertronWaypoints", "get_events")
     local on_spidertron_given_new_destination = event_ids.on_spidertron_given_new_destination
     script.on_event(on_spidertron_given_new_destination, function(event)
         -- Do stuff here instead of in `on_player_used_spider_remote`
