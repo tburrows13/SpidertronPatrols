@@ -5,6 +5,8 @@ Date: 23 September 2020
     - Compatible with Spidertron Weapon Switcher
   Changes:
     - Remote interface `get_event_ids` renamed to `get_events`
+  Bugfixes:
+    - Removed logging when any entity is destroyed
 ---------------------------------------------------------------------------------------------------
 Version: 1.5.0
 Date: 9 September 2020
