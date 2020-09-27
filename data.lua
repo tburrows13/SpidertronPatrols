@@ -2,12 +2,14 @@ require 'shortcut'
 
 local waypoint_remote = table.deepcopy(data.raw["spidertron-remote"]["spidertron-remote"])
 waypoint_remote.name = "spidertron-remote-waypoint"
+waypoint_remote.flags = {"hidden"}
 waypoint_remote.icon = nil
 waypoint_remote.icons = {{icon = "__base__/graphics/icons/spidertron-remote.png", tint = {r=0.5, g=0.5, b=0.9}}}
 
 
 local patrol_remote = table.deepcopy(data.raw["spidertron-remote"]["spidertron-remote"])
 patrol_remote.name = "spidertron-remote-patrol"
+patrol_remote.flags = {"hidden"}
 patrol_remote.icon = "__SpidertronWaypoints__/graphics/patrol-remote.png"
 patrol_remote.icon_mipmaps = 1
 
