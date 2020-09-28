@@ -90,6 +90,9 @@ function generate_sub_text(waypoint, spidertron)
     if wait_data and wait_data.waypoint == waypoint then
       string = tostring(wait_data.wait_time) .. "/" .. string
     end
+    if waypoint.wait_type and waypoint.wait_type == "right" then
+      string = string .. " inactivity"
+    end
     return string
   end
 end
@@ -140,7 +143,12 @@ require 'gui'
 --script.on_event(player)
 local function remote_interface_assign_waypoints(spidertron, waypoints, waypoint_mode, patrol_mode, remote_name)
   for _, waypoint in pairs(waypoints) do
-    on_command_issued(nil, spidertron, waypoint.position, waypoint_mode, patrol_mode, waypoint.wait_time, remote_name)
+    local wait_type
+    if waypoint.wait_type then
+      if waypoint.wait_type == "time_passed" then wait_type = "left" end
+      if waypoint.wait_type == "inactivity" then wait_type = "right" end
+    end
+    on_command_issued(nil, spidertron, waypoint.position, waypoint_mode, patrol_mode, waypoint.wait_time, wait_type, remote_name)
   end
   if patrol_mode then complete_patrol(spidertron) end
 end
@@ -178,7 +186,7 @@ script.on_event("waypoints-complete-patrol",
   end
 )
 
-function on_command_issued(player, spidertron, position, waypoint_mode, patrol_mode, wait_time, remote_name)
+function on_command_issued(player, spidertron, position, waypoint_mode, patrol_mode, wait_time, wait_type, remote_name)
   -- Called when remote used and on remote interface call
   local waypoint_info = get_waypoint_info(spidertron)
   local on_patrol = global.spidertron_on_patrol[spidertron.unit_number]
@@ -196,6 +204,9 @@ function on_command_issued(player, spidertron, position, waypoint_mode, patrol_m
     end
   end
   waypoint_info.remote = remote_name
+  if remote_name == "spidertron-remote" then
+    return
+  end
 
   if not patrol_mode then
     if on_patrol or not waypoint_mode then
@@ -211,7 +222,12 @@ function on_command_issued(player, spidertron, position, waypoint_mode, patrol_m
     if #waypoint_info.waypoints > 0 or util.distance(spidertron.position, spidertron.autopilot_destination) > 5 then
       -- The spidertron has to be a suitable distance away, but only if this is the first (i.e. next) waypoint
       log("Player used " .. remote_name .. " on position " .. util.positiontostr(position))
-      table.insert(waypoint_info.waypoints, {position = position, wait_time = wait_time})
+      local waypoint = {position = position, wait_time = wait_time, wait_type = wait_type}
+      if global.wait_time_defaults[player.index] then
+        waypoint.wait_time = wait_time or global.wait_time_defaults[player.index].wait_time
+        waypoint.wait_type = wait_type or global.wait_time_defaults[player.index].wait_type
+      end
+      table.insert(waypoint_info.waypoints, waypoint)
       --table.insert(waypoint_info.render_ids, false)  -- Will be handled by update_text
       spidertron.autopilot_destination = waypoint_info.waypoints[1].position
       if #waypoint_info.waypoints == 1 then
@@ -240,7 +256,12 @@ function on_command_issued(player, spidertron, position, waypoint_mode, patrol_m
       complete_patrol(spidertron)
     else
       -- Add to patrol
-      table.insert(waypoint_info.waypoints, {position = position, wait_time = wait_time})
+      local waypoint = {position = position, wait_time = wait_time, wait_type = wait_type}
+      if global.wait_time_defaults[player.index] then
+        waypoint.wait_time = wait_time or global.wait_time_defaults[player.index].wait_time
+        waypoint.wait_type = wait_type or global.wait_time_defaults[player.index].wait_type
+      end
+      table.insert(waypoint_info.waypoints, waypoint)
       spidertron.autopilot_destination = nil
     end
     update_text(spidertron)  -- Inserts text at the position that we have just added
@@ -329,7 +350,7 @@ function handle_wait_timers()
       on_spidertron_reached_destination(wait_data.spidertron)
       global.spidertrons_waiting[unit_number] = nil
     else
-      if wait_data.wait_type and wait_data.wait_type == "inactivity" then
+      if wait_data.wait_type and wait_data.wait_type == "right" then
         if was_spidertron_inactive(wait_data.spidertron, wait_data) then
           wait_data.wait_time = wait_data.wait_time - 1
         else
@@ -356,7 +377,7 @@ local function on_nth_tick()
         if util.distance(spidertron.position, waypoint_queue[1].position) < 5 then
           -- The spidertron has reached its destination (if we aren't in patrol mode or we are but not in setup)
           local wait_time = waypoint_queue[1].wait_time
-          local wait_type = waypoint_queue[1].wait_type or "standard"
+          local wait_type = waypoint_queue[1].wait_type or "left"
           if wait_time and wait_time > 0 then
             -- Add to wait queue
             global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time, wait_type = wait_type, waypoint = waypoint_queue[1]}
@@ -438,10 +459,9 @@ local function setup()
     global.registered_spidertrons = {}
     global.stored_remotes = {}
     global.selection_gui = {}
-    global.last_wait_times = {}
-    global.last_wait_types = {}
     global.spidertrons_waiting = {}
     global.sub_render_ids = {}
+    global.wait_time_defaults = {}
     connect_to_remote_interfaces()
     settings_changed()
   end
@@ -465,10 +485,10 @@ local function config_changed_setup(changed_data)
   global.spidertron_on_patrol = global.spidertron_on_patrol or {}
   global.stored_remotes = global.stored_remotes or {}
   global.selection_gui = global.selection_gui or {}
-  global.last_wait_times = global.last_wait_times or {}
-  global.last_wait_types = global.last_wait_types or {}
+  global.last_wait_times = nil
   global.spidertrons_waiting = global.spidertrons_waiting or {}
   global.sub_render_ids = global.sub_render_ids or {}
+  global.wait_time_defaults = global.wait_time_defaults or {}
   if old_version[1] == 1 then
     if old_version[2] < 2 then
       log("Running pre 1.2 migration")

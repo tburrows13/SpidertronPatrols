@@ -22,7 +22,9 @@ Features
 
 - In waypoint mode, *Click* with the spidertron remote to add a waypoint
 - In patrol mode, *Click* to mark the position sequence, then *Click* on the **1** or *Alt + Click* to finish the sequence and the spidertron will start following it
-- Press *Y* after placing a waypoint to set the wait duration for it
+- Press *Y* after placing a waypoint whilst holding a remote to set the countdown duration and type for it
+- Countdown types: **Time passed** will wait for X seconds; **Inactivity** will wait for X seconds of inactivity (i.e. no changes to inventory or ammo)
+- Press *Y* at any other time to configure the default countdown duration and type
 - *Shift + Click* whilst holding a spidertron remote to clear all waypoints for that spidertron
 - *Control + Click* whilst holding a spidertron remote to disconnect it from its spidertron
 - Switch to direct, waypoint and patrol modes with *Shift + F*, *Shift + C*, *Shift + X* respectively (notice the 'circle' that they make around *WASD*!)
@@ -36,20 +38,20 @@ Recommendations
 
 - *Shift + Scroll* controls are derived from **Blueprint book next** and **Blueprint book previous**. If you have rebound these controls, this mod's shift-scrolling will not work
 - Remove *Shift + Mouse wheel up* and *Shift + Mouse wheel down* from **Zoom in** and **Zoom out** controls if you are using the *Shift + Scroll* controls
-- Use [Equipment Grid Logistic Module](https://mods.factorio.com/mod/EquipmentGridLogisticModule) to autofill your patrolling spidertrons
+- Try using [Equipment Grid Logistic Module](https://mods.factorio.com/mod/EquipmentGridLogisticModule) to autofill your patrolling spidertrons or use with **Inactivity** waypoints to wait until item requests are completed before returning to a building site
 
 -----
 Known Bugs / Limitations
 -----
 
+- Waypoint markers cannot be seen in map view (not possible to add because it requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=76539&p=510027) - please post there in support of the addition)
 - Only place remotes in the quickbar when in direct (i.e. vanilla) mode, otherwise, they will disappear from the quickbar (will be fixed in Factorio 1.1 - requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=88867))
-- Waypoint markers cannot be seen in map view (requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=76539&p=510027) - please post there in support of the addition)
+- Changing a waypoint's countdown length whilst a spidertron is at that waypoint changes the waypoint text but has no effect on the spidertron's remaining time
 
 -----
 Future Updates
 -----
 
-- Allow waiting at waypoint until a condition is met (eg no weapons fired for x seconds, inventory not changed for y seconds)
 - Compatibility with [Spidertron squad control](https://mods.factorio.com/mod/Spider_Control) (you can follow the development of that [here](https://github.com/npc-strider/spidertron-squad-control/pull/2))
 - New waypoint remote icon and better looking shortcut icons (help would be appreciated - I have no graphic skills!)
 
@@ -78,7 +80,7 @@ Clears all waypoints for the spidertron associated with `unit_number`
 Sends the spidertron to each waypoint sequentially
 Parameters
 `spidertron` :: LuaEntity
-`waypoints` :: array of tables with keys `position` (Position) and `wait_time` (int)
+`waypoints` :: array of tables with keys `position` (Position), `wait_time` (int - default `0`) in seconds and `wait_type` (string - either `"time_passed"` or `"inactivity"` - default `"time_passed"`)
 
 `assign_patrol(spidertron, waypoints)`
 Same as `assign_waypoints`, but creates and starts a persistent patrol
@@ -88,4 +90,3 @@ Let me know if you plan on using these and I can help you with debugging or addi
 -----
 
 Please leave feedback and bug reports in the mod discussion tab.
-Thank you to [Qon](https://mods.factorio.com/user/Qon) for all of his design feedback and input!

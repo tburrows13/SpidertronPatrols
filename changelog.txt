@@ -1,17 +1,32 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.6.0
+Date: 29 September 2020
+  Features:
+    - Added 'Inactivity' countdown timer option - spidertron waits at waypoint until inactive (no inventory change) for X seconds
+    - Open wait time selector without a remote in hand to change default wait time
+    - Press 'Y' again to confirm the wait time selection GUI (as an alternative to 'Enter' or clicking the tick)
+  Changes:
+    - Changed wait time selector slider from linear to 'exponential'
+  Bugfixes:
+    - Waypoint and Patrol remotes no longer show up in filter selections and logistic requests
+    - Number '1' is no longer shown on ground when using direct mode
+  Compatability:
+    - Waypoint tables from remote interface functions `assign_waypoints` and `assign_patrols` now accept additional key `wait_type` - must be set to `"time_passed"` or `"inactivity"`
+---------------------------------------------------------------------------------------------------
 Version: 1.5.1
 Date: 23 September 2020
   Features:
     - Compatible with Spidertron Weapon Switcher
-  Changes:
-    - Remote interface `get_event_ids` renamed to `get_events`
   Bugfixes:
     - Removed logging when any entity is destroyed
+  Compatability:
+    - Remote interface `get_event_ids` renamed to `get_events`
 ---------------------------------------------------------------------------------------------------
 Version: 1.5.0
 Date: 9 September 2020
   Features:
     - Now shows total and remaining wait time under each waypoint
+  Compatability:
     - New modding remote interface (see readme for documentation)
 ---------------------------------------------------------------------------------------------------
 Version: 1.4.3

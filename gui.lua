@@ -12,51 +12,121 @@ local function slider_value_index(input_value)
   return #slider_values
 end
 
+local function create_gui(player, waypoint_info, default_config)
+  -- TODO Move captions/tooltips to locale file
+  local gui_elements = {}
+
+  local caption
+  if waypoint_info == "default" then
+    caption = "Set default countdown configuration"
+    gui_elements.waypoint = "default"
+  else
+    caption = "Set countdown configuration for waypoint " .. #waypoint_info.waypoints
+    gui_elements.waypoint = waypoint_info.waypoints[#waypoint_info.waypoints]
+    gui_elements.spidertron = waypoint_info.spidertron
+  end
+
+  local frame = player.gui.center.add{type="frame", caption=caption, direction="vertical"}
+  gui_elements.frame = frame
+
+  local vertical_flow_1 = frame.add{type="frame", style="item_and_count_select_background", direction="horizontal"}
+  vertical_flow_1.add{type="label", style="heading_2_label", caption="Countdown type", tooltip={"waypoints-tooltips.waypoints-inactivity-explanation"}}
+  vertical_flow_1.add{type="empty-widget", style="waypoints_empty_filler"}
+  gui_elements.switch = vertical_flow_1.add{type="switch",
+                                            style="waypoints_switch_padding",
+                                            name="waypoints-countdown-type-switch",
+                                            caption="Countdown type",
+                                            left_label_caption="Time passed",
+                                            right_label_caption="Inactivity",
+                                            allow_none_state = false,
+                                            switch_state = default_config.wait_type,
+                                            tooltip={"waypoints-tooltips.waypoints-inactivity-explanation"}
+                                          }
+
+  --length_select_frame.add{type="line", direction="horizontal"}
+
+  local vertical_flow_2 = frame.add{type="frame", style="item_and_count_select_background", direction="horizontal"}
+  gui_elements.slider = vertical_flow_2.add{type="slider",
+                           name="waypoints-condition-selector-slider",
+                           minimum_value=0,
+                           maximum_value=#slider_values,
+                           value=slider_value_index(tonumber(default_config.wait_time)),
+                           value_step=1,
+                           discrete_slider=true,
+                           style="notched_slider"
+                          }
+  gui_elements.text = vertical_flow_2.add{type="textfield",
+                                          name="waypoints-condition-selector-text",
+                                          style="slider_value_textfield",
+                                          numeric=true,
+                                          allow_decimal=false,
+                                          allow_negative=false,
+                                          lose_focus_on_confirm=true,
+                                          text=default_config.wait_time
+                                        }
+  vertical_flow_2.add{type="label", caption="seconds"}
+  gui_elements.confirm = vertical_flow_2.add{type="sprite-button",
+                                             name="waypoints-condition-selector-confirm",
+                                             mouse_button_filter={"left"},
+                                             sprite="utility/check_mark",
+                                             style="item_and_count_select_confirm"
+                                            }
+  return gui_elements
+end
+
 script.on_event("waypoints-change-wait-conditions",
   function(event)
     local player = game.get_player(event.player_index)
     local remote = player.cursor_stack
-    if remote and remote.valid_for_read and remote.type == "spidertron-remote" and not global.selection_gui[player.index] then
-      local spidertron = remote.connected_entity
-      if spidertron then
-        local waypoint_info = get_waypoint_info(spidertron)
-        if waypoint_info.waypoints[1] and (not player.is_shortcut_toggled("spidertron-remote-patrol") or global.spidertron_on_patrol[spidertron.unit_number] == "setup" )then
-          -- There needs to be a 'last waypoint' and if we are in patrol mode, we need to be in setup
-
-          local last_wait_time = global.last_wait_times[player.index] or 0
-
-          local gui_elements = {}
-          local frame = player.gui.center.add{type="frame", caption="Set wait duration for waypoint " .. #waypoint_info.waypoints, direction="vertical"}
-          
-          local length_type_frame = frame.add{type="frame", direction="horizontal"}
-          gui_elements.switch = length_type_frame.add{type="switch", name="waypoints-countdown-type-switch", caption="Countdown type", left_label_caption="Standard", right_label_caption="Inactivity", allow_none_state = false}
-          --length_type_frame.add{type="switch", caption="Time remaining:"}
-          --gui_elements.standard_time_radiobutton = length_type_frame.add{type="radiobutton", state=true}  -- TODO copy state from previous entry
-          --length_type_frame.add{type="label", caption="Time inactive:"}
-          --gui_elements.inactivity_time_radiobutton = length_type_frame.add{type="radiobutton", state=true}  -- TODO copy state from previous entry
-
-
-          local length_select_frame = frame.add{type="frame", style="item_and_count_select_background", direction="horizontal"}
-          gui_elements.slider = length_select_frame.add{type="slider",
-                                   name="waypoints-condition-selector-slider",
-                                   minimum_value=0,
-                                   maximum_value=#slider_values,
-                                   value=slider_value_index(tonumber(last_wait_time)),
-                                   value_step=1,
-                                   discrete_slider=true,
-                                   style="notched_slider"
-                                  }
-          gui_elements.text = length_select_frame.add{type="textfield", name="waypoints-condition-selector-text", numeric=true, allow_decimal=false, allow_negative=false, lose_focus_on_confirm=true, text=last_wait_time, style="slider_value_textfield"}
-          length_select_frame.add{type="label", caption="seconds"}
-          gui_elements.confirm = length_select_frame.add{type="sprite-button", name="waypoints-condition-selector-confirm", mouse_button_filter={"left"}, sprite="utility/check_mark", style="item_and_count_select_confirm"}
-          gui_elements.frame = frame
-
-          gui_elements.waypoint = waypoint_info.waypoints[#waypoint_info.waypoints]
-          gui_elements.spidertron = waypoint_info.spidertron
-          global.selection_gui[player.index] = gui_elements
-
-          player.opened = frame
+    if global.selection_gui[player.index] then
+      local gui_elements = global.selection_gui[player.index]
+      if gui_elements and player.opened == gui_elements.frame then
+        save_and_exit_gui(player, gui_elements)
+      end
+    elseif not global.selection_gui[player.index] then
+      if remote and remote.valid_for_read and remote.type == "spidertron-remote"  then
+        local spidertron = remote.connected_entity
+        if spidertron and (player.is_shortcut_toggled("spidertron-remote-waypoint") or player.is_shortcut_toggled("spidertron-remote-patrol"))
+            and (not global.spidertron_on_patrol[spidertron.unit_number] or global.spidertron_on_patrol[spidertron.unit_number] == "setup") then
+          local waypoint_info = get_waypoint_info(spidertron)
+          if waypoint_info.waypoints[1]then
+            -- There needs to be a 'last waypoint' and if we are in patrol mode, we need to be in setup
+            local config_data
+            local waypoint = waypoint_info.waypoints[#waypoint_info.waypoints]
+            if waypoint.wait_time_manually_set then
+              config_data = {wait_time = waypoint.wait_time, wait_type = waypoint.wait_type}
+            elseif not global.wait_time_defaults[player.index] then
+              config_data = {wait_time = 0, wait_type = "left"}
+              global.wait_time_defaults[player.index] = config_data
+            else
+              config_data = global.wait_time_defaults[player.index]
+            end
+            local gui_elements = create_gui(player, waypoint_info, config_data)
+            global.selection_gui[player.index] = gui_elements
+            player.opened = gui_elements.frame
+          else
+            if not global.wait_time_defaults[player.index] then
+              config_data = {wait_time = 0, wait_type = "left"}
+              global.wait_time_defaults[player.index] = config_data
+            else
+              config_data = global.wait_time_defaults[player.index]
+            end
+            local gui_elements = create_gui(player, "default", config_data)
+            global.selection_gui[player.index] = gui_elements
+            player.opened = gui_elements.frame
+    
+          end
         end
+      elseif (not (remote and remote.valid_for_read)) or (remote and remote.valid_for_read and not contains(remote.name, {"spidertron-remote-waypoint", "spidertron-remote-patrol"})) then
+        if not global.wait_time_defaults[player.index] then
+          config_data = {wait_time = 0, wait_type = "left"}
+          global.wait_time_defaults[player.index] = config_data
+        else
+          config_data = global.wait_time_defaults[player.index]
+        end
+        local gui_elements = create_gui(player, "default", config_data)
+        global.selection_gui[player.index] = gui_elements
+        player.opened = gui_elements.frame
       end
     end
   end
@@ -98,7 +168,7 @@ script.on_event(defines.events.on_gui_confirmed,
   end
 )
 
-local function save_and_exit_gui(player, gui_elements)
+function save_and_exit_gui(player, gui_elements)
   local wait_time = gui_elements.text.text
   local switch_state = gui_elements.switch.switch_state
 
@@ -107,21 +177,19 @@ local function save_and_exit_gui(player, gui_elements)
 
   local waypoint = gui_elements.waypoint
 
-  local switch_value
-  if switch_state and switch_state == "left" then
-    switch_value = "standard"
+  if waypoint == "default" then
+    global.wait_time_defaults[player.index] = {wait_time = tonumber(wait_time), wait_type = switch_state}
   else
-    switch_value = "inactivity"
-  end
-  waypoint.wait_type = switch_value
-  global.last_wait_types[player.index] = switch_value
 
-  log("Wait time set to " .. wait_time .. " at position " .. util.positiontostr(waypoint.position))
-  waypoint.wait_time = tonumber(wait_time)
-  global.last_wait_times[player.index] = wait_time
+    waypoint.wait_type = switch_state
 
-  if gui_elements.spidertron then  -- if condition for guis created in 1.4.3
-    update_text(gui_elements.spidertron)
+    log("Wait time set to " .. wait_time .. " at position " .. util.positiontostr(waypoint.position))
+    waypoint.wait_time = tonumber(wait_time)
+
+    waypoint.wait_time_manually_set = true
+    if gui_elements.spidertron then  -- if condition for guis created in 1.4.3
+      update_text(gui_elements.spidertron)
+    end
   end
 end
 
