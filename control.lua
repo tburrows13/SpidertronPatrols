@@ -293,13 +293,51 @@ function on_spidertron_reached_destination(spidertron, patrol_start)
   update_text(spidertron)
 end
 
+local function inventories_equal(inventory_1, inventory_2)
+  inventory_2 = table.deepcopy(inventory_2)
+  for name, count in pairs(inventory_1) do
+    if not (inventory_2[name] and inventory_2[name] == count) then
+      return false
+    end
+    inventory_2[name] = nil
+  end
+
+  if next(inventory_2) then
+    -- We finished iterating through the first inventory but the second inventory still has items
+    return false
+  end
+  return true
+end
+
+local function was_spidertron_inactive(spidertron, wait_data)
+  local old_trunk = wait_data.previous_trunk
+  local new_trunk = spidertron.get_inventory(defines.inventory.car_trunk).get_contents()
+  local old_ammo = wait_data.previous_ammo
+  local new_ammo = spidertron.get_inventory(defines.inventory.car_ammo).get_contents()
+
+  if (not old_trunk) or (not inventories_equal(old_trunk, new_trunk)) or (not old_ammo) or (not inventories_equal(old_ammo, new_ammo)) then
+    wait_data.previous_trunk = table.deepcopy(new_trunk)
+    wait_data.previous_ammo = table.deepcopy(new_ammo)
+    return false
+  end
+  return true
+end
+
 function handle_wait_timers()
   for unit_number, wait_data in pairs(global.spidertrons_waiting) do
     if wait_data.wait_time <= 1 then
       on_spidertron_reached_destination(wait_data.spidertron)
       global.spidertrons_waiting[unit_number] = nil
     else
-      wait_data.wait_time = wait_data.wait_time - 1
+      if wait_data.wait_type and wait_data.wait_type == "inactivity" then
+        if was_spidertron_inactive(wait_data.spidertron, wait_data) then
+          wait_data.wait_time = wait_data.wait_time - 1
+        else
+          wait_data.wait_time = wait_data.waypoint.wait_time
+        end
+      else
+        wait_data.wait_time = wait_data.wait_time - 1
+      end
     end
     update_text(wait_data.spidertron)
   end
@@ -318,9 +356,10 @@ local function on_nth_tick()
         if util.distance(spidertron.position, waypoint_queue[1].position) < 5 then
           -- The spidertron has reached its destination (if we aren't in patrol mode or we are but not in setup)
           local wait_time = waypoint_queue[1].wait_time
+          local wait_type = waypoint_queue[1].wait_type or "standard"
           if wait_time and wait_time > 0 then
             -- Add to wait queue
-            global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time, waypoint = waypoint_queue[1]}
+            global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time, wait_type = wait_type, waypoint = waypoint_queue[1]}
             update_text(spidertron)
           else
             on_spidertron_reached_destination(spidertron)
@@ -400,6 +439,7 @@ local function setup()
     global.stored_remotes = {}
     global.selection_gui = {}
     global.last_wait_times = {}
+    global.last_wait_types = {}
     global.spidertrons_waiting = {}
     global.sub_render_ids = {}
     connect_to_remote_interfaces()
@@ -426,6 +466,7 @@ local function config_changed_setup(changed_data)
   global.stored_remotes = global.stored_remotes or {}
   global.selection_gui = global.selection_gui or {}
   global.last_wait_times = global.last_wait_times or {}
+  global.last_wait_types = global.last_wait_types or {}
   global.spidertrons_waiting = global.spidertrons_waiting or {}
   global.sub_render_ids = global.sub_render_ids or {}
   if old_version[1] == 1 then

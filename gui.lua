@@ -27,6 +27,13 @@ script.on_event("waypoints-change-wait-conditions",
 
           local gui_elements = {}
           local frame = player.gui.center.add{type="frame", caption="Set wait duration for waypoint " .. #waypoint_info.waypoints, direction="vertical"}
+          
+          local length_type_frame = frame.add{type="frame", direction="horizontal"}
+          gui_elements.switch = length_type_frame.add{type="switch", name="waypoints-countdown-type-switch", caption="Countdown type", left_label_caption="Standard", right_label_caption="Inactivity", allow_none_state = false}
+          --length_type_frame.add{type="switch", caption="Time remaining:"}
+          --gui_elements.standard_time_radiobutton = length_type_frame.add{type="radiobutton", state=true}  -- TODO copy state from previous entry
+          --length_type_frame.add{type="label", caption="Time inactive:"}
+          --gui_elements.inactivity_time_radiobutton = length_type_frame.add{type="radiobutton", state=true}  -- TODO copy state from previous entry
 
 
           local length_select_frame = frame.add{type="frame", style="item_and_count_select_background", direction="horizontal"}
@@ -55,6 +62,16 @@ script.on_event("waypoints-change-wait-conditions",
   end
 )
 
+--[[
+script.on_event(defines.events.on_gui_switch_state_changed,
+  function(event)
+    local gui_elements = global.selection_gui[event.player_index]
+    if gui_elements and event.element == gui_elements.switch then
+      local switch_state = gui_elements.switch.switch_state
+    end
+  end
+)
+]]
 
 -- Slider moved
 script.on_event(defines.events.on_gui_value_changed,
@@ -83,14 +100,26 @@ script.on_event(defines.events.on_gui_confirmed,
 
 local function save_and_exit_gui(player, gui_elements)
   local wait_time = gui_elements.text.text
+  local switch_state = gui_elements.switch.switch_state
+
   gui_elements.frame.destroy()
   global.selection_gui[player.index] = nil
 
-  -- Set last waypoint's wait time to wait_time
   local waypoint = gui_elements.waypoint
+
+  local switch_value
+  if switch_state and switch_state == "left" then
+    switch_value = "standard"
+  else
+    switch_value = "inactivity"
+  end
+  waypoint.wait_type = switch_value
+  global.last_wait_types[player.index] = switch_value
+
   log("Wait time set to " .. wait_time .. " at position " .. util.positiontostr(waypoint.position))
   waypoint.wait_time = tonumber(wait_time)
   global.last_wait_times[player.index] = wait_time
+
   if gui_elements.spidertron then  -- if condition for guis created in 1.4.3
     update_text(gui_elements.spidertron)
   end
