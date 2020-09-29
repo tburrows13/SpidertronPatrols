@@ -3,15 +3,9 @@ Spidertron Waypoints
 
 Have more control over your spidertrons with waypoints! Set up your spidertrons with one-time waypoints or permanent patrols.
 
-Waypoints
------
-![Waypoints gif](https://i.imgur.com/lSvtJP8.gif)
+![Waypoints gif](https://i.imgur.com/FJW3E7V.gif)
 
 -----
-Patrols
------
-![Patrols gif](https://i.imgur.com/leZ8QTK.gif)
-
 You can see Xterminator's Mod Spotlight here:
 
 [![Xterminator Mod Spotlight](https://img.youtube.com/vi/RggwfbKXqoQ/0.jpg)](https://www.youtube.com/watch?v=RggwfbKXqoQ)
