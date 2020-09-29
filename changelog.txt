@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.6.1
+Date: 29 September 2020
+  Bugfixes:
+    - Fixed crash when pressing 'Y'
+    - Fixed pressing 'Y' would sometimes not open the countdown selector GUI
+---------------------------------------------------------------------------------------------------
 Version: 1.6.0
 Date: 29 September 2020
   Features:
@@ -16,7 +22,7 @@ Date: 29 September 2020
 Version: 1.5.1
 Date: 23 September 2020
   Features:
-    - Compatible with Spidertron Weapon Switcher
+    - Compatibility with Spidertron Weapon Switcher
   Bugfixes:
     - Removed logging when any entity is destroyed
   Compatability:

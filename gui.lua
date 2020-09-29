@@ -74,6 +74,22 @@ local function create_gui(player, waypoint_info, default_config)
   return gui_elements
 end
 
+local function should_open_default(remote)
+  -- Open numbered dialog (return false) when player is holding any remote and there is at least one waypoint and if spidertron_on_patrol is set then it must equal "setup"
+  if remote and remote.valid_for_read and remote.type == "spidertron-remote" then
+    local spidertron = remote.connected_entity
+    if spidertron and (not global.spidertron_on_patrol[spidertron.unit_number] or global.spidertron_on_patrol[spidertron.unit_number] == "setup") then
+      -- If we are in patrol mode, we need to be in setup
+      local waypoint_info = get_waypoint_info(spidertron)
+      if waypoint_info.waypoints[1]then
+        -- There is at least one waypoint
+        return false
+      end
+    end
+  end
+  return true
+end
+
 script.on_event("waypoints-change-wait-conditions",
   function(event)
     local player = game.get_player(event.player_index)
@@ -84,40 +100,8 @@ script.on_event("waypoints-change-wait-conditions",
         save_and_exit_gui(player, gui_elements)
       end
     elseif not global.selection_gui[player.index] then
-      if remote and remote.valid_for_read and remote.type == "spidertron-remote"  then
-        local spidertron = remote.connected_entity
-        if spidertron and (player.is_shortcut_toggled("spidertron-remote-waypoint") or player.is_shortcut_toggled("spidertron-remote-patrol"))
-            and (not global.spidertron_on_patrol[spidertron.unit_number] or global.spidertron_on_patrol[spidertron.unit_number] == "setup") then
-          local waypoint_info = get_waypoint_info(spidertron)
-          if waypoint_info.waypoints[1]then
-            -- There needs to be a 'last waypoint' and if we are in patrol mode, we need to be in setup
-            local config_data
-            local waypoint = waypoint_info.waypoints[#waypoint_info.waypoints]
-            if waypoint.wait_time_manually_set then
-              config_data = {wait_time = waypoint.wait_time, wait_type = waypoint.wait_type}
-            elseif not global.wait_time_defaults[player.index] then
-              config_data = {wait_time = 0, wait_type = "left"}
-              global.wait_time_defaults[player.index] = config_data
-            else
-              config_data = global.wait_time_defaults[player.index]
-            end
-            local gui_elements = create_gui(player, waypoint_info, config_data)
-            global.selection_gui[player.index] = gui_elements
-            player.opened = gui_elements.frame
-          else
-            if not global.wait_time_defaults[player.index] then
-              config_data = {wait_time = 0, wait_type = "left"}
-              global.wait_time_defaults[player.index] = config_data
-            else
-              config_data = global.wait_time_defaults[player.index]
-            end
-            local gui_elements = create_gui(player, "default", config_data)
-            global.selection_gui[player.index] = gui_elements
-            player.opened = gui_elements.frame
-    
-          end
-        end
-      elseif (not (remote and remote.valid_for_read)) or (remote and remote.valid_for_read and not contains(remote.name, {"spidertron-remote-waypoint", "spidertron-remote-patrol"})) then
+      if should_open_default(remote) then
+        -- Default configuration GUI
         if not global.wait_time_defaults[player.index] then
           config_data = {wait_time = 0, wait_type = "left"}
           global.wait_time_defaults[player.index] = config_data
@@ -125,6 +109,22 @@ script.on_event("waypoints-change-wait-conditions",
           config_data = global.wait_time_defaults[player.index]
         end
         local gui_elements = create_gui(player, "default", config_data)
+        global.selection_gui[player.index] = gui_elements
+        player.opened = gui_elements.frame
+      else
+        -- Numbered waypoint configuration GUI
+        local waypoint_info = get_waypoint_info(remote.connected_entity)  -- Validity checks have already been done in should_open_default
+        local config_data
+        local waypoint = waypoint_info.waypoints[#waypoint_info.waypoints]
+        if waypoint.wait_time_manually_set then
+          config_data = {wait_time = waypoint.wait_time, wait_type = waypoint.wait_type}
+        elseif not global.wait_time_defaults[player.index] then
+          config_data = {wait_time = 0, wait_type = "left"}
+          global.wait_time_defaults[player.index] = config_data
+        else
+          config_data = global.wait_time_defaults[player.index]
+        end
+        local gui_elements = create_gui(player, waypoint_info, config_data)
         global.selection_gui[player.index] = gui_elements
         player.opened = gui_elements.frame
       end
