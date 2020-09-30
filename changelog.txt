@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.6.2
+Date: 30 September 2020
+  Bugfixes:
+    - Fixed 'Alt + O' and 'Alt + P' for toggling shortcuts having no effect
+    - Fixed default keys for cycling forwards and backwards through remotes being invalid
+---------------------------------------------------------------------------------------------------
 Version: 1.6.1
 Date: 29 September 2020
   Bugfixes:

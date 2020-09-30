@@ -103,6 +103,8 @@ local function switch_to_mode(player_index, mode, toggle)
 
 end
 script.on_event(defines.events.on_lua_shortcut, function(event) switch_to_mode(event.player_index, event.prototype_name, true) end)
+script.on_event("waypoints-waypoint-mode-toggle", function(event) switch_to_mode(event.player_index, "spidertron-remote-waypoint", true) end)
+script.on_event("waypoints-patrol-mode-toggle", function(event) switch_to_mode(event.player_index, "spidertron-remote-patrol", true) end)
 script.on_event("waypoints-go-to-direct-mode", function(event) switch_to_mode(event.player_index, "spidertron-remote") end)
 script.on_event("waypoints-go-to-waypoint-mode", function(event) switch_to_mode(event.player_index, "spidertron-remote-waypoint") end)
 script.on_event("waypoints-go-to-patrol-mode", function(event) switch_to_mode(event.player_index, "spidertron-remote-patrol") end)
