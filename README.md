@@ -18,7 +18,7 @@ Features
 - In patrol mode, *Click* to mark the position sequence, then *Click* on the **1** or *Alt + Click* to finish the sequence and the spidertron will start following it
 - Press *Y* after placing a waypoint whilst holding a remote to set the countdown duration and type for it
 - Countdown types: **Time passed** will wait for X seconds; **Inactivity** will wait for X seconds of inactivity (i.e. no changes to inventory or ammo)
-- Press *Y* at any other time to configure the default countdown duration and type
+- Press *Y* at any other time or *Shift + Y* to configure the default countdown duration and type
 - *Shift + Click* whilst holding a spidertron remote to clear all waypoints for that spidertron
 - *Control + Click* whilst holding a spidertron remote to disconnect it from its spidertron
 - Switch to direct, waypoint and patrol modes with *Shift + F*, *Shift + C*, *Shift + X* respectively (notice the 'circle' that they make around *WASD*!)

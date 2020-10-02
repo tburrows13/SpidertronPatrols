@@ -132,6 +132,29 @@ script.on_event("waypoints-change-wait-conditions",
   end
 )
 
+script.on_event("waypoints-change-default-wait-conditions",
+  function(event)
+    -- Largely copied from above function
+    local player = game.get_player(event.player_index)
+    if global.selection_gui[player.index] then
+      local gui_elements = global.selection_gui[player.index]
+      if gui_elements and player.opened == gui_elements.frame then
+        save_and_exit_gui(player, gui_elements)
+      end
+    elseif not global.selection_gui[player.index] then
+      if not global.wait_time_defaults[player.index] then
+        config_data = {wait_time = 0, wait_type = "left"}
+        global.wait_time_defaults[player.index] = config_data
+      else
+        config_data = global.wait_time_defaults[player.index]
+      end
+      local gui_elements = create_gui(player, "default", config_data)
+      global.selection_gui[player.index] = gui_elements
+      player.opened = gui_elements.frame
+    end
+  end
+)
+
 --[[
 script.on_event(defines.events.on_gui_switch_state_changed,
   function(event)

@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.6.3
+Date: 2 October 2020
+  Features:
+    - Added 'Shift + Y' to always change default waypoint countdown length and type
+---------------------------------------------------------------------------------------------------
 Version: 1.6.2
 Date: 30 September 2020
   Bugfixes:

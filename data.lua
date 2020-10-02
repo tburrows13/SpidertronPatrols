@@ -61,6 +61,13 @@ data:extend({
     consuming = "none",
     order = "ad"
   },
+  {
+    type = "custom-input",
+    name = "waypoints-change-default-wait-conditions",
+    key_sequence = "SHIFT + Y",
+    consuming = "none",
+    order = "ae"
+  },
   waypoint_remote,
   patrol_remote,
   direct_control,
