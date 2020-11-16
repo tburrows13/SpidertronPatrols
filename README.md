@@ -50,6 +50,12 @@ Future Updates
 - New waypoint remote icon and better looking shortcut icons (help would be appreciated - I have no graphic skills!)
 
 -----
+Translation
+-----
+
+You can help by translating this mod into your language using [CrowdIn](https://crowdin.com/project/factorio-mods-localization). Any translations made will be included in the next release.
+
+-----
 Mod Compatibility
 -----
 
@@ -83,4 +89,4 @@ Let me know if you plan on using these and I can help you with debugging or addi
 
 -----
 
-Please leave feedback and bug reports in the mod discussion tab.
+Check out my other mods: [Spidertron Engineer](https://mods.factorio.com/mod/SpidertronEngineer) and [Spidertron Weapon Switcher](https://mods.factorio.com/mod/SpidertronWeaponSwitcher)
