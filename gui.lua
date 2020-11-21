@@ -18,15 +18,16 @@ local function create_gui(player, waypoint_info, default_config)
 
   local caption
   if waypoint_info == "default" then
-    caption = "Set default countdown configuration"
+    caption = "Set default countdown"
     gui_elements.waypoint = "default"
   else
-    caption = "Set countdown configuration for waypoint " .. #waypoint_info.waypoints
+    caption = "Set countdown for waypoint " .. #waypoint_info.waypoints
     gui_elements.waypoint = waypoint_info.waypoints[#waypoint_info.waypoints]
     gui_elements.spidertron = waypoint_info.spidertron
   end
 
-  local frame = player.gui.center.add{type="frame", caption=caption, direction="vertical"}
+  local frame = player.gui.screen.add{type="frame", caption=caption, direction="vertical"}
+  frame.force_auto_center()
   gui_elements.frame = frame
 
   local vertical_flow_1 = frame.add{type="frame", style="item_and_count_select_background", direction="horizontal"}
@@ -225,7 +226,7 @@ script.on_event(defines.events.on_gui_click,
     end
   end
 )
-script.on_event("waypoints-gui-confirm",
+script.on_event("waypoints-gui-confirm",  -- Called when the player presses 'E'
   function(event)
     local player = game.get_player(event.player_index)
     local gui_elements = global.selection_gui[event.player_index]
@@ -242,7 +243,6 @@ script.on_event(defines.events.on_gui_closed,
       gui_elements.frame.destroy()
       global.selection_gui[event.player_index] = nil
     end
-
   end
 )
 

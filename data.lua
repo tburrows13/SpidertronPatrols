@@ -104,8 +104,8 @@ local change_default_wait_time_key = {
 local confirm_gui_key = {
   type = "custom-input",
   name = "waypoints-gui-confirm",
-  key_sequence = "RETURN",
-  order = "ae"
+  key_sequence = "",
+  linked_game_control = "close-gui"
 }
 data:extend{clear_waypoints_key, disconnect_remote_key, complete_patrol_key, change_wait_time_key, change_default_wait_time_key, confirm_gui_key}
 
