@@ -49,6 +49,7 @@ end
 
 function clear_spidertron_waypoints(spidertron, unit_number)
   -- Called on Shift-Click or whenever the current autopilot_destination is removed or when the spidertron is removed.
+  -- Pass in either `spidertron` or `unit_number`
   local waypoint_info
   if spidertron then
     waypoint_info = get_waypoint_info(spidertron)
@@ -107,6 +108,7 @@ function update_sub_text(waypoint, parent_render_id, spidertron)
     if current_text ~= intended_text then
       if intended_text then
         rendering.set_text(render_id, intended_text)
+        rendering.set_color(render_id, spidertron.color)  -- In case the color has changed as well
       else
         rendering.destroy(render_id)
       end
@@ -128,6 +130,7 @@ function update_text(spidertron)
       if rendering.get_text(render_id) ~= tostring(i) then
         -- Only update text
         rendering.set_text(render_id, i)
+        rendering.set_color(render_id, spidertron.color)  -- In case the color has changed as well
       end
     else
       -- We need to create the text
@@ -276,14 +279,16 @@ script.on_event(defines.events.on_player_used_spider_remote,
     local spidertron = event.vehicle
     local position = event.position
 
-    if not event.success then return end
-
-    on_command_issued(player, spidertron, position, player.is_shortcut_toggled("spidertron-remote-waypoint"), player.is_shortcut_toggled("spidertron-remote-patrol"))
+    if event.success then
+      on_command_issued(player, spidertron, position, player.is_shortcut_toggled("spidertron-remote-waypoint"), player.is_shortcut_toggled("spidertron-remote-patrol"))
+    end
   end
 )
 
 
 function on_spidertron_reached_destination(spidertron, patrol_start)
+  -- patrol_start is true when the patrol circuit setup completed.
+  -- This is a special case because the spidertron is on patrol but it is not coming from a patrol waypoint.
   local waypoint_info = get_waypoint_info(spidertron)
   local on_patrol = global.spidertron_on_patrol[spidertron.unit_number]
   log("Spidertron reached destination at " .. util.positiontostr(waypoint_info.waypoints[1].position))
@@ -301,6 +306,7 @@ function on_spidertron_reached_destination(spidertron, patrol_start)
     end
   end
 
+  -- Deal with just-left waypoint
   if on_patrol and not patrol_start then
     -- Add reached position to the back of the queue
     table.insert(waypoint_info.waypoints, removed_waypoint)
