@@ -299,11 +299,9 @@ function on_spidertron_reached_destination(spidertron, patrol_start)
   end
 
   if #waypoint_info.waypoints > 0 then
-    if util.distance(spidertron.position, waypoint_info.waypoints[1].position) > 5 then  -- I can remove all lines like this in Factorio 1.1
-      spidertron.autopilot_destination = waypoint_info.waypoints[1].position
-      -- The spidertron is now walking towards a new waypoint
-      script.raise_event(on_spidertron_given_new_destination, {player_index = 1, vehicle = spidertron, position = waypoint_info.waypoints[1].position, success = true, remote = waypoint_info.remote})
-    end
+    spidertron.autopilot_destination = waypoint_info.waypoints[1].position
+    -- The spidertron is now walking towards a new waypoint
+    script.raise_event(on_spidertron_given_new_destination, {player_index = 1, vehicle = spidertron, position = waypoint_info.waypoints[1].position, success = true, remote = waypoint_info.remote})
   end
 
   -- Deal with just-left waypoint
@@ -372,6 +370,7 @@ end
 script.on_nth_tick(60, handle_wait_timers)
 
 
+-- Delete in 1.1
 local function on_nth_tick()
   for _, waypoint_info in pairs(global.spidertron_waypoints) do
     local spidertron = waypoint_info.spidertron
@@ -388,20 +387,47 @@ local function on_nth_tick()
             -- Add to wait queue
             global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time, wait_type = wait_type, waypoint = waypoint_queue[1]}
             update_text(spidertron)
-          else
-            on_spidertron_reached_destination(spidertron)
           end
-
-        -- Check if we need to clear the queue because something has cancelled the current autopilot_destination
-        -- Note that queue is only cleared when not within 2 tiles of destination
-        elseif not spidertron.autopilot_destination then
-          clear_spidertron_waypoints(spidertron)
         end
       end
     end
   end
 end
 script.on_nth_tick(10, on_nth_tick)
+
+--[[
+script.on_event(defines.events.on_spider_command_completed,
+  function(event)
+    local spidertron = event.spidertron -- TODO Check if this is correct
+    local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
+    local waypoint_queue = waypoint_info.waypoint_queue
+
+    -- The spidertron has reached its destination (if we aren't in patrol mode or we are but not in setup)
+    local wait_time = waypoint_queue[1].wait_time
+    local wait_type = waypoint_queue[1].wait_type or "left"
+    if wait_time and wait_time > 0 then
+      -- Add to wait queue
+      global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time, wait_type = wait_type, waypoint = waypoint_queue[1]}
+      update_text(spidertron)
+    else
+      on_spidertron_reached_destination(spidertron)
+    end
+  end
+)
+]]
+
+-- Detect when the player cancels a spidertron's autopilot_destination
+script.on_event({"move-right-custom", "move-left-custom", "move-up-custom", "move-down-custom"},
+  function(event)
+    local player = game.get_player(event.player_index)
+    local vehicle = player.vehicle
+    if vehicle and vehicle.type == "spider-vehicle" then
+      if global.spidertron_waypoints[vehicle.unit_number] then  -- This check is technically not needed but might be a minor optimisation to do it here
+        clear_spidertron_waypoints(vehicle)
+      end
+    end
+  end
+)
 
 script.on_event(defines.events.on_entity_destroyed,
   function(event)
@@ -523,4 +549,3 @@ end
 
 script.on_init(setup)
 script.on_configuration_changed(config_changed_setup)
-

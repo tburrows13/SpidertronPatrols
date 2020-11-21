@@ -79,6 +79,31 @@ data:extend({
     key_sequence = "RETURN",
     order = "ae"
   },
+  {
+    type = "custom-input",
+    name = "move-right-custom",
+    key_sequence = "",
+    linked_game_control = "move-right"
+  },
+  {
+    type = "custom-input",
+    name = "move-left-custom",
+    key_sequence = "",
+    linked_game_control = "move-left"
+  },
+  {
+    type = "custom-input",
+    name = "move-up-custom",
+    key_sequence = "",
+    linked_game_control = "move-up"
+  },
+  {
+    type = "custom-input",
+    name = "move-down-custom",
+    key_sequence = "",
+    linked_game_control = "move-down"
+  },
+
 })
 
 local styles = data.raw["gui-style"]["default"]
