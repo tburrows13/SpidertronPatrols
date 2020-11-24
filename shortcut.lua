@@ -33,7 +33,7 @@ local waypoint_toggle = {
 	name = "waypoints-waypoint-mode-toggle",
 	key_sequence = "ALT + O",
   consuming = "none",
-  order = "ca"
+  order = "da"
 }
 
 
@@ -75,7 +75,7 @@ local patrol_toggle = {
 	name = "waypoints-patrol-mode-toggle",
 	key_sequence = "ALT + P",
   consuming = "none",
-  order = "cb"
+  order = "d"
 }
 
 

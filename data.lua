@@ -20,19 +20,19 @@ local direct_control = {
   type = "custom-input",
   name = "waypoints-go-to-direct-mode",
   key_sequence = "SHIFT + F",
-  order = "da"
+  order = "ca"
 }
 local waypoint_control = {
   type = "custom-input",
   name = "waypoints-go-to-waypoint-mode",
   key_sequence = "SHIFT + C",
-  order = "db"
+  order = "cb"
 }
 local patrol_control = {
   type = "custom-input",
   name = "waypoints-go-to-patrol-mode",
   key_sequence = "SHIFT + X",
-  order = "dc"
+  order = "cc"
 }
 data:extend{direct_control, waypoint_control, patrol_control}
 
@@ -76,7 +76,7 @@ local clear_waypoints_key = {
 local disconnect_remote_key = {
   type = "custom-input",
   name = "waypoints-disconnect-remote",
-  key_sequence = "CONTROL + mouse-button-1",
+  key_sequence = "SHIFT + mouse-button-2",
   consuming = "none",
   order = "ab"
 }
@@ -105,7 +105,7 @@ local confirm_gui_key = {
   type = "custom-input",
   name = "waypoints-gui-confirm",
   key_sequence = "",
-  linked_game_control = "close-gui"
+  linked_game_control = "confirm-gui"
 }
 data:extend{clear_waypoints_key, disconnect_remote_key, complete_patrol_key, change_wait_time_key, change_default_wait_time_key, confirm_gui_key}
 
