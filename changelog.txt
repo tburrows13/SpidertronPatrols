@@ -1,4 +1,21 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.7.0
+Date: 24 November 2020
+  Features:
+    - Updated to Factorio 1.1
+    - New waypoint remote icon
+    - Improved waypoint and patrol mode shortcut icons
+    - Press 'E' to confirm countdown selector GUI instead of 'Enter' ('Y' also still works as before)
+    - Wait condition selector GUI is now draggable
+    - Partial French and German translations (contribute here: https://crowdin.com/project/factorio-mods-localization)
+  Changes:
+    - Default keybind for "Disconnect remote" changed from 'Control + Left Click' to 'Shift + Right Click' to avoid clashing with new vanilla keybind
+    - Improved English wording
+  Bugfixes:
+    - Fixed remotes sometimes not staying in the quickbar
+    - Fixed spidertron 'cutting corners' when reaching waypoints
+    - Fixed already-placed waypoint markers keeping their old colour when the spidertron is set to a new colour
+---------------------------------------------------------------------------------------------------
 Version: 1.6.3
 Date: 2 October 2020
   Features:

@@ -1,7 +1,7 @@
 Spidertron Waypoints
 ==================
 
-Have more control over your spidertrons with waypoints! Set up your spidertrons with one-time waypoints or permanent patrols.
+Have more control over your spidertrons with waypoints! Set up your spidertrons with one-time waypoints or permanent patrols. Even though basic waypoints are now available in 1.1, this mod goes far beyond that by adding infinitely-repeating patrols and customizable wait conditions similar to train stations/stops.
 
 ![Waypoints gif](https://i.imgur.com/FJW3E7V.gif)
 
@@ -17,14 +17,13 @@ Features
 - In waypoint mode, *Click* with the spidertron remote to add a waypoint
 - In patrol mode, *Click* to mark the position sequence, then *Click* on the **1** or *Alt + Click* to finish the sequence and the spidertron will start following it
 - Press *Y* after placing a waypoint whilst holding a remote to set the countdown duration and type for it
-- Countdown types: **Time passed** will wait for X seconds; **Inactivity** will wait for X seconds of inactivity (i.e. no changes to inventory or ammo)
-- Press *Y* at any other time or *Shift + Y* to configure the default countdown duration and type
-- *Shift + Click* whilst holding a spidertron remote to clear all waypoints for that spidertron
-- *Control + Click* whilst holding a spidertron remote to disconnect it from its spidertron
+- Wait condition types: **Time passed** will wait for X seconds; **Inactivity** will wait for X seconds of inactivity (i.e. no changes to inventory or ammo)
+- Press *Y* at any other time or *Shift + Y* to configure the default wait condition
+- *Shift + Left Click* whilst holding a spidertron remote to clear all waypoints for that spidertron
+- *Shift + Right Click* whilst holding a spidertron remote to disconnect it from its spidertron
 - Switch to direct, waypoint and patrol modes with *Shift + F*, *Shift + C*, *Shift + X* respectively (notice the 'circle' that they make around *WASD*!)
 - Cycle through all 3 modes with *Shift + Scroll* or *+* and *-* (you can remove modes from this cycle in the mod settings)
 - Switch modes by mouse in the shortcut bar and easily view which mode is active
-- Thank you to [danatron1](https://www.reddit.com/r/factorio/comments/iitlvi/i_made_a_mod_that_allows_you_to_set_waypoints/g3dzt1h) for creating the patrol remote icon (which also doubles up as a cool thumbnail!)
 
 -----
 Recommendations
@@ -32,22 +31,20 @@ Recommendations
 
 - *Shift + Scroll* controls are derived from **Blueprint book next** and **Blueprint book previous**. If you have rebound these controls, this mod's shift-scrolling will not work
 - Remove *Shift + Mouse wheel up* and *Shift + Mouse wheel down* from **Zoom in** and **Zoom out** controls if you are using the *Shift + Scroll* controls
-- Try using [Equipment Grid Logistic Module](https://mods.factorio.com/mod/EquipmentGridLogisticModule) to autofill your patrolling spidertrons or use with **Inactivity** waypoints to wait until item requests are completed before returning to a building site
+- Try using 1.1's spidertron logistics tab to autofill your patrolling spidertrons or use with **Inactivity** waypoints to wait until item requests are completed before returning to a building site
 
 -----
 Known Bugs / Limitations
 -----
 
 - Waypoint markers cannot be seen in map view (not possible to add because it requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=76539&p=510027) - please post there in support of the addition)
-- Only place remotes in the quickbar when in direct (i.e. vanilla) mode, otherwise, they will disappear from the quickbar (will be fixed in Factorio 1.1 - requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=88867))
 - Changing a waypoint's countdown length whilst a spidertron is at that waypoint changes the waypoint text but has no effect on the spidertron's remaining time
 
 -----
-Future Updates
+Future Updates?
 -----
 
 - Compatibility with [Spidertron squad control](https://mods.factorio.com/mod/Spider_Control) (you can follow the development of that [here](https://github.com/npc-strider/spidertron-squad-control/pull/2))
-- New waypoint remote icon and better looking shortcut icons (help would be appreciated - I have no graphic skills!)
 
 -----
 Translation
@@ -88,5 +85,7 @@ Same as `assign_waypoints`, but creates and starts a persistent patrol
 Let me know if you plan on using these and I can help you with debugging or adding new features if you need them.
 
 -----
+
+Thank you to [danatron1](https://www.reddit.com/r/factorio/comments/iitlvi/i_made_a_mod_that_allows_you_to_set_waypoints/g3dzt1h) for creating the patrol remote icon (which also doubles up as a cool thumbnail!) and [smokefumus](https://sketchfab.com/smokefumus) for creating the waypoint remote icon.
 
 Check out my other mods: [Spidertron Engineer](https://mods.factorio.com/mod/SpidertronEngineer) and [Spidertron Weapon Switcher](https://mods.factorio.com/mod/SpidertronWeaponSwitcher)
