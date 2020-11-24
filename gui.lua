@@ -13,15 +13,14 @@ local function slider_value_index(input_value)
 end
 
 local function create_gui(player, waypoint_info, default_config)
-  -- TODO Move captions/tooltips to locale file
   local gui_elements = {}
 
   local caption
   if waypoint_info == "default" then
-    caption = "Set default countdown"
+    caption = {"waypoints-gui.default-title"}
     gui_elements.waypoint = "default"
   else
-    caption = "Set countdown for waypoint " .. #waypoint_info.waypoints
+    caption = {"waypoints-gui.standard-title", #waypoint_info.waypoints}
     gui_elements.waypoint = waypoint_info.waypoints[#waypoint_info.waypoints]
     gui_elements.spidertron = waypoint_info.spidertron
   end
@@ -31,17 +30,16 @@ local function create_gui(player, waypoint_info, default_config)
   gui_elements.frame = frame
 
   local vertical_flow_1 = frame.add{type="frame", style="item_and_count_select_background", direction="horizontal"}
-  vertical_flow_1.add{type="label", style="heading_2_label", caption="Countdown type", tooltip={"waypoints-tooltips.waypoints-inactivity-explanation"}}
+  vertical_flow_1.add{type="label", style="heading_2_label", caption={"waypoints-gui.type"}, tooltip={"waypoints-gui.inactivity-explanation-tooltip"}}
   vertical_flow_1.add{type="empty-widget", style="waypoints_empty_filler"}
   gui_elements.switch = vertical_flow_1.add{type="switch",
                                             style="waypoints_switch_padding",
                                             name="waypoints-countdown-type-switch",
-                                            caption="Countdown type",
-                                            left_label_caption="Time passed",
-                                            right_label_caption="Inactivity",
+                                            left_label_caption={"waypoints-gui.time-passed"},
+                                            right_label_caption={"waypoints-gui.inactivity"},
                                             allow_none_state = false,
                                             switch_state = default_config.wait_type,
-                                            tooltip={"waypoints-tooltips.waypoints-inactivity-explanation"}
+                                            tooltip={"waypoints-gui.inactivity-explanation-tooltip"}
                                           }
 
   --length_select_frame.add{type="line", direction="horizontal"}
@@ -65,7 +63,7 @@ local function create_gui(player, waypoint_info, default_config)
                                           lose_focus_on_confirm=true,
                                           text=default_config.wait_time
                                         }
-  vertical_flow_2.add{type="label", caption="seconds"}
+  vertical_flow_2.add{type="label", caption={"waypoints-gui.seconds"}}
   gui_elements.confirm = vertical_flow_2.add{type="sprite-button",
                                              name="waypoints-condition-selector-confirm",
                                              mouse_button_filter={"left"},
@@ -172,7 +170,7 @@ script.on_event(defines.events.on_gui_value_changed,
   function(event)
     local gui_elements = global.selection_gui[event.player_index]
     if gui_elements and event.element == gui_elements.slider then
-      gui_elements.text.text = slider_values[gui_elements.slider.slider_value]
+      gui_elements.text.text = tostring(slider_values[gui_elements.slider.slider_value])
     end
   end
 )
