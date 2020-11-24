@@ -1,6 +1,3 @@
-
---[[
--- Re-enable in Factorio 1.1
 local function get_previous_quickbar(player)
   local quickbar_slots = {}
   for i = 1, 100 do
@@ -11,62 +8,26 @@ end
 
 local function fill_in_quickbar(player, previous_quickbar, new_stack)
   for i = 1, 100 do
-    if previous_quickbar[i] and not player.get_quick_bar_slot(i) then
+    if previous_quickbar[i] then 
+      if not player.get_quick_bar_slot(i) then
       -- The quickbar filter has been lost since last check, therefore it contained the replaced item
-      player.set_quick_bar_slot(i, new_stack)  -- This line doesn't work in 1.0 because it doesn't keep new_stack.item_number
+      player.set_quick_bar_slot(i, new_stack)
     end
   end
+  end
 end
-]]
 
-local function convert_remote(stack, new_name)
-  if stack and stack.valid_for_read and stack.name ~= new_name then
-    if stack.name == "spidertron-remote" and contains({"spidertron-remote-patrol", "spidertron-remote-waypoint"}, new_name) then
-      -- Save the actual remote into a temp inventory
+
+local function convert_remote(stack, new_name, player)
+  if stack and stack.valid_for_read and stack.name ~= new_name and contains({"spidertron-remote", "spidertron-remote-patrol", "spidertron-remote-waypoint"}, stack.name) then
       local connected_spidertron = stack.connected_entity
+      local hand_location = player.hand_location
 
-      --local previous_quickbar = get_previous_quickbar(player)
-      --player.clean_cursor()
-      local inventory = game.create_inventory(1)
-      local temporary_stack = inventory[1]
-
-      temporary_stack.transfer_stack(stack)
+      local previous_quickbar = get_previous_quickbar(player)
       stack.set_stack{name=new_name, count=1}
       stack.connected_entity = connected_spidertron
-      --fill_in_quickbar(player, previous_quickbar, stack)
-      global.stored_remotes[stack.item_number] = inventory
-      log("Added inventory for item number " .. stack.item_number)
-
-    elseif new_name == "spidertron-remote" and contains({"spidertron-remote-patrol", "spidertron-remote-waypoint"}, stack.name) then
-      -- Retrieve the actual remote from the temp inventory
-      local item_number = stack.item_number
-      local inventory = global.stored_remotes[item_number]
-      if not inventory then
-        log("Could not find inventory for item number " .. item_number)
-        stack.set_stack{name=new_name, count=1}
-        return
-      end
-      stack.clear()
-      stack.transfer_stack(inventory[1])
-      inventory.destroy()
-      global.stored_remotes[item_number] = nil
-      log("Clearing inventory for item number " .. item_number)
-
-    elseif contains({"spidertron-remote-patrol", "spidertron-remote-waypoint"}, stack.name) then
-      -- We are just transferring between 2 dummy remotes
-      local connected_spidertron = stack.connected_entity
-
-      -- Retrieve the actual remote info so that we can restore it under a different key
-      local actual_remote_inventory = global.stored_remotes[stack.item_number]
-      global[stack.item_number] = nil
-
-      stack.set_stack{name=new_name, count=1}
-      stack.connected_entity = connected_spidertron
-
-      global.stored_remotes[stack.item_number] = actual_remote_inventory
-      log("Moved inventory for item number " .. stack.item_number)
-
-    end
+      fill_in_quickbar(player, previous_quickbar, stack)
+      player.hand_location = hand_location
   end
 
 end
@@ -82,13 +43,13 @@ local function switch_to_mode(player_index, mode, toggle)
     -- Called when shortcut is toggled
     if player.is_shortcut_toggled(mode) then
       -- Shortcut already on, so turn off
-      convert_remote(stack, "spidertron-remote")
+      convert_remote(stack, "spidertron-remote", player)
       player.set_shortcut_toggled(mode, false)
       return
     end
   end
 
-  convert_remote(stack, mode)
+  convert_remote(stack, mode, player)
   log("Player " .. player.name .. " switching to mode " .. mode)
   if mode == "spidertron-remote-waypoint" then
     player.set_shortcut_toggled("spidertron-remote-waypoint", true)
@@ -162,39 +123,29 @@ script.on_event("waypoints-mode-scroll-backwards-key", function(event) on_mode_s
 --script.on_event("pick-item-custom", function(event) game.print("Pickted item! " .. serpent.block(event)) end)
 
 
-local function convert_remotes_in_inventory(inventory)
-  for i = 1,#inventory do
+local function convert_remotes_in_player(player)
+  local inventory = player.get_main_inventory()
+  for i = 1, #inventory do
     local stack = inventory[i]
-    convert_remote(stack, "spidertron-remote")
+    convert_remote(stack, "spidertron-remote", player)
   end
 end
-script.on_event(defines.events.on_player_main_inventory_changed, function (event) convert_remotes_in_inventory(game.get_player(event.player_index).get_main_inventory()) end)
+script.on_event(defines.events.on_player_main_inventory_changed, function (event) convert_remotes_in_player(game.get_player(event.player_index)) end)
 
 script.on_event(defines.events.on_player_cursor_stack_changed,
   function(event)
     local player = game.get_player(event.player_index)
     if player.is_shortcut_toggled("spidertron-remote-waypoint") then
       -- Only convert to waypoint remote if waypoint mode is on
-      convert_remote(player.cursor_stack, "spidertron-remote-waypoint")
+      convert_remote(player.cursor_stack, "spidertron-remote-waypoint", player)
     end
     if player.is_shortcut_toggled("spidertron-remote-patrol") then
       -- Only convert to patrol remote if patrol mode is on
-      convert_remote(player.cursor_stack, "spidertron-remote-patrol")
+      convert_remote(player.cursor_stack, "spidertron-remote-patrol", player)
     end
   end
 )
 
-script.on_event(defines.events.on_player_configured_spider_remote,
-  function(event)
-    local player = game.get_player(event.player_index)
-    local remote = player.cursor_stack
-    local spidertron = event.vehicle
-    if contains({"spidertron-remote-patrol", "spidertron-remote-waypoint"}, remote.name) then
-      -- We need to update the actual stored remote
-      global.stored_remotes[remote.item_number][1].connected_entity = spidertron
-    end
-  end
-)
 
 script.on_event("waypoints-disconnect-remote",
   function(event)
@@ -202,12 +153,6 @@ script.on_event("waypoints-disconnect-remote",
     local remote = player.cursor_stack
     if remote and remote.valid_for_read and remote.type == "spidertron-remote" then
       remote.connected_entity = nil
-
-      if contains({"spidertron-remote-patrol", "spidertron-remote-waypoint"}, remote.name) then
-        -- We need to update the stored remote
-        global.stored_remotes[remote.item_number][1].connected_entity = nil
-      end
-
     end
   end
 )

@@ -22,9 +22,6 @@ global.spidertron_on_patrol: indexed by spidertron.unit_number
 global.registered_spidertrons: indexed by outcome of script.register_on_entity_destroyed(spidertron)
   contains unit_number
 
-global.stored_remotes: indexed by remote_stack.item_number
-  contains a LuaInventory with 1 slot that holds the original remote so that it can be retrieved with a 'dummy' remote
-
 global.selection_gui: indexed by player.index
   frame :: LuaGuiElement
   slider :: LuaGuiElement
@@ -168,7 +165,7 @@ function complete_patrol(spidertron)
   -- Called when '1' clicked with the patrol remote or on ALT + Click
   on_spidertron_reached_destination(spidertron, true)
   global.spidertron_on_patrol[spidertron.unit_number] = "patrol"
-  log("Loop completed")
+  log("Patrol circuit creation completed")
 end
 
 script.on_event("waypoints-complete-patrol",
@@ -222,7 +219,6 @@ function on_command_issued(player, spidertron, position, waypoint_mode, patrol_m
       script.raise_event(on_spidertron_given_new_destination, {player_index = player.index, vehicle = spidertron, position = position, success = true, remote = remote_name})
 
     end
-    if #waypoint_info.waypoints > 0 or util.distance(spidertron.position, spidertron.autopilot_destination) > 5 then
       -- The spidertron has to be a suitable distance away, but only if this is the first (i.e. next) waypoint
       log("Player used " .. remote_name .. " on position " .. util.positiontostr(position))
       local waypoint = {position = position, wait_time = wait_time, wait_type = wait_type}
@@ -238,7 +234,7 @@ function on_command_issued(player, spidertron, position, waypoint_mode, patrol_m
         script.raise_event(on_spidertron_given_new_destination, {player_index = player.index, vehicle = spidertron, position = waypoint_info.waypoints[1].position, success = true, remote = remote_name})
       end
       update_text(spidertron)
-    end
+    
 
   else
     -- We are in patrol mode
@@ -291,7 +287,6 @@ function on_spidertron_reached_destination(spidertron, patrol_start)
   -- This is a special case because the spidertron is on patrol but it is not coming from a patrol waypoint.
   local waypoint_info = get_waypoint_info(spidertron)
   local on_patrol = global.spidertron_on_patrol[spidertron.unit_number]
-  log("Spidertron reached destination at " .. util.positiontostr(waypoint_info.waypoints[1].position))
   local removed_waypoint
   if not patrol_start then
     removed_waypoint = table.remove(waypoint_info.waypoints, 1)
@@ -336,9 +331,9 @@ end
 
 local function was_spidertron_inactive(spidertron, wait_data)
   local old_trunk = wait_data.previous_trunk
-  local new_trunk = spidertron.get_inventory(defines.inventory.car_trunk).get_contents()
+  local new_trunk = spidertron.get_inventory(defines.inventory.spider_trunk).get_contents()
   local old_ammo = wait_data.previous_ammo
-  local new_ammo = spidertron.get_inventory(defines.inventory.car_ammo).get_contents()
+  local new_ammo = spidertron.get_inventory(defines.inventory.spider_ammo).get_contents()
 
   if (not old_trunk) or (not inventories_equal(old_trunk, new_trunk)) or (not old_ammo) or (not inventories_equal(old_ammo, new_ammo)) then
     wait_data.previous_trunk = table.deepcopy(new_trunk)
@@ -370,51 +365,28 @@ end
 script.on_nth_tick(60, handle_wait_timers)
 
 
--- Delete in 1.1
-local function on_nth_tick()
-  for _, waypoint_info in pairs(global.spidertron_waypoints) do
-    local spidertron = waypoint_info.spidertron
-    local waypoint_queue = waypoint_info.waypoints
-    if spidertron and spidertron.valid and not global.spidertrons_waiting[spidertron.unit_number] then
-      local on_patrol = global.spidertron_on_patrol[spidertron.unit_number]
-      if on_patrol ~= "setup" and #waypoint_queue > 0 then
-        -- Check if we have arrived
-        if util.distance(spidertron.position, waypoint_queue[1].position) < 5 then
-          -- The spidertron has reached its destination (if we aren't in patrol mode or we are but not in setup)
-          local wait_time = waypoint_queue[1].wait_time
-          local wait_type = waypoint_queue[1].wait_type or "left"
-          if wait_time and wait_time > 0 then
-            -- Add to wait queue
-            global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time, wait_type = wait_type, waypoint = waypoint_queue[1]}
-            update_text(spidertron)
-          end
-        end
+
+script.on_event(defines.events.on_spider_command_completed,
+  function(event)
+    local spidertron = event.vehicle -- TODO Check if this is correct
+    local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
+    local waypoints = waypoint_info.waypoints
+
+    -- The spidertron has reached its destination (if we aren't in patrol mode or we are but not in setup)
+    if waypoints[1] then
+      local wait_time = waypoints[1].wait_time
+      local wait_type = waypoints[1].wait_type or "left"
+      if wait_time and wait_time > 0 then
+        -- Add to wait queue
+        global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time, wait_type = wait_type, waypoint = waypoints[1]}
+        update_text(spidertron)
+      else
+        on_spidertron_reached_destination(spidertron)
       end
     end
   end
-end
-script.on_nth_tick(10, on_nth_tick)
-
---[[
-script.on_event(defines.events.on_spider_command_completed,
-  function(event)
-    local spidertron = event.spidertron -- TODO Check if this is correct
-    local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
-    local waypoint_queue = waypoint_info.waypoint_queue
-
-    -- The spidertron has reached its destination (if we aren't in patrol mode or we are but not in setup)
-    local wait_time = waypoint_queue[1].wait_time
-    local wait_type = waypoint_queue[1].wait_type or "left"
-    if wait_time and wait_time > 0 then
-      -- Add to wait queue
-      global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time, wait_type = wait_type, waypoint = waypoint_queue[1]}
-      update_text(spidertron)
-    else
-      on_spidertron_reached_destination(spidertron)
-    end
-  end
 )
-]]
+
 
 -- Detect when the player cancels a spidertron's autopilot_destination
 script.on_event({"move-right-custom", "move-left-custom", "move-up-custom", "move-down-custom"},
@@ -489,7 +461,6 @@ local function setup()
     global.spidertron_waypoints = {}
     global.spidertron_on_patrol = {}
     global.registered_spidertrons = {}
-    global.stored_remotes = {}
     global.selection_gui = {}
     global.spidertrons_waiting = {}
     global.sub_render_ids = {}
@@ -515,7 +486,6 @@ local function config_changed_setup(changed_data)
   end
 
   global.spidertron_on_patrol = global.spidertron_on_patrol or {}
-  global.stored_remotes = global.stored_remotes or {}
   global.selection_gui = global.selection_gui or {}
   global.last_wait_times = nil
   global.spidertrons_waiting = global.spidertrons_waiting or {}
