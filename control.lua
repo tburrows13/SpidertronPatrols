@@ -194,6 +194,7 @@ function on_command_issued(player, spidertron, position, waypoint_mode, patrol_m
   local reg_id = script.register_on_entity_destroyed(spidertron)
   global.registered_spidertrons[reg_id] = spidertron.unit_number
 
+  local player_index
   if player then  -- Only called when remote used, not with remote interface. Can probably be improved by merging player, waypoint_mode, patrol_mode and remote_name
     remote_name = player.cursor_stack.name
     -- Clear waypoints if remote is different to usual
@@ -202,9 +203,11 @@ function on_command_issued(player, spidertron, position, waypoint_mode, patrol_m
       waypoint_info = get_waypoint_info(spidertron)  -- Resets back to empty
       global.spidertron_on_patrol[spidertron.unit_number] = nil
     end
+    player_index = player.index
   end
   waypoint_info.remote = remote_name
-  if remote_name == "spidertron-remote" then
+
+  if not contains({"spidertron-remote-waypoint", "spidertron-remote-patrol"}, remote_name) then
     return
   end
 
@@ -216,13 +219,13 @@ function on_command_issued(player, spidertron, position, waypoint_mode, patrol_m
       global.spidertron_on_patrol[spidertron.unit_number] = nil
 
       -- We are not dealing with it, but we still need to pass on that
-      script.raise_event(on_spidertron_given_new_destination, {player_index = player.index, vehicle = spidertron, position = position, success = true, remote = remote_name})
+      script.raise_event(on_spidertron_given_new_destination, {player_index = player_index, vehicle = spidertron, position = position, success = true, remote = remote_name})
 
     end
       -- The spidertron has to be a suitable distance away, but only if this is the first (i.e. next) waypoint
       log("Player used " .. remote_name .. " on position " .. util.positiontostr(position))
       local waypoint = {position = position, wait_time = wait_time, wait_type = wait_type}
-      if global.wait_time_defaults[player.index] then
+      if player and global.wait_time_defaults[player.index] then
         waypoint.wait_time = wait_time or global.wait_time_defaults[player.index].wait_time
         waypoint.wait_type = wait_type or global.wait_time_defaults[player.index].wait_type
       end
@@ -231,10 +234,10 @@ function on_command_issued(player, spidertron, position, waypoint_mode, patrol_m
       spidertron.autopilot_destination = waypoint_info.waypoints[1].position
       if #waypoint_info.waypoints == 1 then
         -- The spidertron was not already walking towards a waypoint
-        script.raise_event(on_spidertron_given_new_destination, {player_index = player.index, vehicle = spidertron, position = waypoint_info.waypoints[1].position, success = true, remote = remote_name})
+        script.raise_event(on_spidertron_given_new_destination, {player_index = player_index, vehicle = spidertron, position = waypoint_info.waypoints[1].position, success = true, remote = remote_name})
       end
       update_text(spidertron)
-    
+
 
   else
     -- We are in patrol mode
@@ -256,7 +259,7 @@ function on_command_issued(player, spidertron, position, waypoint_mode, patrol_m
     else
       -- Add to patrol
       local waypoint = {position = position, wait_time = wait_time, wait_type = wait_type}
-      if global.wait_time_defaults[player.index] then
+      if player and global.wait_time_defaults[player.index] then
         waypoint.wait_time = wait_time or global.wait_time_defaults[player.index].wait_time
         waypoint.wait_type = wait_type or global.wait_time_defaults[player.index].wait_type
       end
@@ -370,18 +373,20 @@ script.on_event(defines.events.on_spider_command_completed,
   function(event)
     local spidertron = event.vehicle -- TODO Check if this is correct
     local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
-    local waypoints = waypoint_info.waypoints
+    if waypoint_info then
+      local waypoints = waypoint_info.waypoints
 
-    -- The spidertron has reached its destination (if we aren't in patrol mode or we are but not in setup)
-    if waypoints[1] then
-      local wait_time = waypoints[1].wait_time
-      local wait_type = waypoints[1].wait_type or "left"
-      if wait_time and wait_time > 0 then
-        -- Add to wait queue
-        global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time, wait_type = wait_type, waypoint = waypoints[1]}
-        update_text(spidertron)
-      else
-        on_spidertron_reached_destination(spidertron)
+      -- The spidertron has reached its destination (if we aren't in patrol mode or we are but not in setup)
+      if waypoints[1] then
+        local wait_time = waypoints[1].wait_time
+        local wait_type = waypoints[1].wait_type or "left"
+        if wait_time and wait_time > 0 then
+          -- Add to wait queue
+          global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time, wait_type = wait_type, waypoint = waypoints[1]}
+          update_text(spidertron)
+        else
+          on_spidertron_reached_destination(spidertron)
+        end
       end
     end
   end

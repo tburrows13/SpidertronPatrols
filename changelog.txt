@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.7.1
+Date: 29 November 2020
+  Bugfixes:
+    - Fixed crash in `assign_waypoints` and `assign_patrol` remote interfaces
+    - Fixed incompatability with mods that add custom spidertron remotes
+---------------------------------------------------------------------------------------------------
 Version: 1.7.0
 Date: 24 November 2020
   Features:
