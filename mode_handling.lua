@@ -11,9 +11,9 @@ local function fill_in_quickbar(player, previous_quickbar, new_stack)
     if previous_quickbar[i] then 
       if not player.get_quick_bar_slot(i) then
       -- The quickbar filter has been lost since last check, therefore it contained the replaced item
-      player.set_quick_bar_slot(i, new_stack)
+       player.set_quick_bar_slot(i, new_stack)
+      end
     end
-  end
   end
 end
 
