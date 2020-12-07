@@ -207,10 +207,6 @@ function on_command_issued(player, spidertron, position, waypoint_mode, patrol_m
   end
   waypoint_info.remote = remote_name
 
-  if not contains({"spidertron-remote-waypoint", "spidertron-remote-patrol"}, remote_name) then
-    return
-  end
-
   if not patrol_mode then
     if on_patrol or not waypoint_mode then
       -- Clear all waypoints if we were previously patrolling or waypoints are off
@@ -278,7 +274,9 @@ script.on_event(defines.events.on_player_used_spider_remote,
     local spidertron = event.vehicle
     local position = event.position
 
-    if event.success then
+    local remote = player.cursor_stack.name
+
+    if event.success and contains({"spidertron-remote", "spidertron-remote-waypoint", "spidertron-remote-patrol"}, remote) then
       on_command_issued(player, spidertron, position, player.is_shortcut_toggled("spidertron-remote-waypoint"), player.is_shortcut_toggled("spidertron-remote-patrol"))
     end
   end
@@ -430,7 +428,7 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, settings_changed)
 
 local function spidertron_switched(event)
   -- Called in response to Spidertron Weapon Switcher event
-  local previous_unit_number = event.previous_spidertron_unit_number
+  local previous_unit_number = event.old_spidertron.unit_number
   local spidertron = event.new_spidertron
   if global.spidertron_waypoints[previous_unit_number] then
     global.spidertron_waypoints[spidertron.unit_number] = global.spidertron_waypoints[previous_unit_number]

@@ -5,5 +5,5 @@
     "author": "Xorimuth",
     "description": "Have more control over your spidertrons by using waypoints and creating patrols! Includes customizable 'Time passed' or 'Inactivity' wait conditions.",
     "factorio_version": "1.1",
-    "dependencies": ["base"]
+    "dependencies": ["base", "? SpidertronWeaponSwitcher >= 1.2.0"]
 }

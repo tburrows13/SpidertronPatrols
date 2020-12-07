@@ -1,6 +1,9 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.7.1
-Date: 29 November 2020
+Date: 7 December 2020
+  Compatibility:
+    - Added initial compatibility with Spidertron Squad Control (waypoint mode only)
+    - Fixed compatibility with Spidertron Weapon Switcher v1.2.0
   Bugfixes:
     - Fixed that moving the map whilst in a spidertron would cancel that spidertron's waypoints
     - Fixed crash in `assign_waypoints` and `assign_patrol` remote interfaces

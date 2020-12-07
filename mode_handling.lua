@@ -87,14 +87,16 @@ local function on_mode_scrolled(player_index, direction)
   local player = game.get_player(player_index)
   local stack = player.cursor_stack
   if stack and stack.valid_for_read and stack.type == "spidertron-remote" then
-
     local modes = global.scroll_modes
     if #modes == 1 then
       return
     end
+
     local index
+    local waypoint_on = player.is_shortcut_toggled("spidertron-remote-waypoint")
+    local patrol_on = player.is_shortcut_toggled("spidertron-remote-patrol")
     for i, mode in pairs(modes) do
-      if mode == stack.name then
+      if (mode == "spidertron-remote" and not waypoint_on and not patrol_on) or (mode == "spidertron-remote-waypoint" and waypoint_on) or (mode == "spidertron-remote-patrol" and patrol_on) then
         index = i
         break
       end
