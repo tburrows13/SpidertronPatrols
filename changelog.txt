@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.7.2
+Date: 12 December 2020
+  Bugfixes:
+    - Fixed waypoints not being cancelled when moving the spidertron manually 
+---------------------------------------------------------------------------------------------------
 Version: 1.7.1
 Date: 7 December 2020
   Compatibility:

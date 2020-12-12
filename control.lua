@@ -396,7 +396,7 @@ script.on_event({"move-right-custom", "move-left-custom", "move-up-custom", "mov
   function(event)
     local player = game.get_player(event.player_index)
     local vehicle = player.vehicle
-    if vehicle and vehicle.type == "spider-vehicle" and player.render_mode == defines.game then  -- Render mode means player isn't in map view...
+    if vehicle and vehicle.type == "spider-vehicle" and player.render_mode == defines.render_mode.game then  -- Render mode means player isn't in map view...
       if global.spidertron_waypoints[vehicle.unit_number] then  -- This check is technically not needed but might be a minor optimisation to do it here
         clear_spidertron_waypoints(vehicle)
       end
