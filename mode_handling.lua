@@ -18,18 +18,32 @@ local function fill_in_quickbar(player, previous_quickbar, new_stack)
 end
 
 
-local function convert_remote(stack, new_name, player)
+local function convert_remote(stack, new_name, player, item_location)
   if stack and stack.valid_for_read and stack.name ~= new_name and contains({"spidertron-remote", "spidertron-remote-patrol", "spidertron-remote-waypoint"}, stack.name) then
-      local connected_spidertron = stack.connected_entity
-      local hand_location = player.hand_location
+    local connected_spidertron = stack.connected_entity
+    local hand_location = player.hand_location
 
-      local previous_quickbar = get_previous_quickbar(player)
-      stack.set_stack{name=new_name, count=1}
-      stack.connected_entity = connected_spidertron
-      fill_in_quickbar(player, previous_quickbar, stack)
+    if item_location then
+      local slot_filter = item_location.inventory.get_filter(item_location.slot)
+      if slot_filter == stack.name then
+        -- The item to convert is in a filtered slot, so leave it alone
+        return
+      end
+    end
+
+
+    local previous_quickbar = get_previous_quickbar(player)
+    local change_successful = stack.set_stack{name=new_name, count=1}
+    if not change_successful then
+      log("Couldn't convert remote")
+    end
+    stack.connected_entity = connected_spidertron
+    fill_in_quickbar(player, previous_quickbar, stack)
+    if hand_location and not player.get_inventory(hand_location.inventory)[hand_location.slot].count then
       player.hand_location = hand_location
-  end
+    end
 
+  end
 end
 
 local function switch_to_mode(player_index, mode, toggle)
@@ -129,7 +143,7 @@ local function convert_remotes_in_player(player)
   local inventory = player.get_main_inventory()
   for i = 1, #inventory do
     local stack = inventory[i]
-    convert_remote(stack, "spidertron-remote", player)
+    convert_remote(stack, "spidertron-remote", player, {inventory = inventory, slot = i})
   end
 end
 script.on_event(defines.events.on_player_main_inventory_changed, function (event) convert_remotes_in_player(game.get_player(event.player_index)) end)

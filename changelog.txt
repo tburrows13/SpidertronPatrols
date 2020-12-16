@@ -1,9 +1,11 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.7.2
-Date: 12 December 2020
+Date: 16 December 2020
   Bugfixes:
     - Fixed waypoints not being cancelled when moving the spidertron manually
     - Fixed crash when another mod removes the spidertron whilst its wait condition GUI is open
+    - Fixed `Inventory slot is not empty.` crash
+    - Fixed strange behaviour when creating a waypoint or patrol remote filter in a player's inventory 
 ---------------------------------------------------------------------------------------------------
 Version: 1.7.1
 Date: 7 December 2020
