@@ -54,6 +54,7 @@ function clear_spidertron_waypoints(spidertron, unit_number)
     waypoint_info = global.spidertron_waypoints[unit_number]
     if not waypoint_info then return end
   end
+  if next(waypoint_info.waypoints) == nil then return end
   if not unit_number then unit_number = spidertron.unit_number end
   log("Clearing spidertron waypoints for unit number " .. unit_number)
   for i, render_id in pairs(waypoint_info.render_ids) do
@@ -216,23 +217,27 @@ function on_command_issued(player, spidertron, position, waypoint_mode, patrol_m
 
       -- We are not dealing with it, but we still need to pass on that
       script.raise_event(on_spidertron_given_new_destination, {player_index = player_index, vehicle = spidertron, position = position, success = true, remote = remote_name})
-
     end
-      -- The spidertron has to be a suitable distance away, but only if this is the first (i.e. next) waypoint
-      log("Player used " .. remote_name .. " on position " .. util.positiontostr(position))
-      local waypoint = {position = position, wait_time = wait_time, wait_type = wait_type}
-      if player and global.wait_time_defaults[player.index] then
-        waypoint.wait_time = wait_time or global.wait_time_defaults[player.index].wait_time
-        waypoint.wait_type = wait_type or global.wait_time_defaults[player.index].wait_type
-      end
-      table.insert(waypoint_info.waypoints, waypoint)
-      --table.insert(waypoint_info.render_ids, false)  -- Will be handled by update_text
-      spidertron.autopilot_destination = waypoint_info.waypoints[1].position
-      if #waypoint_info.waypoints == 1 then
-        -- The spidertron was not already walking towards a waypoint
-        script.raise_event(on_spidertron_given_new_destination, {player_index = player_index, vehicle = spidertron, position = waypoint_info.waypoints[1].position, success = true, remote = remote_name})
-      end
-      update_text(spidertron)
+
+    if not waypoint_mode and not patrol_mode then
+      -- We don't want to mess around with it because it is in direct mode (and may be following an entity)
+      return
+    end
+
+    log("Player used " .. remote_name .. " on position " .. util.positiontostr(position))
+    local waypoint = {position = position, wait_time = wait_time, wait_type = wait_type}
+    if player and global.wait_time_defaults[player.index] then
+      waypoint.wait_time = wait_time or global.wait_time_defaults[player.index].wait_time
+      waypoint.wait_type = wait_type or global.wait_time_defaults[player.index].wait_type
+    end
+    table.insert(waypoint_info.waypoints, waypoint)
+    --table.insert(waypoint_info.render_ids, false)  -- Will be handled by update_text
+    spidertron.autopilot_destination = waypoint_info.waypoints[1].position
+    if #waypoint_info.waypoints == 1 then
+      -- The spidertron was not already walking towards a waypoint
+      script.raise_event(on_spidertron_given_new_destination, {player_index = player_index, vehicle = spidertron, position = waypoint_info.waypoints[1].position, success = true, remote = remote_name})
+    end
+    update_text(spidertron)
 
 
   else
