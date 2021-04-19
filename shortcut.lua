@@ -7,23 +7,23 @@ local waypoint_shortcut = {
   order = "a",
   icon =
   {
-    filename = "__SpidertronWaypoints__/graphics/waypoint-shortcut.png",
+    filename = "__SpidertronWaypoints__/graphics/shortcut/waypoint-shortcut.png",
     size = 32,
     flags = {"gui-icon"}
   },
   small_icon = {
-    filename = "__SpidertronWaypoints__/graphics/waypoint-shortcut-24.png",
+    filename = "__SpidertronWaypoints__/graphics/shortcut/waypoint-shortcut-24.png",
     size = 24,
     flags = {"gui-icon"}
   },
   disabled_icon = {
-    filename = "__SpidertronWaypoints__/graphics/waypoint-shortcut-white.png",
+    filename = "__SpidertronWaypoints__/graphics/shortcut/waypoint-shortcut-white.png",
     size = 32,
     flags = {"gui-icon"}
   },
   disabled_small_icon =
   {
-    filename = "__SpidertronWaypoints__/graphics/waypoint-shortcut-white-24.png",
+    filename = "__SpidertronWaypoints__/graphics/shortcut/waypoint-shortcut-white-24.png",
     size = 24,
     flags = {"gui-icon"}
   }
@@ -46,25 +46,25 @@ local patrol_shortcut = {
   order = "b",
   icon =
   {
-    filename = "__SpidertronWaypoints__/graphics/patrol-shortcut.png",
+    filename = "__SpidertronWaypoints__/graphics/shortcut/patrol-shortcut.png",
     size = 32,
     flags = {"gui-icon"}
   },
   small_icon =
   {
-    filename = "__SpidertronWaypoints__/graphics/patrol-shortcut-24.png",
+    filename = "__SpidertronWaypoints__/graphics/shortcut/patrol-shortcut-24.png",
     size = 24,
     flags = {"gui-icon"}
   },
   disabled_icon =
   {
-    filename = "__SpidertronWaypoints__/graphics/patrol-shortcut-white.png",
+    filename = "__SpidertronWaypoints__/graphics/shortcut/patrol-shortcut-white.png",
     size = 32,
     flags = {"gui-icon"}
   },
   disabled_small_icon =
   {
-    filename = "__SpidertronWaypoints__/graphics/patrol-shortcut-white-24.png",
+    filename = "__SpidertronWaypoints__/graphics/shortcut/patrol-shortcut-white-24.png",
     size = 24,
     flags = {"gui-icon"}
   }

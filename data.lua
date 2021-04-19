@@ -4,13 +4,13 @@ require 'shortcut'
 local waypoint_remote = table.deepcopy(data.raw["spidertron-remote"]["spidertron-remote"])
 waypoint_remote.name = "spidertron-remote-waypoint"
 waypoint_remote.flags = {"hidden"}
-waypoint_remote.icon = "__SpidertronWaypoints__/graphics/waypoint-remote.png"
+waypoint_remote.icon = "__SpidertronWaypoints__/graphics/icon/waypoint-remote.png"
 waypoint_remote.icon_mipmaps = 1
 
 local patrol_remote = table.deepcopy(data.raw["spidertron-remote"]["spidertron-remote"])
 patrol_remote.name = "spidertron-remote-patrol"
 patrol_remote.flags = {"hidden"}
-patrol_remote.icon = "__SpidertronWaypoints__/graphics/patrol-remote.png"
+patrol_remote.icon = "__SpidertronWaypoints__/graphics/icon/patrol-remote.png"
 patrol_remote.icon_mipmaps = 1
 
 data:extend{waypoint_remote, patrol_remote}
