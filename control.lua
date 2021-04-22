@@ -1,6 +1,6 @@
-require "util"
-require "utils"
-require "mode_handling"
+local util = require "util"
+require "scripts.utils"
+require "scripts.mode_handling"
 
 --[[
 Globals:
