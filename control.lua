@@ -1,5 +1,5 @@
 local util = require "util"
-require "scripts.utils"
+require "utils"
 require "scripts.mode_handling"
 
 --[[
