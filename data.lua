@@ -1,5 +1,6 @@
 require "prototypes.shortcut"
 require "prototypes.custom-input"
+require "prototypes.technology"
 
 
 local waypoint_remote = table.deepcopy(data.raw["spidertron-remote"]["spidertron-remote"])

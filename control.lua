@@ -1,6 +1,7 @@
 local util = require "util"
 require "utils"
 require "scripts.mode_handling"
+local dock_script = require "scripts.dock_handling."
 
 --[[
 Globals:
@@ -18,9 +19,6 @@ global.spidertron_on_patrol: indexed by spidertron.unit_number
   contains either
   "setup" - when clicking with patrol remote but before it has started moving
   "patrol" - after patrol loop is finished
-
-global.registered_spidertrons: indexed by outcome of script.register_on_entity_destroyed(spidertron)
-  contains unit_number
 
 global.selection_gui: indexed by player.index
   frame :: LuaGuiElement
@@ -191,9 +189,6 @@ function on_command_issued(player, spidertron, position, waypoint_mode, patrol_m
   -- Called when remote used and on remote interface call
   local waypoint_info = get_waypoint_info(spidertron)
   local on_patrol = global.spidertron_on_patrol[spidertron.unit_number]
-
-  local reg_id = script.register_on_entity_destroyed(spidertron)
-  global.registered_spidertrons[reg_id] = spidertron.unit_number
 
   local player_index
   if player then  -- Only called when remote used, not with remote interface. Can probably be improved by merging player, waypoint_mode, patrol_mode and remote_name
@@ -412,11 +407,9 @@ script.on_event({"move-right-custom", "move-left-custom", "move-up-custom", "mov
 script.on_event(defines.events.on_entity_destroyed,
   function(event)
     local unit_number = event.unit_number
-    local reg_id = event.registration_number
-    if contains_key(global.registered_spidertrons, reg_id, true) then
-      clear_spidertron_waypoints(nil, unit_number)
-      global.spidertron_on_patrol[unit_number] = nil
-    end
+    clear_spidertron_waypoints(nil, unit_number)
+    global.spidertron_on_patrol[unit_number] = nil
+    dock_script.on_entity_destroyed(event)
   end
 )
 
@@ -452,8 +445,7 @@ local function spidertron_switched(event)
     global.spidertrons_waiting[previous_unit_number] = nil
   end
 
-  local reg_id = script.register_on_entity_destroyed(spidertron)
-  global.registered_spidertrons[reg_id] = spidertron.unit_number
+  script.register_on_entity_destroyed(spidertron)
 end
 
 local function connect_to_remote_interfaces()
@@ -473,6 +465,8 @@ local function setup()
     global.spidertrons_waiting = {}
     global.sub_render_ids = {}
     global.wait_time_defaults = {}
+    global.spidertron_docks = {}
+    global.spidertrons_docked = {}
     connect_to_remote_interfaces()
     settings_changed()
   end
@@ -500,6 +494,8 @@ local function config_changed_setup(changed_data)
   global.sub_render_ids = global.sub_render_ids or {}
   global.wait_time_defaults = global.wait_time_defaults or {}
   if old_version[1] == 1 then
+    global.spidertron_docks = {}
+    global.spidertrons_docked = {}
     if old_version[2] < 2 then
       log("Running pre 1.2 migration")
       -- Run in >=1.2
