@@ -59,7 +59,8 @@ local clear_waypoints_key = {
 local disconnect_remote_key = {
   type = "custom-input",
   name = "waypoints-disconnect-remote",
-  key_sequence = "SHIFT + mouse-button-2",
+  key_sequence = "",
+  linked_game_control = "stack-split",  -- SHIFT + mouse-button-2 by default
   consuming = "none",
   order = "ab"
 }
