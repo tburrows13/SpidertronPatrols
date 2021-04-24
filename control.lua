@@ -496,40 +496,13 @@ local function config_changed_setup(changed_data)
 
   log("Coming from old version: " .. old_version)
   old_version = util.split(old_version, ".")
-  for i=1,#old_version do
+  for i=1, #old_version do
     old_version[i] = tonumber(old_version[i])
   end
 
-  global.spidertron_on_patrol = global.spidertron_on_patrol or {}
-  global.selection_gui = global.selection_gui or {}
-  global.last_wait_times = nil
-  global.spidertrons_waiting = global.spidertrons_waiting or {}
-  global.sub_render_ids = global.sub_render_ids or {}
-  global.wait_time_defaults = global.wait_time_defaults or {}
-  if old_version[1] == 1 then
-    global.spidertron_docks = {}
-    global.spidertrons_docked = {}
-    if old_version[2] < 2 then
-      log("Running pre 1.2 migration")
-      -- Run in >=1.2
-      global.registered_spidertrons = {}
-      -- Clean up 1.1 bug
-      rendering.clear("SpidertronWaypoints")
-    end
-    if old_version[2] < 4 then
-      log("Running pre 1.4 migration")
-      -- Convert global format
-      for unit_number, waypoint_info in pairs(global.spidertron_waypoints) do
-        local waypoints = {}
-        for i, position in pairs(waypoint_info.positions) do
-          waypoints[i] = {}
-          waypoints[i].position = position
-        end
-        global.spidertron_waypoints[unit_number].positions = nil
-        global.spidertron_waypoints[unit_number].waypoints = waypoints
-      end
-    end
-  end
+  -- Example usage for migrations
+  --if old_version[1] == 1 then
+  --  if old_version[2] < 2 then
 
   settings_changed()
 end
