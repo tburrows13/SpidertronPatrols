@@ -445,6 +445,19 @@ local function spidertron_switched(event)
     global.spidertrons_waiting[previous_unit_number] = nil
   end
 
+  if global.spidertrons_docked[previous_unit_number] then
+    local dock_unit_number = global.spidertrons_docked[previous_unit_number]
+    global.spidertrons_docked[spidertron.unit_number] = dock_unit_number
+    global.spidertrons_docked[previous_unit_number] = nil
+    dock_data = global.spidertron_docks[dock_unit_number]
+    if dock_data then
+      local connected_spidertron = dock_data.connected_spidertron
+      if connected_spidertron then
+        global.spidertron_docks[dock_unit_number].connected_spidertron = spidertron
+      end
+    end
+  end
+
   script.register_on_entity_destroyed(spidertron)
 end
 
