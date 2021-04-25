@@ -2,7 +2,7 @@
 local clear_waypoints_key = {
   type = "custom-input",
   name = "clear-spidertron-waypoints",
-  key_sequence = "SHIFT + mouse-button-1",
+  key_sequence = "CONTROL + mouse-button-2",
   consuming = "none",
   order = "aa"
 }
