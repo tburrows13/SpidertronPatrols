@@ -1,19 +1,10 @@
 local util = require "util"
 require "utils"
 require "scripts.mode_handling"
-local dock_script = require "scripts.dock_handling."
+local remote_interface = require "scripts.remote-interface"
+local dock_script = require "scripts.dock_handling"
 
 --[[
-Design:
-on_spider_remote_used:
-  - check that remote is patrol remote
-  - check if location collides with any waypoint entities
-  - store new location or open waypoint config GUI
-  - set autopilot_destination back to what it is supposed to be
-
-on_player_cursor_stack_changed:
-  - if changed to patrol remote, spawn waypoint entities for that set of waypoints
-
 Globals:
 global.spidertron_waypoints: indexed by spidertron.unit_number:
   spidertron :: LuaEntity
@@ -24,11 +15,6 @@ global.spidertron_waypoints: indexed by spidertron.unit_number:
     condition :: TBD
   current_index :: int (0-based index of waypoints)
   render_ids :: auto-generatated from waypoints
-
-global.spidertron_on_patrol: indexed by spidertron.unit_number
-  contains either
-  "setup" - when clicking with patrol remote but before it has started moving
-  "patrol" - after patrol loop is finished
 
 global.selection_gui: indexed by player.index
   frame :: LuaGuiElement
@@ -148,51 +134,6 @@ end
 
 require 'gui'
 
---script.on_event(player)
-local function remote_interface_assign_waypoints(spidertron, waypoints, waypoint_mode, patrol_mode, remote_name)
-  for _, waypoint in pairs(waypoints) do
-    local wait_type
-    if waypoint.wait_type then
-      if waypoint.wait_type == "time_passed" then wait_type = "left" end
-      if waypoint.wait_type == "inactivity" then wait_type = "right" end
-    end
-    on_command_issued(nil, spidertron, waypoint.position, waypoint_mode, patrol_mode, waypoint.wait_time, wait_type, remote_name)
-  end
-  if patrol_mode then complete_patrol(spidertron) end
-end
-
-local on_spidertron_given_new_destination = script.generate_event_name()
-remote.add_interface("SpidertronWaypoints", {get_events = function() return {on_spidertron_given_new_destination = on_spidertron_given_new_destination} end,
-                                             clear_waypoints = function(unit_number) clear_spidertron_waypoints(nil, unit_number) end,
-                                             assign_waypoints = function(spidertron, waypoints) remote_interface_assign_waypoints(spidertron, waypoints, true, false, "spidertron-remote-waypoint") end,
-                                             assign_patrol = function(spidertron, waypoints) remote_interface_assign_waypoints(spidertron, waypoints, false, true, "spidertron-remote-patrol") end,
-                                            })
-
-
-function complete_patrol(spidertron)
-  -- Called when '1' clicked with the patrol remote or on ALT + Click
-  on_spidertron_reached_destination(spidertron, true)
-  global.spidertron_on_patrol[spidertron.unit_number] = "patrol"
-  log("Patrol circuit creation completed")
-end
-
-script.on_event("waypoints-complete-patrol",
-  function(event)
-    local player = game.get_player(event.player_index)
-    local remote = player.cursor_stack
-    if remote and remote.valid_for_read and remote.name == "spidertron-remote-patrol" then
-      local spidertron = remote.connected_entity
-      if spidertron then
-        local on_patrol = global.spidertron_on_patrol[spidertron.unit_number]
-        local waypoint_info = get_waypoint_info(spidertron)
-        if on_patrol and on_patrol == "setup" and waypoint_info.waypoints[1] then
-          -- We need to be in setup and there needs to be at least one waypoint
-          complete_patrol(spidertron)
-        end
-      end
-    end
-  end
-)
 
 function on_patrol_command_issued(player, spidertron, position)
   -- Called when remote used and on remote interface call
@@ -251,26 +192,10 @@ function on_spidertron_reached_destination(spidertron)
     waypoint_info.current_index = next_waypoint
 
     -- The spidertron is now walking towards a new waypoint
-    script.raise_event(on_spidertron_given_new_destination, {player_index = 1, vehicle = spidertron, position = waypoint_info.waypoints[1].position, success = true, remote = waypoint_info.remote})
+    script.raise_event(remote_interface.on_spidertron_given_new_destination, {player_index = 1, vehicle = spidertron, position = waypoint_info.waypoints[1].position, success = true, remote = waypoint_info.remote})
   end
 
   update_text(spidertron)
-end
-
-local function inventories_equal(inventory_1, inventory_2)
-  inventory_2 = table.deepcopy(inventory_2)
-  for name, count in pairs(inventory_1) do
-    if not (inventory_2[name] and inventory_2[name] == count) then
-      return false
-    end
-    inventory_2[name] = nil
-  end
-
-  if next(inventory_2) then
-    -- We finished iterating through the first inventory but the second inventory still has items
-    return false
-  end
-  return true
 end
 
 local function was_spidertron_inactive(spidertron, wait_data)
@@ -279,7 +204,7 @@ local function was_spidertron_inactive(spidertron, wait_data)
   local old_ammo = wait_data.previous_ammo
   local new_ammo = spidertron.get_inventory(defines.inventory.spider_ammo).get_contents()
 
-  if (not old_trunk) or (not inventories_equal(old_trunk, new_trunk)) or (not old_ammo) or (not inventories_equal(old_ammo, new_ammo)) then
+  if (not old_trunk) or (not table_equals(old_trunk, new_trunk)) or (not old_ammo) or (not table_equals(old_ammo, new_ammo)) then
     wait_data.previous_trunk = table.deepcopy(new_trunk)
     wait_data.previous_ammo = table.deepcopy(new_ammo)
     return false
@@ -351,7 +276,6 @@ script.on_event(defines.events.on_entity_destroyed,
   function(event)
     local unit_number = event.unit_number
     clear_spidertron_waypoints(nil, unit_number)
-    global.spidertron_on_patrol[unit_number] = nil
     dock_script.on_entity_destroyed(event)
   end
 )
@@ -375,11 +299,6 @@ local function spidertron_switched(event)
     global.spidertron_waypoints[spidertron.unit_number] = global.spidertron_waypoints[previous_unit_number]
     global.spidertron_waypoints[spidertron.unit_number].spidertron = spidertron
     global.spidertron_waypoints[previous_unit_number] = nil
-  end
-
-  if global.spidertron_on_patrol[previous_unit_number] then
-    global.spidertron_on_patrol[spidertron.unit_number] = global.spidertron_on_patrol[previous_unit_number]
-    global.spidertron_on_patrol[previous_unit_number] = nil
   end
 
   if global.spidertrons_waiting[previous_unit_number] then
@@ -415,7 +334,6 @@ script.on_load(connect_to_remote_interfaces)
 
 local function setup()
     global.spidertron_waypoints = {}
-    global.spidertron_on_patrol = {}
     global.registered_spidertrons = {}
     global.selection_gui = {}
     global.spidertrons_waiting = {}

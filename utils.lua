@@ -28,7 +28,7 @@ function table_equals(table1, table2)
     table2[item_name] = nil
   end
 
-  return #table2 == 0
+  return next(table2) ~= nil
 end
 
 
