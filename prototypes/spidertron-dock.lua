@@ -7,7 +7,7 @@ local dock_item = {
   icon_size = 64,
   stack_size = 50,
   place_result = "sp-spidertron-dock-0",
-  order = "b[personal-transport]-c[spidertron]-d[dock]",
+  order = "b[personal-transport]-c[spidertron]-c[[dock]",  -- [[ ensures that it is ordered before all spidertron-logistics items
   subgroup = "transport",
 }
 
@@ -15,11 +15,11 @@ local dock_recipe = {
   type = 'recipe',
   name = 'sp-spidertron-dock',
   ingredients = {
-    {'steel-chest', 4},
-    {'spidertron-remote', 1}
+    {"steel-chest", 4},
+    {"spidertron-remote", 1}
   },
   energy_required = 4,
-  results = {{'sp-spidertron-dock', 1}},
+  result = "sp-spidertron-dock",
   enabled = false
 }
 

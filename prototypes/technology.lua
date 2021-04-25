@@ -6,8 +6,12 @@ data:extend{
     icon_size = 256, icon_mipmaps = 4,
     effects = {
       {
-        recipe = "sp-spidertron-dock",
-        type = "unlock-recipe"
+        type = "unlock-recipe",
+        recipe = "sp-spidertron-dock"
+      },
+      {
+        type = "unlock-recipe",
+        recipe = "sp-spidertron-remote-patrol"
       },
     },
     prerequisites = {
