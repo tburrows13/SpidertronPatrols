@@ -7,7 +7,6 @@ local function remote_interface_assign_waypoints(spidertron, waypoints, waypoint
     end
     on_patrol_command_issued(nil, spidertron, waypoint.position, waypoint_mode, patrol_mode, waypoint.wait_time, wait_type, remote_name)
   end
-  if patrol_mode then complete_patrol(spidertron) end
 end
 
 local on_spidertron_given_new_destination = script.generate_event_name()
