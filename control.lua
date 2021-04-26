@@ -1,6 +1,7 @@
 local util = require "util"
 require "utils"
 require "scripts.mode_handling"
+local waypoint_rendering = require "scripts.waypoint-rendering"
 local remote_interface = require "scripts.remote-interface"
 local dock_script = require "scripts.dock_handling"
 
@@ -32,7 +33,7 @@ function get_waypoint_info(spidertron)
   local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
   if not waypoint_info then
     log("No waypoint info found. Creating blank table")
-    global.spidertron_waypoints[spidertron.unit_number] = {spidertron = spidertron, waypoints = {}, render_ids = {}, current_index = 0}  -- Entity, list of positions, list of render ids
+    global.spidertron_waypoints[spidertron.unit_number] = {spidertron = spidertron, waypoints = {}, render_ids = {}, current_index = 0}
     waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
   end
   return waypoint_info
@@ -56,6 +57,9 @@ function clear_spidertron_waypoints(spidertron, unit_number)
       rendering.destroy(global.sub_render_ids[render_id])
     end
   end
+
+  -- TODO Remove waypoint visualisations
+
   global.spidertron_waypoints[unit_number] = nil
   global.spidertrons_waiting[unit_number] = nil
 end
@@ -140,13 +144,17 @@ function on_patrol_command_issued(player, spidertron, position)
   local waypoint_info = get_waypoint_info(spidertron)
   -- We are in patrol mode
   log("Player used patrol remote on position " .. util.positiontostr(position))
+
   -- Add to patrol
-  local waypoint = {position = position}
-  if player and global.wait_time_defaults[player.index] then
-    waypoint.wait_time = global.wait_time_defaults[player.index].wait_time
-    waypoint.wait_type = global.wait_time_defaults[player.index].wait_type
+  if (not player.selected) or player.selected.name ~= "sp-spidertron-waypoint" then
+    local waypoint = {position = position}
+    if player and global.wait_time_defaults[player.index] then
+      waypoint.wait_time = global.wait_time_defaults[player.index].wait_time
+      waypoint.wait_type = global.wait_time_defaults[player.index].wait_type
+    end
+    table.insert(waypoint_info.waypoints, waypoint)
+    waypoint_rendering.on_waypoint_added(player, spidertron, position)
   end
-  table.insert(waypoint_info.waypoints, waypoint)
 
   -- Send the spidertron to current_index waypoint, and add all other waypoints to autopilot_destinations
   local waypoints = waypoint_info.waypoints
@@ -334,7 +342,7 @@ script.on_load(connect_to_remote_interfaces)
 
 local function setup()
     global.spidertron_waypoints = {}
-    global.registered_spidertrons = {}
+    global.waypoint_visualisations = {}
     global.selection_gui = {}
     global.spidertrons_waiting = {}
     global.sub_render_ids = {}
