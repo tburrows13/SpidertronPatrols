@@ -299,47 +299,6 @@ local function settings_changed()
 end
 script.on_event(defines.events.on_runtime_mod_setting_changed, settings_changed)
 
-local function spidertron_switched(event)
-  -- Called in response to Spidertron Weapon Switcher event
-  local previous_unit_number = event.old_spidertron.unit_number
-  local spidertron = event.new_spidertron
-  if global.spidertron_waypoints[previous_unit_number] then
-    global.spidertron_waypoints[spidertron.unit_number] = global.spidertron_waypoints[previous_unit_number]
-    global.spidertron_waypoints[spidertron.unit_number].spidertron = spidertron
-    global.spidertron_waypoints[previous_unit_number] = nil
-  end
-
-  if global.spidertrons_waiting[previous_unit_number] then
-    global.spidertrons_waiting[spidertron.unit_number] = global.spidertrons_waiting[previous_unit_number]
-    global.spidertrons_waiting[spidertron.unit_number].spidertron = spidertron
-    global.spidertrons_waiting[previous_unit_number] = nil
-  end
-
-  if global.spidertrons_docked[previous_unit_number] then
-    local dock_unit_number = global.spidertrons_docked[previous_unit_number]
-    global.spidertrons_docked[spidertron.unit_number] = dock_unit_number
-    global.spidertrons_docked[previous_unit_number] = nil
-    dock_data = global.spidertron_docks[dock_unit_number]
-    if dock_data then
-      local connected_spidertron = dock_data.connected_spidertron
-      if connected_spidertron then
-        global.spidertron_docks[dock_unit_number].connected_spidertron = spidertron
-      end
-    end
-  end
-
-  script.register_on_entity_destroyed(spidertron)
-end
-
-local function connect_to_remote_interfaces()
-  if remote.interfaces["SpidertronWeaponSwitcher"] then
-    on_spidertron_switched = remote.call("SpidertronWeaponSwitcher", "get_events").on_spidertron_switched
-    log("Creating event")
-    script.on_event(on_spidertron_switched, spidertron_switched)
-  end
-end
-script.on_load(connect_to_remote_interfaces)
-
 local function setup()
     global.spidertron_waypoints = {}
     global.waypoint_visualisations = {}
@@ -349,7 +308,7 @@ local function setup()
     global.wait_time_defaults = {}
     global.spidertron_docks = {}
     global.spidertrons_docked = {}
-    connect_to_remote_interfaces()
+    remote_interface.connect_to_remote_interfaces()
     settings_changed()
   end
 
