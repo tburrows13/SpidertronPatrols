@@ -1,6 +1,7 @@
 require "prototypes.custom-input"
 require "prototypes.spidertron-remote"
 require "prototypes.technology"
+require "prototypes.style"
 
 local empty_entity = {
   name = "sp-spidertron-waypoint",
@@ -15,7 +16,3 @@ local empty_entity = {
   flags = {"placeable-off-grid"}
 }
 data:extend{empty_entity}
-
-local styles = data.raw["gui-style"]["default"]
-styles.waypoints_switch_padding = {type = "switch_style", parent="switch", top_padding=3}  -- Fixes height of switch to be the same as its labels
-styles.waypoints_empty_filler = {type = "empty_widget_style", horizontally_stretchable="on"}

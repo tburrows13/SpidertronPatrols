@@ -4,6 +4,7 @@ require "scripts.mode_handling"
 local waypoint_rendering = require "scripts.waypoint-rendering"
 local remote_interface = require "scripts.remote-interface"
 local dock_script = require "scripts.dock_handling"
+local patrol_gui = require "scripts.patrol-gui"
 
 --[[
 Globals:
@@ -12,10 +13,12 @@ global.spidertron_waypoints: indexed by spidertron.unit_number:
   waypoints :: array of Waypoint
   Waypoint contains
     position :: Position (Concept)
-    wait_time :: int (in seconds)
-    condition :: TBD
+    type :: string ("none", "time-passed", "inactivity", "full-inventory", "empty-inventory", "robots-inactive", "passenger-present", "passenger-not-present", "item-count")
+    wait_time :: int (in seconds, only with "time-passed" or "inactivity")
   current_index :: int (0-based index of waypoints)
-  render_ids :: auto-generatated from waypoints
+  tick_arrived :: int
+  on_patrol :: bool
+  [TBC render_ids :: auto-generatated from waypoints]
 
 global.selection_gui: indexed by player.index
   frame :: LuaGuiElement
@@ -33,7 +36,7 @@ function get_waypoint_info(spidertron)
   local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
   if not waypoint_info then
     log("No waypoint info found. Creating blank table")
-    global.spidertron_waypoints[spidertron.unit_number] = {spidertron = spidertron, waypoints = {}, render_ids = {}, current_index = 0}
+    global.spidertron_waypoints[spidertron.unit_number] = {spidertron = spidertron, waypoints = {}, render_ids = {}, current_index = 0, on_patrol = false}
     waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
   end
   return waypoint_info
@@ -136,7 +139,7 @@ function update_text(spidertron)
   end
 end
 
-require 'gui'
+--require 'gui'
 
 
 function on_patrol_command_issued(player, spidertron, position)
@@ -147,24 +150,29 @@ function on_patrol_command_issued(player, spidertron, position)
 
   -- Add to patrol
   if (not player.selected) or player.selected.name ~= "sp-spidertron-waypoint" then
-    local waypoint = {position = position}
-    if player and global.wait_time_defaults[player.index] then
+    local waypoint = {position = position, type = "none"}
+    --[[if player and global.wait_time_defaults[player.index] then
       waypoint.wait_time = global.wait_time_defaults[player.index].wait_time
       waypoint.wait_type = global.wait_time_defaults[player.index].wait_type
-    end
+    end]]
     table.insert(waypoint_info.waypoints, waypoint)
     waypoint_rendering.on_waypoint_added(player, spidertron, position)
   end
 
-  -- Send the spidertron to current_index waypoint, and add all other waypoints to autopilot_destinations
-  local waypoints = waypoint_info.waypoints
-  local number_of_waypoints = #waypoints
-  local current_index = waypoint_info.current_index
-  spidertron.autopilot_destination = nil
-  for i = 0, number_of_waypoints do
-    local index = ((i + current_index) % number_of_waypoints)
-    spidertron.add_autopilot_destination(waypoints[index + 1].position)
+  if waypoint_info.on_patrol then
+    -- Send the spidertron to current_index waypoint, and add all other waypoints to autopilot_destinations
+    local waypoints = waypoint_info.waypoints
+    local number_of_waypoints = #waypoints
+    local current_index = waypoint_info.current_index
+    spidertron.autopilot_destination = waypoints[current_index + 1].position
+    --[[for i = 0, number_of_waypoints do
+      local index = ((i + current_index) % number_of_waypoints)
+      spidertron.add_autopilot_destination(waypoints[index + 1].position)
+    end]]
+  else
+    spidertron.autopilot_destination = nil
   end
+  patrol_gui.update_gui_schedule(waypoint_info)
   update_text(spidertron)  -- Inserts text at the position that we have just added
 
 end
@@ -182,8 +190,10 @@ script.on_event(defines.events.on_player_used_spider_remote,
       if remote.name == "sp-spidertron-remote-patrol" then
         on_patrol_command_issued(player, spidertron, position)
       else
-        clear_spidertron_waypoints(spidertron)
-
+        --clear_spidertron_waypoints(spidertron)
+        local waypoint_info = get_waypoint_info(spidertron)
+        waypoint_info.on_patrol = false
+        patrol_gui.update_gui_switch(waypoint_info)
       end
     end
   end
@@ -193,17 +203,19 @@ script.on_event(defines.events.on_player_used_spider_remote,
 function on_spidertron_reached_destination(spidertron)
   local waypoint_info = get_waypoint_info(spidertron)
 
-  local number_of_waypoints = #waypoint_info.waypoints
-  if number_of_waypoints > 0 then
-    local next_waypoint = ((waypoint_info.current_index + 1) % number_of_waypoints)
-    spidertron.add_autopilot_destination(waypoint_info.waypoints[next_waypoint + 1].position)
-    waypoint_info.current_index = next_waypoint
+  if waypoint_info.on_patrol then
+    local number_of_waypoints = #waypoint_info.waypoints
+    if number_of_waypoints > 0 then
+      local next_waypoint = ((waypoint_info.current_index + 1) % number_of_waypoints)
+      --spidertron.add_autopilot_destination(waypoint_info.waypoints[next_waypoint + 1].position)
+      spidertron.autopilot_destination = waypoint_info.waypoints[next_waypoint + 1].position
+      waypoint_info.current_index = next_waypoint
 
-    -- The spidertron is now walking towards a new waypoint
-    script.raise_event(remote_interface.on_spidertron_given_new_destination, {player_index = 1, vehicle = spidertron, position = waypoint_info.waypoints[1].position, success = true, remote = waypoint_info.remote})
+      patrol_gui.update_gui_schedule(waypoint_info)
+      -- The spidertron is now walking towards a new waypoint
+      --script.raise_event(remote_interface.on_spidertron_given_new_destination, {player_index = 1, vehicle = spidertron, position = waypoint_info.waypoints[1].position, success = true, remote = waypoint_info.remote})
+    end
   end
-
-  update_text(spidertron)
 end
 
 local function was_spidertron_inactive(spidertron, wait_data)
@@ -273,9 +285,10 @@ script.on_event({"move-right-custom", "move-left-custom", "move-up-custom", "mov
     local player = game.get_player(event.player_index)
     local vehicle = player.vehicle
     if vehicle and vehicle.type == "spider-vehicle" and player.render_mode == defines.render_mode.game then  -- Render mode means player isn't in map view...
-      if global.spidertron_waypoints[vehicle.unit_number] then  -- This check is technically not needed but might be a minor optimisation to do it here
-        clear_spidertron_waypoints(vehicle)
-      end
+      local waypoint_info = get_waypoint_info(vehicle)
+      waypoint_info.on_patrol = false
+      patrol_gui.update_gui_switch(waypoint_info)
+      --clear_spidertron_waypoints(vehicle)
     end
   end
 )
@@ -308,6 +321,7 @@ local function setup()
     global.wait_time_defaults = {}
     global.spidertron_docks = {}
     global.spidertrons_docked = {}
+    global.open_gui_elements = {}
     remote_interface.connect_to_remote_interfaces()
     settings_changed()
   end
