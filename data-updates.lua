@@ -1,3 +1,3 @@
 util = require "util"
-require "utils"
+require "scripts.utils"
 require "prototypes.spidertron-dock"

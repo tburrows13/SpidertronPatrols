@@ -1,5 +1,5 @@
 local util = require "util"
-require "utils"
+require "scripts.utils"
 require "scripts.mode_handling"
 local waypoint_rendering = require "scripts.waypoint-rendering"
 local remote_interface = require "scripts.remote-interface"
