@@ -13,11 +13,14 @@ global.spidertron_waypoints: indexed by spidertron.unit_number:
   spidertron :: LuaEntity
   waypoints :: array of Waypoint
   Waypoint contains
-    position :: Position (Concept)
     type :: string ("none", "time-passed", "inactivity", "full-inventory", "empty-inventory", "robots-inactive", "passenger-present", "passenger-not-present", "item-count")
+    position :: Position (Concept)
     wait_time :: int (in seconds, only with "time-passed" or "inactivity")
-  current_index :: int (0-based index of waypoints)
-  tick_arrived :: int
+    [TBC "item-count" condition info]
+  current_index :: int (0-based index of waypoints, so `current_waypoint = waypoints[current_index + 1]`)
+  tick_arrived :: int (only set when at a waypoint)
+  tick_inactive :: int (only used whilst at an "inactivity" waypoint)
+  previous_inventories :: table (only used whilst at an "inactivity" waypoint)
   on_patrol :: bool
   [TBC render_ids :: auto-generatated from waypoints]
 
@@ -37,7 +40,13 @@ function get_waypoint_info(spidertron)
   local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
   if not waypoint_info then
     log("No waypoint info found. Creating blank table")
-    global.spidertron_waypoints[spidertron.unit_number] = {spidertron = spidertron, waypoints = {}, render_ids = {}, current_index = 0, on_patrol = false}
+    global.spidertron_waypoints[spidertron.unit_number] = {
+      spidertron = spidertron,
+      waypoints = {},
+      render_ids = {},
+      current_index = 0,
+      on_patrol = false
+    }
     waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
   end
   return waypoint_info

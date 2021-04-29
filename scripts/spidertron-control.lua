@@ -48,7 +48,6 @@ script.on_event(defines.events.on_player_used_spider_remote,
       if remote.name == "sp-spidertron-remote-patrol" then
         on_patrol_command_issued(player, spidertron, position)
       else
-        --clear_spidertron_waypoints(spidertron)
         local waypoint_info = get_waypoint_info(spidertron)
         waypoint_info.on_patrol = false
         patrol_gui.update_gui_switch(waypoint_info)
@@ -59,80 +58,114 @@ script.on_event(defines.events.on_player_used_spider_remote,
 
 ---------------------------------------------------------------------------------------------------
 
-function on_spidertron_reached_destination(spidertron)
-  local waypoint_info = get_waypoint_info(spidertron)
-
-  if waypoint_info.on_patrol then
-    local number_of_waypoints = #waypoint_info.waypoints
-    if number_of_waypoints > 0 then
-      local next_waypoint = ((waypoint_info.current_index + 1) % number_of_waypoints)
-      --spidertron.add_autopilot_destination(waypoint_info.waypoints[next_waypoint + 1].position)
-      spidertron.autopilot_destination = waypoint_info.waypoints[next_waypoint + 1].position
-      waypoint_info.current_index = next_waypoint
-
-      patrol_gui.update_gui_schedule(waypoint_info)
-      -- The spidertron is now walking towards a new waypoint
-      --script.raise_event(remote_interface.on_spidertron_given_new_destination, {player_index = 1, vehicle = spidertron, position = waypoint_info.waypoints[1].position, success = true, remote = waypoint_info.remote})
-    end
-  end
-end
-
-local function was_spidertron_inactive(spidertron, wait_data)
-  local old_trunk = wait_data.previous_trunk
+local function was_spidertron_inactive(spidertron, old_inventories)
+  local old_trunk = old_inventories.trunk
+  local old_ammo = old_inventories.ammo
   local new_trunk = spidertron.get_inventory(defines.inventory.spider_trunk).get_contents()
-  local old_ammo = wait_data.previous_ammo
   local new_ammo = spidertron.get_inventory(defines.inventory.spider_ammo).get_contents()
 
-  if (not old_trunk) or (not table_equals(old_trunk, new_trunk)) or (not old_ammo) or (not table_equals(old_ammo, new_ammo)) then
-    wait_data.previous_trunk = table.deepcopy(new_trunk)
-    wait_data.previous_ammo = table.deepcopy(new_ammo)
+  if not old_trunk or not old_ammo or not table_equals(old_trunk, new_trunk) or not table_equals(old_ammo, new_ammo) then
+    old_inventories.trunk = table.deepcopy(new_trunk)
+    old_inventories.ammo = table.deepcopy(new_ammo)
     return false
   end
   return true
 end
 
-function handle_wait_timers()
-  for unit_number, wait_data in pairs(global.spidertrons_waiting) do
-    if wait_data.wait_time <= 1 then
-      on_spidertron_reached_destination(wait_data.spidertron)
-      global.spidertrons_waiting[unit_number] = nil
-    else
-      if wait_data.wait_type and wait_data.wait_type == "right" then
-        if was_spidertron_inactive(wait_data.spidertron, wait_data) then
-          wait_data.wait_time = wait_data.wait_time - 1
-        else
-          wait_data.wait_time = wait_data.waypoint.wait_time
-        end
-      else
-        wait_data.wait_time = wait_data.wait_time - 1
-      end
-    end
-    update_text(wait_data.spidertron)
+
+local function leave_waypoint(spidertron)
+  local waypoint_info = get_waypoint_info(spidertron)
+
+  local number_of_waypoints = #waypoint_info.waypoints
+  if number_of_waypoints > 0 then
+    -- Nil some data that is only needed whilst at a waypoint
+    waypoint_info.tick_arrived = nil
+    waypoint_info.tick_inactive = nil
+    waypoint_info.previous_inventories = nil
+
+    local next_waypoint = ((waypoint_info.current_index + 1) % number_of_waypoints)
+    spidertron.add_autopilot_destination(waypoint_info.waypoints[next_waypoint + 1].position)
+    waypoint_info.current_index = next_waypoint
+
+    patrol_gui.update_gui_schedule(waypoint_info)
+    -- The spidertron is now walking towards a new waypoint
+    -- TODO Finalise event raising
+    --script.raise_event(remote_interface.on_spidertron_given_new_destination, {player_index = 1, vehicle = spidertron, position = waypoint_info.waypoints[1].position, success = true, remote = waypoint_info.remote})
   end
 end
-script.on_nth_tick(60, handle_wait_timers)
 
+function handle_wait_timers()
+  for unit_number, waypoint_info in pairs(global.spidertron_waypoints) do
+    local tick_arrived = waypoint_info.tick_arrived
+    if tick_arrived then
+      -- Spidertron is waiting
+      local spidertron = waypoint_info.spidertron
+      local waypoint = waypoint_info.waypoints[waypoint_info.current_index + 1]
+      local waypoint_type = waypoint.type
+      if waypoint_type == "time-passed" then
+        if (game.tick - waypoint_info.tick_arrived) >= waypoint.wait_time * 60 then
+          leave_waypoint(spidertron)
+        end
+      elseif waypoint_type == "inactivity" then
+        if was_spidertron_inactive(spidertron, waypoint_info.previous_inventories) then
+          if (game.tick - waypoint_info.tick_inactive) <= waypoint.wait_time * 60 then
+            leave_waypoint(spidertron)
+          end
+        else
+          waypoint_info.tick_inactive = game.tick
+        end
+      elseif waypoint_type == "full-inventory" then
+        -- Only checks the last inventory slot
+        local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
+        if inventory.find_empty_stack() == nil then
+          local last_stack = inventory[#inventory]
+          if last_stack.valid_for_read and last_stack.count == last_stack.prototype.stack_size then
+            leave_waypoint(spidertron)
+          end
+        end
+      elseif waypoint_type == "empty-inventory" then
+        if spidertron.get_inventory(defines.inventory.spider_trunk).is_empty() then
+          leave_waypoint(spidertron)
+        end
+      elseif waypoint_type == "item-count" then
+        -- TODO
+      elseif waypoint_type == "robots-inactive" then
+        local logistic_network = spidertron.logistic_network
+        if logistic_network.all_construction_robots == logistic_network.available_construction_robots then
+          leave_waypoint(spidertron)
+        end
+      elseif waypoint_type == "passenger-present" then
+        if spidertron.get_driver() or spidertron.get_passenger() then
+          leave_waypoint(spidertron)
+        end
+      elseif waypoint_type == "passenger-not-present" then
+        if not (spidertron.get_driver() or spidertron.get_passenger()) then
+          leave_waypoint(spidertron)
+        end
+      end
+    end
+    --update_text(wait_data.spidertron)
+  end
+end
+script.on_nth_tick(10, handle_wait_timers)
 
 
 script.on_event(defines.events.on_spider_command_completed,
   function(event)
     local spidertron = event.vehicle
-    --[[local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
-    if waypoint_info then
+    local waypoint_info = get_waypoint_info(spidertron)
+    if waypoint_info.on_patrol then
       local waypoints = waypoint_info.waypoints
+      local waypoint = waypoints[waypoint_info.current_index + 1]
+      local waypoint_type = waypoint.type
 
-      -- The spidertron has reached its destination (if we aren't in patrol mode or we are but not in setup)
-      if waypoints[1] then
-        local wait_time = waypoints[1].wait_time
-        local wait_type = waypoints[1].wait_type or "left"
-        if wait_time and wait_time > 0 then
-          -- Add to wait queue
-          global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time, wait_type = wait_type, waypoint = waypoints[1]}
-          update_text(spidertron)
-        else]]
-          on_spidertron_reached_destination(spidertron)
-        --[[end
+      if waypoint_type == "none" or ((waypoint_type == "time-passed" or waypoint_type == "inactivity") and waypoint.wait_time == 0) then
+        leave_waypoint(spidertron)
+      else
+        waypoint_info.tick_arrived = game.tick
+        patrol_gui.update_gui_schedule(waypoint_info)
+        --global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time, wait_type = wait_type, waypoint = waypoints[1]}
       end
-    end]]
+    end
   end
 )
