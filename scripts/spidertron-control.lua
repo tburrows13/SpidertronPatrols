@@ -89,7 +89,7 @@ function go_to_next_waypoint(spidertron, next_index)
     spidertron.autopilot_destination = waypoint_info.waypoints[next_index].position
     waypoint_info.current_index = next_index
 
-    patrol_gui.update_gui_schedule(waypoint_info)
+    patrol_gui.update_gui_button_states(waypoint_info)
     -- The spidertron is now walking towards a new waypoint
     -- TODO Finalise event raising
     --script.raise_event(remote_interface.on_spidertron_given_new_destination, {player_index = 1, vehicle = spidertron, position = waypoint_info.waypoints[1].position, success = true, remote = waypoint_info.remote})
@@ -171,7 +171,7 @@ script.on_event(defines.events.on_spider_command_completed,
           waypoint_info.previous_inventories = {}
         end
         waypoint_info.tick_arrived = game.tick
-        patrol_gui.update_gui_schedule(waypoint_info)
+        patrol_gui.update_gui_button_states(waypoint_info)
         --global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time, wait_type = wait_type, waypoint = waypoints[1]}
       end
     end

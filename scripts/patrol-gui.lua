@@ -69,25 +69,27 @@ local function build_waypoint_player_input(i, waypoint)
   end
 end
 
+local function generate_button_status(waypoint_info, index)
+  local style = "train_schedule_action_button"
+  local sprite = "utility/play"
+  if waypoint_info.on_patrol and waypoint_info.current_index == index then
+    style = "sp_clicked_train_schedule_action_button"
+    if waypoint_info.tick_arrived then
+      sprite = "utility/stop"
+    end
+  end
+  return {style = style, sprite = sprite}
+end
+
 local function build_waypoint_frames(waypoint_info)
   --waypoint_info.waypoints = {{type = "none"}, {type = "time-passed", wait_time = 5}, {type = "inactivity", wait_time = 10}}--{type = "full-inventory"}, {type = "empty-inventory"}, {type = "robots-inactive"}, {type = "passenger-present"}, {type = "passenger-not-present"}, {type = "none"}, {type = "time-passed", wait_time = 5}, {type = "inactivity", wait_time = 10}, {type = "full-inventory"}, {type = "empty-inventory"}, {type = "robots-inactive"}, {type = "passenger-present"}, {type = "passenger-not-present"}, {type = "none"}, {type = "time-passed", wait_time = 5}, {type = "inactivity", wait_time = 10}, {type = "full-inventory"}, {type = "empty-inventory"}, {type = "robots-inactive"}, {type = "passenger-present"}, {type = "passenger-not-present"}}
   local frames = {}
   for i, waypoint in pairs(waypoint_info.waypoints) do
-
-    -- Set button according to current state
-    local button_style = "train_schedule_action_button"
-    local button_sprite = "utility/play"
-    if waypoint_info.on_patrol and waypoint_info.current_index == i then
-      button_style = "sp_clicked_train_schedule_action_button"
-      if waypoint_info.tick_arrived then
-        button_sprite = "utility/stop"
-      end
-    end
-
+    local button_status = generate_button_status(waypoint_info, i)
     table.insert(frames,
       {type = "frame", name = "schedule-waypoint-" .. i, style = "sp_spidertron_schedule_station_frame", children = {
         {
-          type = "sprite-button", style = button_style, mouse_button_filter = {"left"}, sprite = button_sprite,
+          type = "sprite-button", name = "status_button", style = button_status.style, mouse_button_filter = {"left"}, sprite = button_status.sprite,
           actions = {on_click = {action = "go_to_waypoint", index = i}}
         },
         {
@@ -184,6 +186,22 @@ local function build_gui(player, spidertron)
   --frame.add{type = "label", caption = player.name}
 end
 
+function patrol_gui.update_gui_button_states(waypoint_info)
+  -- Lightweight version of patrol_gui.update_gui_schedule that only touches the play/stop buttons
+  -- Use when not the result of a GUI interaction
+  for _, player in pairs(game.players) do
+    local gui_elements = global.open_gui_elements[player.index]
+    if gui_elements then
+      local scroll_pane = gui_elements["schedule-scroll-pane"]
+      for i, frame in pairs(scroll_pane.children) do
+        local button_status = generate_button_status(waypoint_info, i)
+        local status_button = frame.status_button
+        status_button.style = button_status.style
+        status_button.sprite = button_status.sprite
+      end
+    end
+  end
+end
 
 function patrol_gui.update_gui_schedule(waypoint_info)
   local spidertron = waypoint_info.spidertron
