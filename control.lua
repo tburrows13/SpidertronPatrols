@@ -17,7 +17,7 @@ global.spidertron_waypoints: indexed by spidertron.unit_number:
     position :: Position (Concept)
     wait_time :: int (in seconds, only with "time-passed" or "inactivity")
     [TBC "item-count" condition info]
-  current_index :: int (0-based index of waypoints, so `current_waypoint = waypoints[current_index + 1]`)
+  current_index :: int (index of waypoints)
   tick_arrived :: int (only set when at a waypoint)
   tick_inactive :: int (only used whilst at an "inactivity" waypoint)
   previous_inventories :: table (only used whilst at an "inactivity" waypoint)
@@ -44,7 +44,7 @@ function get_waypoint_info(spidertron)
       spidertron = spidertron,
       waypoints = {},
       render_ids = {},
-      current_index = 0,
+      current_index = 1,
       on_patrol = false
     }
     waypoint_info = global.spidertron_waypoints[spidertron.unit_number]

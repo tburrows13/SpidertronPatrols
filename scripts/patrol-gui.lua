@@ -68,7 +68,7 @@ local function build_waypoint_frames(waypoint_info)
     -- Set button according to current state
     local button_style = "train_schedule_action_button"
     local button_sprite = "utility/play"
-    if waypoint_info.on_patrol and waypoint_info.current_index + 1 == i then
+    if waypoint_info.on_patrol and waypoint_info.current_index == i then
       button_style = "sp_clicked_train_schedule_action_button"
       if waypoint_info.tick_arrived then
         button_sprite = "utility/stop"
@@ -303,7 +303,7 @@ script.on_event(defines.events.on_gui_switch_state_changed,
           local waypoint_info = global.spidertron_waypoints[action.unit_number]
           local on_patrol = switch.switch_state == "left"
           if on_patrol then
-            local next_waypoint = waypoint_info.waypoints[waypoint_info.current_index + 1] or waypoint_info.waypoints[1]
+            local next_waypoint = waypoint_info.waypoints[waypoint_info.current_index] or waypoint_info.waypoints[1]
             if next_waypoint then
               spidertron.autopilot_destination = next_waypoint.position
             end

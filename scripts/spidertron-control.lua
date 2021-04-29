@@ -22,8 +22,10 @@ function on_patrol_command_issued(player, spidertron, position)
     local waypoints = waypoint_info.waypoints
     local number_of_waypoints = #waypoints
     local current_index = waypoint_info.current_index
-    spidertron.autopilot_destination = waypoints[current_index + 1].position
-    --[[for i = 0, number_of_waypoints do
+    spidertron.autopilot_destination = waypoints[current_index].position
+    --[[
+    -- Still using 0-based index
+    for i = 0, number_of_waypoints do
       local index = ((i + current_index) % number_of_waypoints)
       spidertron.add_autopilot_destination(waypoints[index + 1].position)
     end]]
@@ -83,9 +85,9 @@ local function leave_waypoint(spidertron)
     waypoint_info.tick_inactive = nil
     waypoint_info.previous_inventories = nil
 
-    local next_waypoint = ((waypoint_info.current_index + 1) % number_of_waypoints)
-    spidertron.add_autopilot_destination(waypoint_info.waypoints[next_waypoint + 1].position)
-    waypoint_info.current_index = next_waypoint
+    local next_index = ((waypoint_info.current_index) % number_of_waypoints) + 1
+    spidertron.add_autopilot_destination(waypoint_info.waypoints[next_index].position)
+    waypoint_info.current_index = next_index
 
     patrol_gui.update_gui_schedule(waypoint_info)
     -- The spidertron is now walking towards a new waypoint
@@ -100,7 +102,7 @@ function handle_wait_timers()
     if tick_arrived then
       -- Spidertron is waiting
       local spidertron = waypoint_info.spidertron
-      local waypoint = waypoint_info.waypoints[waypoint_info.current_index + 1]
+      local waypoint = waypoint_info.waypoints[waypoint_info.current_index]
       local waypoint_type = waypoint.type
       if waypoint_type == "time-passed" then
         if (game.tick - waypoint_info.tick_arrived) >= waypoint.wait_time * 60 then
@@ -156,7 +158,7 @@ script.on_event(defines.events.on_spider_command_completed,
     local waypoint_info = get_waypoint_info(spidertron)
     if waypoint_info.on_patrol then
       local waypoints = waypoint_info.waypoints
-      local waypoint = waypoints[waypoint_info.current_index + 1]
+      local waypoint = waypoints[waypoint_info.current_index]
       local waypoint_type = waypoint.type
 
       if waypoint_type == "none" or ((waypoint_type == "time-passed" or waypoint_type == "inactivity") and waypoint.wait_time == 0) then
