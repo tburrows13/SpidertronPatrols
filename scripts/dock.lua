@@ -41,7 +41,7 @@ function on_entity_destroyed(event)
       if dock_data then
         local dock = dock_data.dock
         if dock.valid then
-          dock.surface.create_entity{name = "flying-text", position = dock.position, text = "Spidertron removed"}
+          dock.surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-removed"}}
 
           dock = replace_dock(dock, "sp-spidertron-dock-0")
           global.spidertron_docks[dock.unit_number] = {dock = dock}
@@ -115,9 +115,6 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
   local spidertron_contents = spidertron_inventory.get_contents()
 
   -- Can't deal with filters because "container" entities don't support them
-  if spidertron_inventory.is_filtered() then
-    game.print("Warning, cannot deal with filtered inventories")
-  end
 
   local dock_inventory = dock.get_inventory(defines.inventory.chest)
   local dock_contents = dock_inventory.get_contents()
@@ -164,7 +161,7 @@ local function update_dock(dock_data)
       if dock.to_be_deconstructed() or spidertron.speed > 0.1 or not math2d.bounding_box.collides_with(dock.bounding_box, spidertron.bounding_box) then
         -- Spidertron needs to become undocked
         global.spidertrons_docked[spidertron.unit_number] = nil
-        surface.create_entity{name = "flying-text", position = dock.position, text = "Spidertron undocked"}
+        surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-undocked"}}
 
         dock = replace_dock(dock, "sp-spidertron-dock-0")
         global.spidertron_docks[dock.unit_number] = {dock = dock}
@@ -194,7 +191,7 @@ local function update_dock(dock_data)
               dock_data.connected_spidertron = spidertron
               spidertrons_docked[spidertron.unit_number] = dock.unit_number
               --game.print("Spidertron docked")
-              surface.create_entity{name = "flying-text", position = dock.position, text = "Spidertron docked"}
+              surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-docked"}}
 
               local spidertron_contents = inventory.get_contents()
               local dock_inventory = dock.get_inventory(defines.inventory.chest)
