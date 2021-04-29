@@ -25,6 +25,18 @@ dropdown_index = {
   ["passenger-not-present"] = 9,
 }
 
+dropdown_index_lookup = {
+  "none",
+  "time-passed",
+  "inactivity",
+  "full-inventory",
+  "empty-inventory",
+  "item-count",
+  "robots-inactive",
+  "passenger-present",
+  "passenger-not-present",
+}
+
 local function generate_number_input()
   return {
     {type = "frame", style = "number_input_frame", children = {
@@ -85,7 +97,11 @@ local function build_waypoint_frames(waypoint_info)
           type = "label", style = "sp_spidertron_waypoint_label", caption = "#" .. tostring(i),
           actions = {on_click = {action = "move_camera_to_waypoint", index = i}}
         },
-        {type = "drop-down", items = dropdown_contents, selected_index = dropdown_index[waypoint.type]},
+        {
+          type = "drop-down", items = dropdown_contents, selected_index = dropdown_index[waypoint.type],
+          ref = {"waypoint_dropdown", i},
+          actions = {on_selection_state_changed = {action = "waypoint_type_changed", index = i}}
+        },
         {type = "flow", style = "player_input_horizontal_flow", children =
           build_waypoint_player_input(waypoint)
         },
@@ -103,7 +119,7 @@ local function build_on_patrol_switch(waypoint_info)
   return {
     type = "switch",
     ref = {"on_patrol_switch"},
-    actions = {on_switch_state_changed = {action = "toggle_on_patrol", unit_number = waypoint_info.spidertron.unit_number}},
+    actions = {on_switch_state_changed = {action = "toggle_on_patrol"}},
     switch_state = switch_state,
     left_label_caption = {"gui-train.automatic-mode"},
     right_label_caption = {"gui-train.manual-mode"}}
@@ -140,7 +156,7 @@ local function build_gui(player, spidertron)
         {type = "flow", direction = "vertical", style = "inset_frame_container_vertical_flow", children = {
           {type = "frame", style = "inside_shallow_frame", children = {
             --{type = "frame", style = "sp_spidertron_minimap_frame", children = {
-              {type = "camera", style = "sp_spidertron_camera", ref = {"camera"}, position = spidertron.position, surface_index = spidertron.surface.index, zoom = 0.4, elem_mods = {entity = spidertron}},
+              {type = "camera", style = "sp_spidertron_camera", ref = {"camera"}, position = spidertron.position, surface_index = spidertron.surface.index, zoom = 0.5, elem_mods = {entity = spidertron}},
 
               --{type = "minimap", style = "minimap", position = spidertron.position, surface_index = spidertron.surface.index, zoom = 2},
             --}},
@@ -179,7 +195,9 @@ function patrol_gui.update_gui_schedule(waypoint_info)
       scroll_pane.clear()
       local waypoint_frames = build_waypoint_frames(waypoint_info)
       if next(waypoint_frames) then
-        gui.build(scroll_pane, waypoint_frames)
+        local new_gui_elements = gui.build(scroll_pane, waypoint_frames)
+        -- Copy across new gui elements to global storage
+        gui_elements.waypoint_dropdown = new_gui_elements.waypoint_dropdown
       else
         -- Clear GUI
         local relative_frame = player.gui.relative["sp-relative-frame"]
@@ -237,11 +255,6 @@ script.on_event(defines.events.on_gui_closed,
       global.open_gui_elements = global.open_gui_elements or {}  -- TODO Remove
 
       global.open_gui_elements[player.index] = nil
-      --[[for _, frame in pairs(player.gui.relative.children) do
-        if frame.name == "sp-relative-frame" then
-          frame.destroy()
-        end
-      end]]
     end
   end
 )
@@ -336,7 +349,7 @@ script.on_event(defines.events.on_gui_switch_state_changed,
         local gui_elements = global.open_gui_elements[player.index]
         if gui_elements then
           local switch = gui_elements.on_patrol_switch
-          local waypoint_info = global.spidertron_waypoints[action.unit_number]
+          local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
           local on_patrol = switch.switch_state == "left"
           set_on_patrol(on_patrol, spidertron, waypoint_info)
         end
@@ -344,5 +357,34 @@ script.on_event(defines.events.on_gui_switch_state_changed,
     end
   end
 )
+
+script.on_event(defines.events.on_gui_selection_state_changed,
+  function(event)
+    local action = gui.read_action(event)
+    if action then
+      local player = game.get_player(event.player_index)
+      local spidertron = player.opened
+      assert(spidertron.type == "spider-vehicle")
+      log(serpent.block(action))
+      if action.action == "waypoint_type_changed" then
+        local gui_elements = global.open_gui_elements[player.index]
+        local dropdown = gui_elements.waypoint_dropdown[action.index]
+        local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
+        local waypoint = waypoint_info.waypoints[action.index]
+        local new_waypoint_type = dropdown_index_lookup[dropdown.selected_index]
+        if waypoint.type ~= new_waypoint_type then
+          waypoint.type = new_waypoint_type
+          if new_waypoint_type == "time-passed" or new_waypoint_type == "inactivity" then
+            waypoint.wait_time = 0
+          else
+            waypoint.wait_time = nil
+          end
+          patrol_gui.update_gui_schedule(waypoint_info)
+        end
+      end
+    end
+  end
+)
+
 
 return patrol_gui

@@ -104,7 +104,10 @@ function handle_wait_timers()
       local spidertron = waypoint_info.spidertron
       local waypoint = waypoint_info.waypoints[waypoint_info.current_index]
       local waypoint_type = waypoint.type
-      if waypoint_type == "time-passed" then
+      if waypoint_type == "none" then
+        -- Can happen if waypoint type is changed whilst spidertron is at waypoint
+        go_to_next_waypoint(spidertron)
+      elseif waypoint_type == "time-passed" then
         if (game.tick - waypoint_info.tick_arrived) >= waypoint.wait_time * 60 then
           go_to_next_waypoint(spidertron)
         end
