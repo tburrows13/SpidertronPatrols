@@ -82,7 +82,6 @@ function replace_dock(dock, new_dock_name)
   old_dock = dock
   dock = dock.surface.create_entity{name = new_dock_name, position = dock.position, force = dock.force, spill = false, create_build_effect_smoke = false}
 
-
   dock.health = health
   dock.last_user = last_user
 
@@ -162,8 +161,8 @@ local function update_dock(dock_data)
       dock_data.previous_contents = update_dock_inventory(dock, spidertron, dock_data.previous_contents)
 
       -- 0.1 * 216 ~ 20km/h
-      if spidertron.speed > 0.1 or not math2d.bounding_box.collides_with(dock.bounding_box, spidertron.bounding_box) then
-        -- Spidertron is undocked
+      if dock.to_be_deconstructed() or spidertron.speed > 0.1 or not math2d.bounding_box.collides_with(dock.bounding_box, spidertron.bounding_box) then
+        -- Spidertron needs to become undocked
         global.spidertrons_docked[spidertron.unit_number] = nil
         surface.create_entity{name = "flying-text", position = dock.position, text = "Spidertron undocked"}
 
@@ -173,37 +172,38 @@ local function update_dock(dock_data)
       end
     else
       if spidertron then
-        -- spidertron is not valid
+        -- `spidertron` is not valid
         dock_data = {dock = dock_data.dock}
       end
 
-      -- Check if port should initiate connection
-      local dock_position = dock.position
-      local nearby_spidertrons = surface.find_entities_filtered{type = "spider-vehicle", area = dock.bounding_box, force = dock.force}
-      local spidertrons_docked = global.spidertrons_docked
-      for _, spidertron in pairs(nearby_spidertrons) do
-        if not global.spidertrons_docked[spidertron.unit_number] and spidertron.speed < 0.1 and spidertron.name ~= "companion" then
-          local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
-          local inventory_size = #inventory
-          if inventory_size > 0 then
-            -- Switch dock entity out for one with the correct inventory size
-            dock = replace_dock(dock, "sp-spidertron-dock-" .. inventory_size)
-            dock_data.dock = dock
-            global.spidertron_docks[dock.unit_number] = dock_data
-            delete = true
+      -- Check if dock should initiate connection
+      if not dock.to_be_deconstructed() then
+        local nearby_spidertrons = surface.find_entities_filtered{type = "spider-vehicle", area = dock.bounding_box, force = dock.force}
+        local spidertrons_docked = global.spidertrons_docked
+        for _, spidertron in pairs(nearby_spidertrons) do
+          if not global.spidertrons_docked[spidertron.unit_number] and spidertron.speed < 0.1 and spidertron.name ~= "companion" then
+            local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
+            local inventory_size = #inventory
+            if inventory_size > 0 then
+              -- Switch dock entity out for one with the correct inventory size
+              dock = replace_dock(dock, "sp-spidertron-dock-" .. inventory_size)
+              dock_data.dock = dock
+              global.spidertron_docks[dock.unit_number] = dock_data
+              delete = true
 
-            dock_data.connected_spidertron = spidertron
-            spidertrons_docked[spidertron.unit_number] = dock.unit_number
-            --game.print("Spidertron docked")
-            surface.create_entity{name = "flying-text", position = dock.position, text = "Spidertron docked"}
+              dock_data.connected_spidertron = spidertron
+              spidertrons_docked[spidertron.unit_number] = dock.unit_number
+              --game.print("Spidertron docked")
+              surface.create_entity{name = "flying-text", position = dock.position, text = "Spidertron docked"}
 
-            local spidertron_contents = inventory.get_contents()
-            local dock_inventory = dock.get_inventory(defines.inventory.chest)
-            for item_name, count in pairs(spidertron_contents) do
-              dock_inventory.insert{name = item_name, count = count}
+              local spidertron_contents = inventory.get_contents()
+              local dock_inventory = dock.get_inventory(defines.inventory.chest)
+              for item_name, count in pairs(spidertron_contents) do
+                dock_inventory.insert{name = item_name, count = count}
+              end
+              dock_data.previous_contents = spidertron_contents
+              break
             end
-            dock_data.previous_contents = spidertron_contents
-            break
           end
         end
       end
