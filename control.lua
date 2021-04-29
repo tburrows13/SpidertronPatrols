@@ -30,9 +30,6 @@ global.selection_gui: indexed by player.index
   text :: LuaGuiElement
   confirm :: LuaGuiElement
   waypoint :: Waypoint (defined above) - the waypoint that this dialog is setting
-
-global.last_wait_time: indexed by player.index
-  int
 ]]
 
 
@@ -92,7 +89,8 @@ script.on_event("clear-spidertron-waypoints",
 )
 
 function generate_sub_text(waypoint, spidertron)
-  local wait_data = global.spidertrons_waiting[spidertron.unit_number]
+  return
+  --[[local wait_data = global.spidertrons_waiting[spidertron.unit_number]
 
   if waypoint.wait_time and waypoint.wait_time > 0 then
     local string = tostring(waypoint.wait_time) .. "s"
@@ -104,6 +102,7 @@ function generate_sub_text(waypoint, spidertron)
     end
     return string
   end
+  ]]
 end
 
 function update_sub_text(waypoint, parent_render_id, spidertron)
@@ -192,8 +191,6 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, settings_changed)
 local function setup()
     global.spidertron_waypoints = {}
     global.waypoint_visualisations = {}
-    global.selection_gui = {}
-    global.spidertrons_waiting = {}
     global.sub_render_ids = {}
     global.wait_time_defaults = {}
     global.spidertron_docks = {}

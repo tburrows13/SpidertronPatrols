@@ -1,9 +1,10 @@
 local gui = require "__SpidertronWaypoints__.scripts.gui-beta"
+local time_select_gui = require "time-select-gui"
 
 patrol_gui = {}
 
 dropdown_contents = {
-  "None",
+  {"description.no-limit"},
   {"gui-train.add-time-condition"},
   {"gui-train.add-inactivity-condition"},
   {"gui-train.add-full-condition"},
@@ -37,28 +38,22 @@ dropdown_index_lookup = {
   "passenger-not-present",
 }
 
-local function generate_number_input()
-  return {
-    {type = "frame", style = "number_input_frame", children = {
-      {type = "flow", style = "player_input_horizontal_flow", children = {
-        {type = "slider"},
-        {type = "textfield", style = "slider_value_textfield"}
-      }},
-      {type = "sprite-button", style= "item_and_count_select_confirm", mouse_button_filter = {"left"}, sprite="utility/check_mark",
-    }
-    }}
-  }
-end
 
-local function build_waypoint_player_input(waypoint)
+local function build_waypoint_player_input(i, waypoint)
   if waypoint.type == "time-passed" then
     return {
-      {type = "button", style = "train_schedule_condition_time_selection_button", caption = {"time-symbol-seconds", waypoint.wait_time}},
+      {
+        type = "button", style = "train_schedule_condition_time_selection_button", caption = {"time-symbol-seconds", waypoint.wait_time},
+        actions = {on_click = {action = "select_time", index = i}}
+      },
       {type = "label", style = "squashable_label", caption = {"gui-train.passed"}}
     }
   elseif waypoint.type == "inactivity" then
     return {
-      {type = "button", style = "train_schedule_condition_time_selection_button", caption = {"time-symbol-seconds", waypoint.wait_time}},
+      {
+        type = "button", style = "train_schedule_condition_time_selection_button", caption = {"time-symbol-seconds", waypoint.wait_time},
+        actions = {on_click = {action = "select_time", index = i}}
+      },
       {type = "label", style = "squashable_label", caption = {"gui-train.of-inactivity"}}
     }
   --[[elseif waypoint.type == "full-inventory" then
@@ -103,10 +98,13 @@ local function build_waypoint_frames(waypoint_info)
           actions = {on_selection_state_changed = {action = "waypoint_type_changed", index = i}}
         },
         {type = "flow", style = "player_input_horizontal_flow", children =
-          build_waypoint_player_input(waypoint)
+          build_waypoint_player_input(i, waypoint)
         },
         {type = "empty-widget", style = "waypoints_empty_filler"},
-        {type = "sprite-button", style = "train_schedule_delete_button", actions = {on_click = {action = "delete_waypoint", index = i}}, mouse_button_filter = {"left"}, sprite = "utility/close_white", hovered_sprite = "utility/close_black"}
+        {
+          type = "sprite-button", style = "train_schedule_delete_button",
+          actions = {on_click = {action = "delete_waypoint", index = i}}, mouse_button_filter = {"left"}, sprite = "utility/close_white", hovered_sprite = "utility/close_black"
+        }
       }}
     )
   end
@@ -139,7 +137,7 @@ local function build_gui(player, spidertron)
       anchor = anchor,
       children = {
         {type = "flow", ref = {"titlebar", "flow"}, children = {
-          {type = "label", style = "frame_title", caption = "Schedule", ignored_by_interaction = true},
+          {type = "label", style = "frame_title", caption = {"gui-train.schedule"}, ignored_by_interaction = true},
           {type = "empty-widget", style = "flib_titlebar_drag_handle", ignored_by_interaction = true},
           --[[{
             type = "sprite-button",
@@ -269,6 +267,14 @@ script.on_event(defines.events.on_gui_click,
       log(serpent.block(action))
       local gui_elements = global.open_gui_elements[player.index]
 
+      local action_gui = action.gui
+      if action_gui and action_gui == "time_select" then
+        -- Click was in time select GUI
+        local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
+        time_select_gui.on_gui_click(global.open_gui_elements[event.player_index].time_select, waypoint_info)
+        return
+      end
+
       local action_name = action.action
       if action_name == "go_to_waypoint" then
         -- 'Play' button
@@ -277,6 +283,13 @@ script.on_event(defines.events.on_gui_click,
           set_on_patrol(true, spidertron, waypoint_info)
           spidertron_control.go_to_next_waypoint(spidertron, action.index)
         end
+      elseif action_name == "select_time" then
+        local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
+        local time_select_gui_elements = gui.build(player.gui.screen, time_select_gui.build_gui(waypoint_info.waypoints[action.index].wait_time, spidertron.unit_number, action.index))
+        time_select_gui_elements.frame.force_auto_center()
+        time_select_gui_elements.frame.bring_to_front()
+        time_select_gui_elements.textfield.focus()
+        global.open_gui_elements[player.index].time_select = time_select_gui_elements
       elseif action_name == "delete_waypoint" then
         -- Delete waypoint button
         local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
@@ -383,6 +396,28 @@ script.on_event(defines.events.on_gui_selection_state_changed,
           end
           patrol_gui.update_gui_schedule(waypoint_info)
         end
+      end
+    end
+  end
+)
+
+script.on_event(defines.events.on_gui_value_changed,
+  function(event)
+    local action = gui.read_action(event)
+    if action then
+      if action.gui == "time_select" then
+        time_select_gui.on_gui_value_changed(global.open_gui_elements[event.player_index].time_select)
+      end
+    end
+  end
+)
+
+script.on_event(defines.events.on_gui_text_changed,
+  function(event)
+    local action = gui.read_action(event)
+    if action then
+      if action.gui == "time_select" then
+        time_select_gui.on_gui_text_changed(global.open_gui_elements[event.player_index].time_select)
       end
     end
   end

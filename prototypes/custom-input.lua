@@ -37,7 +37,7 @@ local change_default_wait_time_key = {
 }
 local confirm_gui_key = {
   type = "custom-input",
-  name = "waypoints-gui-confirm",
+  name = "sp-confirm-gui",
   key_sequence = "",
   linked_game_control = "confirm-gui"
 }
