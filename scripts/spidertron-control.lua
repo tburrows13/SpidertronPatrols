@@ -113,7 +113,7 @@ function handle_wait_timers()
         end
       elseif waypoint_type == "inactivity" then
         if was_spidertron_inactive(spidertron, waypoint_info.previous_inventories) then
-          if (game.tick - waypoint_info.tick_inactive) <= waypoint.wait_time * 60 then
+          if (game.tick - waypoint_info.tick_inactive) >= waypoint.wait_time * 60 then
             go_to_next_waypoint(spidertron)
           end
         else
@@ -167,6 +167,9 @@ script.on_event(defines.events.on_spider_command_completed,
       if waypoint_type == "none" or ((waypoint_type == "time-passed" or waypoint_type == "inactivity") and waypoint.wait_time == 0) then
         go_to_next_waypoint(spidertron)
       else
+        if waypoint_type == "inactivity" then
+          waypoint_info.previous_inventories = {}
+        end
         waypoint_info.tick_arrived = game.tick
         patrol_gui.update_gui_schedule(waypoint_info)
         --global.spidertrons_waiting[spidertron.unit_number] = {spidertron = spidertron, wait_time = wait_time, wait_type = wait_type, waypoint = waypoints[1]}
