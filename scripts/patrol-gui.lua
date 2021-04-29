@@ -1,5 +1,4 @@
 local gui = require "__SpidertronWaypoints__.scripts.gui-beta"
-local time_select_gui = require "time-select-gui"
 
 patrol_gui = {}
 
@@ -38,32 +37,35 @@ dropdown_index_lookup = {
   "passenger-not-present",
 }
 
+local slider_values = {5, 10, 20, 30, 60, 120, 240, 600}
+slider_values[0] = 0
+
+local function slider_value_index(input_value)
+  for i, slider_value in pairs(slider_values) do
+    if input_value == slider_value then
+      return i
+    elseif input_value < slider_value then
+      return i - 1
+    end
+  end
+  return #slider_values
+end
+
 
 local function build_waypoint_player_input(i, waypoint)
-  if waypoint.type == "time-passed" then
+  if waypoint.type == "time-passed" or waypoint.type == "inactivity" then
     return {
       {
-        type = "button", style = "train_schedule_condition_time_selection_button", caption = {"time-symbol-seconds", waypoint.wait_time},
-        actions = {on_click = {action = "select_time", index = i}}
+        type = "slider", style = "sp_compact_notched_slider", minimum_value = 0, maximum_value = #slider_values, value = slider_value_index(waypoint.wait_time), discrete_slider = true,
+        ref = {"time_slider", i},
+        actions = {on_value_changed = {action = "update_text_field", index = i}}
       },
-      {type = "label", style = "squashable_label", caption = {"gui-train.passed"}}
-    }
-  elseif waypoint.type == "inactivity" then
-    return {
       {
-        type = "button", style = "train_schedule_condition_time_selection_button", caption = {"time-symbol-seconds", waypoint.wait_time},
-        actions = {on_click = {action = "select_time", index = i}}
-      },
-      {type = "label", style = "squashable_label", caption = {"gui-train.of-inactivity"}}
+        type = "textfield", style = "sp_compact_slider_value_textfield", numeric = true, allow_decimal = false, allow_negative = false, text = tostring(waypoint.wait_time) .. " s", lose_focus_on_confirm = true,
+        ref = {"time_textfield", i},
+        actions = {on_text_changed = {action = "update_slider", index = i}, on_click = {action = "remove_s", index = i}, on_confirmed = {action = "add_s", index = i}}
+      }
     }
-  --[[elseif waypoint.type == "full-inventory" then
-    return {
-      {type = "label", style = "squashable_label_with_left_padding", caption = {"gui-train-wait-condition-description.full-condition"}}
-    }
-  elseif waypoint.type == "empty-inventory" then
-    return {
-      {type = "label", style = "squashable_label_with_left_padding", caption = {"gui-train-wait-condition-description.empty-condition"}}
-    }]]
   end
 end
 
@@ -196,6 +198,8 @@ function patrol_gui.update_gui_schedule(waypoint_info)
         local new_gui_elements = gui.build(scroll_pane, waypoint_frames)
         -- Copy across new gui elements to global storage
         gui_elements.waypoint_dropdown = new_gui_elements.waypoint_dropdown
+        gui_elements.time_slider = new_gui_elements.time_slider
+        gui_elements.time_textfield = new_gui_elements.time_textfield
       else
         -- Clear GUI
         local relative_frame = player.gui.relative["sp-relative-frame"]
@@ -267,14 +271,6 @@ script.on_event(defines.events.on_gui_click,
       log(serpent.block(action))
       local gui_elements = global.open_gui_elements[player.index]
 
-      local action_gui = action.gui
-      if action_gui and action_gui == "time_select" then
-        -- Click was in time select GUI
-        local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
-        time_select_gui.on_gui_click(global.open_gui_elements[event.player_index].time_select, waypoint_info)
-        return
-      end
-
       local action_name = action.action
       if action_name == "go_to_waypoint" then
         -- 'Play' button
@@ -283,13 +279,6 @@ script.on_event(defines.events.on_gui_click,
           set_on_patrol(true, spidertron, waypoint_info)
           spidertron_control.go_to_next_waypoint(spidertron, action.index)
         end
-      elseif action_name == "select_time" then
-        local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
-        local time_select_gui_elements = gui.build(player.gui.screen, time_select_gui.build_gui(waypoint_info.waypoints[action.index].wait_time, spidertron.unit_number, action.index))
-        time_select_gui_elements.frame.force_auto_center()
-        time_select_gui_elements.frame.bring_to_front()
-        time_select_gui_elements.textfield.focus()
-        global.open_gui_elements[player.index].time_select = time_select_gui_elements
       elseif action_name == "delete_waypoint" then
         -- Delete waypoint button
         local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
@@ -333,6 +322,9 @@ script.on_event(defines.events.on_gui_click,
           camera.entity = nil
           camera.position = waypoint_info.waypoints[action.index].position
         end
+      elseif action_name == "remove_s" then
+        local textfield = gui_elements.time_textfield[action.index]
+        textfield.text = string.sub(textfield.text, 0, -3)
       end
     end
   end
@@ -401,12 +393,24 @@ script.on_event(defines.events.on_gui_selection_state_changed,
   end
 )
 
+local function set_waypoint_time(wait_time, spidertron, waypoint_index)
+  local waypoint_info = get_waypoint_info(spidertron)
+  local waypoint = waypoint_info.waypoints[waypoint_index]
+  waypoint.wait_time = wait_time
+end
+
 script.on_event(defines.events.on_gui_value_changed,
   function(event)
     local action = gui.read_action(event)
     if action then
-      if action.gui == "time_select" then
-        time_select_gui.on_gui_value_changed(global.open_gui_elements[event.player_index].time_select)
+      if action.action == "update_text_field" then
+        local player = game.get_player(event.player_index)
+
+        local gui_elements = global.open_gui_elements[player.index]
+        local wait_time = slider_values[gui_elements.time_slider[action.index].slider_value]
+        gui_elements.time_textfield[action.index].text = tostring(wait_time) .. " s"
+
+        set_waypoint_time(wait_time, player.opened, action.index)
       end
     end
   end
@@ -416,12 +420,36 @@ script.on_event(defines.events.on_gui_text_changed,
   function(event)
     local action = gui.read_action(event)
     if action then
-      if action.gui == "time_select" then
-        time_select_gui.on_gui_text_changed(global.open_gui_elements[event.player_index].time_select)
+      if action.action == "update_slider" then
+        local player = game.get_player(event.player_index)
+
+        local gui_elements = global.open_gui_elements[player.index]
+        local text = gui_elements.time_textfield[action.index].text
+        if text == "" then
+          text = "0"
+        end
+        local wait_time = tonumber(text)
+        gui_elements.time_slider[action.index].slider_value = slider_value_index(wait_time)
+
+        set_waypoint_time(wait_time, player.opened, action.index)
       end
     end
   end
 )
 
+script.on_event(defines.events.on_gui_confirmed,
+  function(event)
+    local action = gui.read_action(event)
+    if action then
+      if action.action == "add_s" then
+        local player = game.get_player(event.player_index)
+
+        local gui_elements = global.open_gui_elements[player.index]
+        local textfield = gui_elements.time_textfield[action.index]
+        textfield.text = textfield.text .. " s"
+      end
+    end
+  end
+)
 
 return patrol_gui

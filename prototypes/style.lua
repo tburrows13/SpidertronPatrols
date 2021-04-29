@@ -48,6 +48,7 @@ styles.sp_spidertron_schedule_station_frame = {
   type = "frame_style",
   parent = "train_schedule_station_frame",
   width = 480,
+  horizontally_stretchable = "off"
 }
 
 
@@ -92,10 +93,21 @@ styles.sp_spidertron_waypoint_label = {
 }
 
 
-
-
 styles.sp_stretchable_empty_widget = {
   type = "empty_widget_style",
   horizontally_stretchable = "stretch_and_expand",
   horizontally_squashable = "on",
+}
+
+styles.sp_compact_notched_slider = {
+  type = "slider_style",
+  parent = "notched_slider",
+  --horizontally_squashable = "on",  -- Doesn't do anything?
+  maximal_width = 115,
+}
+
+styles.sp_compact_slider_value_textfield = {
+  type = "textbox_style",
+  parent = "slider_value_textfield",
+  width = 60,
 }
