@@ -24,6 +24,16 @@ styles.sp_spidertron_schedule_scroll_pane = {
   type = "scroll_pane_style",
   parent = "train_schedule_scroll_pane",
   vertically_stretchable = "stretch_and_expand",
+  background_graphical_set = {
+    position = {282, 17},
+    corner_size = 8,
+    custom_horizontal_tiling_sizes = {28, 440},
+    overall_tiling_horizontal_spacing = 8,
+    overall_tiling_horizontal_padding = 4,
+    overall_tiling_vertical_spacing = 12,
+    overall_tiling_vertical_size = 28,
+    overall_tiling_vertical_padding = 4
+  }
 }
 
 styles.waypoints_switch_padding = {type = "switch_style", parent = "switch", top_padding = 3}  -- Fixes height of switch to be the same as its labels
