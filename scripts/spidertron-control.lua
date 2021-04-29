@@ -97,7 +97,7 @@ function go_to_next_waypoint(spidertron, next_index)
 end
 
 function handle_wait_timers()
-  for unit_number, waypoint_info in pairs(global.spidertron_waypoints) do
+  for _, waypoint_info in pairs(global.spidertron_waypoints) do
     local tick_arrived = waypoint_info.tick_arrived
     if tick_arrived then
       -- Spidertron is waiting
@@ -152,7 +152,7 @@ function handle_wait_timers()
     --update_text(wait_data.spidertron)
   end
 end
-script.on_nth_tick(10, handle_wait_timers)
+script.on_nth_tick(5, handle_wait_timers)
 
 
 script.on_event(defines.events.on_spider_command_completed,
