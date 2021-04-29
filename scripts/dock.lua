@@ -190,7 +190,6 @@ local function update_dock(dock_data)
 end
 script.on_event(defines.events.on_tick,
   function()
-    global.from_k = global.from_k or 1
     if next(global.spidertron_docks) then
       -- TODO Replace '20' with configurable setting?
       global.from_k = for_n_of(global.spidertron_docks, global.from_k, 20, update_dock)
