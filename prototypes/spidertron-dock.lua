@@ -33,6 +33,8 @@ local function create_spidertron_dock(inventory_size)
     icon = "__SpidertronWaypoints__/graphics/icon/spidertron-dock.png",
     icon_size = 64,
     inventory_size = inventory_size,
+    enable_inventory_bar = false,
+    scale_info_icons = false,
     picture = {
       layers = {
         {

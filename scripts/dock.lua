@@ -68,8 +68,16 @@ script.on_event(defines.events.on_pre_player_mined_item,
 function replace_dock(dock, new_dock_name)
   local health = dock.health
   local last_user = dock.last_user
-  local to_be_deconstructed = dock.to_be_deconstructed()  -- Probably does nothing because dock is a car, so can't be deconstructed
-  -- TODO persist player.opened
+  --local circuit_connected_entities = dock.circuit_connected_entities
+  local circuit_connection_definitions = dock.circuit_connection_definitions
+  local to_be_deconstructed = dock.to_be_deconstructed()
+
+  local players_with_gui_open = {}
+  for _, player in pairs(game.connected_players) do
+    if player.opened == dock then
+      table.insert(players_with_gui_open, player)
+    end
+  end
 
   old_dock = dock
   dock = dock.surface.create_entity{name = new_dock_name, position = dock.position, force = dock.force, spill = false, create_build_effect_smoke = false}
@@ -78,8 +86,22 @@ function replace_dock(dock, new_dock_name)
   dock.health = health
   dock.last_user = last_user
 
+  for _, definition in pairs(circuit_connection_definitions) do
+    dock.connect_neighbour{
+      wire = definition.wire,
+      target_entity = definition.target_entity,
+      target_circuit_id = definition.target_circuit_id
+    }
+  end
+
   if to_be_deconstructed then
     dock.order_deconstruction(dock.force)
+  end
+
+  for _, player in pairs(players_with_gui_open) do
+    if player.valid then
+      player.opened = dock
+    end
   end
 
   script.register_on_entity_destroyed(dock)
