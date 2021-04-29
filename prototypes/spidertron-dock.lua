@@ -24,46 +24,46 @@ local dock_recipe = {
 }
 
 
---[[
 -- "container" definition doesn't support filters, but does support circuit connections
 local function create_spidertron_dock(inventory_size)
   return {
     type = "container",
     name = "sp-spidertron-dock-" .. inventory_size,
-    icon = "__SpidertronWaypoints__/graphics/icon/spidertron-chest.png",
+    localised_name = {"entity-name.sp-spidertron-dock"},
+    icon = "__SpidertronWaypoints__/graphics/icon/spidertron-dock.png",
     icon_size = 64,
     inventory_size = inventory_size,
     picture = {
       layers = {
         {
-          filename = "__SpidertronWaypoints__/graphics/entity/spidertron-chest.png",
+          filename = "__base__/graphics/entity/artillery-turret/artillery-turret-base.png",
           height = 100,
+          width = 104,
+          priority = "high",
           hr_version = {
-            filename = "__SpidertronWaypoints__/graphics/entity/hr-spidertron-chest.png",
+            filename = "__base__/graphics/entity/artillery-turret/hr-artillery-turret-base.png",
             height = 199,
+            width = 207,
             priority = "high",
             scale = 0.5,
-            width = 207
           },
-          priority = "high",
-          width = 104,
         },
         {
           draw_as_shadow = true,
-          filename = "__SpidertronWaypoints__/graphics/entity/shadow.png",
+          filename = "__base__/graphics/entity/artillery-turret/artillery-turret-base-shadow.png",
           height = 75,
+          width = 138,
+          shift = {0.5625, 0.5},
+          priority = "high",
           hr_version = {
             draw_as_shadow = true,
-            filename = "__SpidertronWaypoints__/graphics/entity/hr-shadow.png",
+            filename = "__base__/graphics/entity/artillery-turret/hr-artillery-turret-base-shadow.png",
             height = 149,
+            width = 277,
+            shift = {0.5625, 0.5},
             priority = "high",
             scale = 0.5,
-            shift = {0.5625, 0.5},
-            width = 277,
           },
-          priority = "high",
-          shift = {0.5625, 0.5},
-          width = 138,
         },
       }
     },
@@ -72,8 +72,8 @@ local function create_spidertron_dock(inventory_size)
     circuit_wire_max_distance = circuit_connections.circuit_wire_max_distance,
     max_health = 600,
     minable = {mining_time = 1, result = "sp-spidertron-dock"},
+    placeable_by = {item = "sp-spidertron-dock", count = 1},
     corpse = "artillery-turret-remnants",
-    fast_replaceable_group = "sp-spidertron-container",
     close_sound = {
       filename = "__base__/sound/metallic-chest-close.ogg",
       volume = 0.6
@@ -87,8 +87,8 @@ local function create_spidertron_dock(inventory_size)
     flags = {"placeable-neutral", "player-creation"},
   }
 end
-]]
 
+--[[
 local function create_spidertron_dock(inventory_size)
   -- TODO Fix map colors and collision masks
   return {
@@ -168,7 +168,7 @@ local function create_spidertron_dock(inventory_size)
     selection_box = {{-1.5, -1.5}, {1.5, 1.5}},
     flags = {"placeable-neutral", "player-creation"},
   }
-end
+end]]
 
 
 local sizes_created = {0}

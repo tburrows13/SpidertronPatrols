@@ -58,7 +58,7 @@ script.on_event(defines.events.on_pre_player_mined_item,
     -- because all their items are duplicates from the spidertron's inventory
     local dock = event.entity
     if dock and string.sub(dock.name, 0, 14) == "sp-spidertron-" then
-      local dock_inventory = dock.get_inventory(defines.inventory.car_trunk)
+      local dock_inventory = dock.get_inventory(defines.inventory.chest)
       dock_inventory.clear()
     end
   end
@@ -93,9 +93,12 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
   local spidertron_inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
   local spidertron_contents = spidertron_inventory.get_contents()
 
-  -- TODO Copy across filters
+  -- Can't deal with filters because "container" entities don't support them
+  if spidertron_inventory.is_filtered() then
+    game.print("Warning, cannot deal with filtered inventories")
+  end
 
-  local dock_inventory = dock.get_inventory(defines.inventory.car_trunk)
+  local dock_inventory = dock.get_inventory(defines.inventory.chest)
   local dock_contents = dock_inventory.get_contents()
 
   local spidertron_diff = table_diff(spidertron_contents, previous_contents)
@@ -173,7 +176,7 @@ local function update_dock(dock_data)
             surface.create_entity{name = "flying-text", position = dock.position, text = "Spidertron docked"}
 
             local spidertron_contents = inventory.get_contents()
-            local dock_inventory = dock.get_inventory(defines.inventory.car_trunk)
+            local dock_inventory = dock.get_inventory(defines.inventory.chest)
             for item_name, count in pairs(spidertron_contents) do
               dock_inventory.insert{name = item_name, count = count}
             end
