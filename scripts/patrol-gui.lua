@@ -374,8 +374,10 @@ script.on_event(defines.events.on_gui_selection_state_changed,
         local new_waypoint_type = dropdown_index_lookup[dropdown.selected_index]
         if waypoint.type ~= new_waypoint_type then
           waypoint.type = new_waypoint_type
-          if new_waypoint_type == "time-passed" or new_waypoint_type == "inactivity" then
-            waypoint.wait_time = 0
+          if new_waypoint_type == "time-passed" then
+            waypoint.wait_time = 30
+          elseif new_waypoint_type == "inactivity" then
+            waypoint.wait_time = 5
           else
             waypoint.wait_time = nil
           end
