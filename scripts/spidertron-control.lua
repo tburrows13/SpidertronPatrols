@@ -75,7 +75,7 @@ local function was_spidertron_inactive(spidertron, old_inventories)
 end
 
 
-local function leave_waypoint(spidertron)
+function go_to_next_waypoint(spidertron, next_index)
   local waypoint_info = get_waypoint_info(spidertron)
 
   local number_of_waypoints = #waypoint_info.waypoints
@@ -85,8 +85,8 @@ local function leave_waypoint(spidertron)
     waypoint_info.tick_inactive = nil
     waypoint_info.previous_inventories = nil
 
-    local next_index = ((waypoint_info.current_index) % number_of_waypoints) + 1
-    spidertron.add_autopilot_destination(waypoint_info.waypoints[next_index].position)
+    next_index = next_index or ((waypoint_info.current_index) % number_of_waypoints) + 1
+    spidertron.autopilot_destination = waypoint_info.waypoints[next_index].position
     waypoint_info.current_index = next_index
 
     patrol_gui.update_gui_schedule(waypoint_info)
@@ -106,12 +106,12 @@ function handle_wait_timers()
       local waypoint_type = waypoint.type
       if waypoint_type == "time-passed" then
         if (game.tick - waypoint_info.tick_arrived) >= waypoint.wait_time * 60 then
-          leave_waypoint(spidertron)
+          go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "inactivity" then
         if was_spidertron_inactive(spidertron, waypoint_info.previous_inventories) then
           if (game.tick - waypoint_info.tick_inactive) <= waypoint.wait_time * 60 then
-            leave_waypoint(spidertron)
+            go_to_next_waypoint(spidertron)
           end
         else
           waypoint_info.tick_inactive = game.tick
@@ -122,27 +122,27 @@ function handle_wait_timers()
         if inventory.find_empty_stack() == nil then
           local last_stack = inventory[#inventory]
           if last_stack.valid_for_read and last_stack.count == last_stack.prototype.stack_size then
-            leave_waypoint(spidertron)
+            go_to_next_waypoint(spidertron)
           end
         end
       elseif waypoint_type == "empty-inventory" then
         if spidertron.get_inventory(defines.inventory.spider_trunk).is_empty() then
-          leave_waypoint(spidertron)
+          go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "item-count" then
         -- TODO
       elseif waypoint_type == "robots-inactive" then
         local logistic_network = spidertron.logistic_network
         if logistic_network.all_construction_robots == logistic_network.available_construction_robots then
-          leave_waypoint(spidertron)
+          go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "passenger-present" then
         if spidertron.get_driver() or spidertron.get_passenger() then
-          leave_waypoint(spidertron)
+          go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "passenger-not-present" then
         if not (spidertron.get_driver() or spidertron.get_passenger()) then
-          leave_waypoint(spidertron)
+          go_to_next_waypoint(spidertron)
         end
       end
     end
@@ -162,7 +162,7 @@ script.on_event(defines.events.on_spider_command_completed,
       local waypoint_type = waypoint.type
 
       if waypoint_type == "none" or ((waypoint_type == "time-passed" or waypoint_type == "inactivity") and waypoint.wait_time == 0) then
-        leave_waypoint(spidertron)
+        go_to_next_waypoint(spidertron)
       else
         waypoint_info.tick_arrived = game.tick
         patrol_gui.update_gui_schedule(waypoint_info)
@@ -171,3 +171,5 @@ script.on_event(defines.events.on_spider_command_completed,
     end
   end
 )
+
+return {go_to_next_waypoint = go_to_next_waypoint}

@@ -5,7 +5,7 @@ local waypoint_rendering = require "scripts.waypoint-rendering"
 local remote_interface = require "scripts.remote-interface"
 local dock_script = require "scripts.dock"
 local patrol_gui = require "scripts.patrol-gui"
-local spidertron_control = require "scripts.spidertron-control"
+spidertron_control = require "scripts.spidertron-control"
 
 --[[
 Globals:

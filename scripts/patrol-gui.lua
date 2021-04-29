@@ -77,7 +77,10 @@ local function build_waypoint_frames(waypoint_info)
 
     table.insert(frames,
       {type = "frame", name = "schedule-waypoint-" .. i, style = "sp_spidertron_schedule_station_frame", children = {
-        {type = "sprite-button", style = button_style, mouse_button_filter = {"left"}, sprite = button_sprite},
+        {
+          type = "sprite-button", style = button_style, mouse_button_filter = {"left"}, sprite = button_sprite,
+          actions = {on_click = {action = "go_to_waypoint", index = i}}
+        },
         {
           type = "label", style = "sp_spidertron_waypoint_label", caption = "#" .. tostring(i),
           actions = {on_click = {action = "move_camera_to_waypoint", index = i}}
@@ -87,7 +90,7 @@ local function build_waypoint_frames(waypoint_info)
           build_waypoint_player_input(waypoint)
         },
         {type = "empty-widget", style = "waypoints_empty_filler"},
-        {type = "sprite-button", style = "train_schedule_delete_button", actions = {on_click = {action = "delete_waypoint", unit_number = waypoint_info.spidertron.unit_number, index = i}}, mouse_button_filter = {"left"}, sprite = "utility/close_white", hovered_sprite = "utility/close_black"}
+        {type = "sprite-button", style = "train_schedule_delete_button", actions = {on_click = {action = "delete_waypoint", index = i}}, mouse_button_filter = {"left"}, sprite = "utility/close_white", hovered_sprite = "utility/close_black"}
       }}
     )
   end
@@ -99,7 +102,7 @@ local function build_on_patrol_switch(waypoint_info)
   if waypoint_info.on_patrol then switch_state = "left" else switch_state = "right" end
   return {
     type = "switch",
-    ref = {"on-patrol-switch"},
+    ref = {"on_patrol_switch"},
     actions = {on_switch_state_changed = {action = "toggle_on_patrol", unit_number = waypoint_info.spidertron.unit_number}},
     switch_state = switch_state,
     left_label_caption = {"gui-train.automatic-mode"},
@@ -200,7 +203,7 @@ function patrol_gui.update_gui_switch(waypoint_info)
   for _, player in pairs(game.players) do
     local gui_elements = global.open_gui_elements[player.index]
     if gui_elements then
-      local switch = gui_elements["on-patrol-switch"]
+      local switch = gui_elements.on_patrol_switch
       gui.update(
         switch,
         {elem_mods = {switch_state = build_on_patrol_switch(waypoint_info).switch_state}}
@@ -253,12 +256,32 @@ script.on_event(defines.events.on_gui_click,
       log(serpent.block(action))
       local gui_elements = global.open_gui_elements[player.index]
 
-      if action.action == "delete_waypoint" then
+      local action_name = action.action
+      if action_name == "go_to_waypoint" then
+        -- 'Play' button
         local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
-        table.remove(waypoint_info.waypoints, action.index)
+        if not waypoint_info.on_patrol or action.index ~= waypoint_info.current_index then
+          set_on_patrol(true, spidertron, waypoint_info)
+          spidertron_control.go_to_next_waypoint(spidertron, action.index)
+        end
+      elseif action_name == "delete_waypoint" then
+        -- Delete waypoint button
+        local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
+        local waypoints = waypoint_info.waypoints
+        local index_to_delete = action.index
+        if waypoint_info.current_index > index_to_delete then
+          waypoint_info.current_index = waypoint_info.current_index - 1
+        end
+        table.remove(waypoints, index_to_delete)
+        if not waypoints[index_to_delete] then
+          waypoint_info.current_index = 1
+        end
+        if waypoint_info.on_patrol then
+          spidertron_control.go_to_next_waypoint(spidertron, waypoint_info.current_index)
+        end
         patrol_gui.update_gui_schedule(waypoint_info)
-
-      elseif action.action == "toggle_camera_center_on_spidertron" then
+      elseif action_name == "toggle_camera_center_on_spidertron" then
+        -- Recenter button
         if gui_elements then
           local center_button = gui_elements.center_button
           local camera = gui_elements.camera
@@ -273,7 +296,8 @@ script.on_event(defines.events.on_gui_click,
             camera.position = spidertron.position
           end
         end
-      elseif action.action == "move_camera_to_waypoint" then
+      elseif action_name == "move_camera_to_waypoint" then
+        -- Numbered labels
         if gui_elements then
           local center_button = gui_elements.center_button
           local camera = gui_elements.camera
@@ -288,6 +312,18 @@ script.on_event(defines.events.on_gui_click,
   end
 )
 
+function set_on_patrol(on_patrol, spidertron, waypoint_info)
+  if on_patrol then
+    --local next_waypoint = waypoint_info.waypoints[waypoint_info.current_index] or waypoint_info.waypoints[1]
+    spidertron_control.go_to_next_waypoint(spidertron, waypoint_info.current_index)
+  else
+    spidertron.autopilot_destination = nil
+  end
+  waypoint_info.on_patrol = on_patrol
+  patrol_gui.update_gui_switch(waypoint_info)
+
+end
+
 script.on_event(defines.events.on_gui_switch_state_changed,
   function(event)
     local action = gui.read_action(event)
@@ -299,19 +335,10 @@ script.on_event(defines.events.on_gui_switch_state_changed,
       if action.action == "toggle_on_patrol" then
         local gui_elements = global.open_gui_elements[player.index]
         if gui_elements then
-          local switch = gui_elements["on-patrol-switch"]
+          local switch = gui_elements.on_patrol_switch
           local waypoint_info = global.spidertron_waypoints[action.unit_number]
           local on_patrol = switch.switch_state == "left"
-          if on_patrol then
-            local next_waypoint = waypoint_info.waypoints[waypoint_info.current_index] or waypoint_info.waypoints[1]
-            if next_waypoint then
-              spidertron.autopilot_destination = next_waypoint.position
-            end
-          else
-            spidertron.autopilot_destination = nil
-          end
-          waypoint_info.on_patrol = on_patrol
-          patrol_gui.update_gui_switch(waypoint_info)
+          set_on_patrol(on_patrol, spidertron, waypoint_info)
         end
       end
     end
