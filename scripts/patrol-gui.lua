@@ -159,7 +159,10 @@ local function build_gui(player, spidertron)
         {type = "flow", direction = "vertical", style = "inset_frame_container_vertical_flow", children = {
           {type = "frame", style = "inside_shallow_frame", children = {
             --{type = "frame", style = "sp_spidertron_minimap_frame", children = {
-              {type = "camera", style = "sp_spidertron_camera", ref = {"camera"}, position = spidertron.position, surface_index = spidertron.surface.index, zoom = 0.5, elem_mods = {entity = spidertron}},
+              {
+                type = "camera", style = "sp_spidertron_camera", position = spidertron.position, surface_index = spidertron.surface.index, zoom = 0.5, elem_mods = {entity = spidertron},
+                ref = {"camera"},
+              },
 
               --{type = "minimap", style = "minimap", position = spidertron.position, surface_index = spidertron.surface.index, zoom = 2},
             --}},
@@ -174,6 +177,10 @@ local function build_gui(player, spidertron)
                   type = "sprite-button", style = "sp_clicked_tool_button", mouse_button_filter = {"left"}, sprite = "utility/center", tooltip = {"gui-patrol.center-on-spidertron"},
                   ref = {"center_button"},
                   actions = {on_click = {action = "toggle_camera_center_on_spidertron"}},
+                },
+                {
+                  type = "sprite-button", style = "tool_button", mouse_button_filter = {"left"}, sprite = "utility/map", tooltip = {"gui-train.open-in-map"},
+                  actions = {on_click = {action = "open_location_in_map"}},
                 }
               }},
             }},
@@ -285,7 +292,6 @@ script.on_event(defines.events.on_gui_click,
       local player = game.get_player(event.player_index)
       local spidertron = player.opened
       assert(spidertron.type == "spider-vehicle")
-      log(serpent.block(action))
       local gui_elements = global.open_gui_elements[player.index]
 
       local action_name = action.action
@@ -314,6 +320,16 @@ script.on_event(defines.events.on_gui_click,
         end
         patrol_gui.update_gui_schedule(waypoint_info)
         update_render_text(spidertron)
+      elseif action_name == "open_location_in_map" then
+        local camera = gui_elements.camera
+        local entity = camera.entity
+        if entity then
+          player.open_map(entity.position, 0.109)  -- 0.109 deduced by experimentation to be close to vanilla 'open in map' scale
+        else
+          log("Opening map in position, " .. serpent.block(camera.position))
+          player.open_map(camera.position, 0.109)
+        end
+        player.opened = nil
       elseif action_name == "toggle_camera_center_on_spidertron" then
         -- Recenter button
         if gui_elements then
