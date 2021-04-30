@@ -181,7 +181,11 @@ local function build_gui(player, spidertron)
                 {
                   type = "sprite-button", style = "tool_button", mouse_button_filter = {"left"}, sprite = "utility/map", tooltip = {"gui-train.open-in-map"},
                   actions = {on_click = {action = "open_location_in_map"}},
-                }
+                },
+                {
+                  type = "sprite-button", style = "tool_button", mouse_button_filter = {"left"}, sprite = "utility/reset", tooltip = {"gui-patrol.delete-all-waypoints"},
+                  actions = {on_click = {action = "delete_all_waypoints"}},
+                },
               }},
             }},
             {type = "scroll-pane", style = "sp_spidertron_schedule_scroll_pane", ref = {"schedule-scroll-pane"}, horizontal_scroll_policy = "never", vertical_scroll_policy = "auto-and-reserve-space", children =
@@ -245,8 +249,6 @@ function patrol_gui.update_gui_schedule(waypoint_info)
 end
 
 function patrol_gui.update_gui_switch(waypoint_info)
-  local spidertron = waypoint_info.spidertron
-
   for _, player in pairs(game.players) do
     local gui_elements = global.open_gui_elements[player.index]
     if gui_elements then
@@ -320,6 +322,8 @@ script.on_event(defines.events.on_gui_click,
         end
         patrol_gui.update_gui_schedule(waypoint_info)
         update_render_text(spidertron)
+      elseif action_name == "delete_all_waypoints" then
+        clear_spidertron_waypoints(spidertron)
       elseif action_name == "open_location_in_map" then
         local camera = gui_elements.camera
         local entity = camera.entity

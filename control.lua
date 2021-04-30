@@ -59,7 +59,8 @@ function clear_spidertron_waypoints(spidertron, unit_number)
       rendering.destroy(global.sub_render_ids[render_id])
     end]]
   end
-
+  waypoint_info.waypoints = {}
+  patrol_gui.update_gui_schedule(waypoint_info)
   global.spidertron_waypoints[unit_number] = nil
 end
 
