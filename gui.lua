@@ -211,7 +211,7 @@ function save_and_exit_gui(player, gui_elements)
 
     waypoint.wait_time_manually_set = true
     if gui_elements.spidertron and gui_elements.spidertron.valid then  -- if condition for guis created in 1.4.3
-      update_text(gui_elements.spidertron)
+      update_render_text(gui_elements.spidertron)
     end
   end
 end

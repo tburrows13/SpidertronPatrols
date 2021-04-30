@@ -32,7 +32,7 @@ function on_patrol_command_issued(player, spidertron, position)
     spidertron.autopilot_destination = nil
   end
   patrol_gui.update_gui_schedule(waypoint_info)
-  update_text(spidertron)  -- Inserts text at the position that we have just added
+  update_render_text(spidertron)  -- Inserts text at the position that we have just added
 
 end
 
@@ -148,7 +148,6 @@ function handle_wait_timers()
         end
       end
     end
-    --update_text(wait_data.spidertron)
   end
 end
 script.on_nth_tick(5, handle_wait_timers)

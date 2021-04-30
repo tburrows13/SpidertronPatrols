@@ -246,7 +246,7 @@ function patrol_gui.update_gui_switch(waypoint_info)
         switch,
         {elem_mods = {switch_state = build_on_patrol_switch(waypoint_info).switch_state}}
       )
-      patrol_gui.update_gui_schedule(waypoint_info)
+      patrol_gui.update_gui_button_states(waypoint_info)
     end
   end
 end
@@ -302,6 +302,7 @@ script.on_event(defines.events.on_gui_click,
         if waypoint_info.current_index > index_to_delete then
           waypoint_info.current_index = waypoint_info.current_index - 1
         end
+        rendering.destroy(waypoints[index_to_delete].render_id)
         table.remove(waypoints, index_to_delete)
         if not waypoints[index_to_delete] then
           waypoint_info.current_index = 1
@@ -310,6 +311,7 @@ script.on_event(defines.events.on_gui_click,
           spidertron_control.go_to_next_waypoint(spidertron, waypoint_info.current_index)
         end
         patrol_gui.update_gui_schedule(waypoint_info)
+        update_render_text(spidertron)
       elseif action_name == "toggle_camera_center_on_spidertron" then
         -- Recenter button
         if gui_elements then

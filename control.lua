@@ -16,19 +16,12 @@ global.spidertron_waypoints: indexed by spidertron.unit_number:
     position :: Position (Concept)
     wait_time :: int (in seconds, only with "time-passed" or "inactivity")
     [TBC "item-count" condition info]
+    render_id :: int
   current_index :: int (index of waypoints)
   tick_arrived :: int (only set when at a waypoint)
   tick_inactive :: int (only used whilst at an "inactivity" waypoint)
   previous_inventories :: table (only used whilst at an "inactivity" waypoint)
   on_patrol :: bool
-  [TBC render_ids :: auto-generatated from waypoints]
-
-global.selection_gui: indexed by player.index
-  frame :: LuaGuiElement
-  slider :: LuaGuiElement
-  text :: LuaGuiElement
-  confirm :: LuaGuiElement
-  waypoint :: Waypoint (defined above) - the waypoint that this dialog is setting
 ]]
 
 
@@ -49,7 +42,7 @@ function get_waypoint_info(spidertron)
 end
 
 function clear_spidertron_waypoints(spidertron, unit_number)
-  -- Called on Shift-Click or whenever the current autopilot_destination is removed or when the spidertron is removed.
+  -- Called on custom-input or whenever the current autopilot_destination is removed or when the spidertron is removed.
   -- Pass in either `spidertron` or `unit_number`
   local waypoint_info
   if spidertron then
@@ -60,11 +53,11 @@ function clear_spidertron_waypoints(spidertron, unit_number)
   end
   if not unit_number then unit_number = spidertron.unit_number end
   log("Clearing spidertron waypoints for unit number " .. unit_number)
-  for i, render_id in pairs(waypoint_info.render_ids) do
-    rendering.destroy(render_id)
-    if global.sub_render_ids[render_id] then
+  for _, waypoint in pairs(waypoint_info.waypoints) do
+    rendering.destroy(waypoint.render_id)
+    --[[if global.sub_render_ids[render_id] then
       rendering.destroy(global.sub_render_ids[render_id])
-    end
+    end]]
   end
 
   global.spidertron_waypoints[unit_number] = nil
@@ -84,9 +77,9 @@ script.on_event("clear-spidertron-waypoints",
   end
 )
 
+--[[
 function generate_sub_text(waypoint, spidertron)
-  return
-  --[[local wait_data = global.spidertrons_waiting[spidertron.unit_number]
+  local wait_data = global.spidertrons_waiting[spidertron.unit_number]
 
   if waypoint.wait_time and waypoint.wait_time > 0 then
     local string = tostring(waypoint.wait_time) .. "s"
@@ -98,7 +91,6 @@ function generate_sub_text(waypoint, spidertron)
     end
     return string
   end
-  ]]
 end
 
 function update_sub_text(waypoint, parent_render_id, spidertron)
@@ -122,33 +114,28 @@ function update_sub_text(waypoint, parent_render_id, spidertron)
     global.sub_render_ids[parent_render_id] = render_id
   end
 end
+]]
 
-function update_text(spidertron)
+function update_render_text(spidertron)
   -- Updates numbered text on ground for given spidertron
   local waypoint_info = get_waypoint_info(spidertron)
   -- Re-render all waypoints
   for i, waypoint in pairs(waypoint_info.waypoints) do
-    local render_id = waypoint_info.render_ids[i]
+    local render_id = waypoint.render_id
     if render_id and rendering.is_valid(render_id) then
       if rendering.get_text(render_id) ~= tostring(i) then
-        -- Only update text
         rendering.set_text(render_id, i)
-        rendering.set_color(render_id, spidertron.color)  -- In case the color has changed as well
+      end
+      if rendering.get_color(render_id) ~= spidertron.color then
+        rendering.set_color(render_id, spidertron.color)
       end
     else
       -- We need to create the text
-      render_id = rendering.draw_text{text = tostring(i), surface = spidertron.surface, target = {waypoint.position.x, waypoint.position.y - 1.2}, color = spidertron.color, scale = 4, alignment = "center"}
-      waypoint_info.render_ids[i] = render_id
+      render_id = rendering.draw_text{text = tostring(i), surface = spidertron.surface, target = {waypoint.position.x, waypoint.position.y - 1.2}, color = spidertron.color, scale = 4.5, alignment = "center"}
+      waypoint.render_id = render_id
     end
-    update_sub_text(waypoint, render_id, spidertron)
   end
 end
-
---require 'gui'
-
-
-
-
 
 
 -- Detect when the player cancels a spidertron's autopilot_destination
@@ -189,8 +176,10 @@ local function setup()
     global.waypoint_visualisations = {}
     global.sub_render_ids = {}
     global.wait_time_defaults = {}
+
     global.spidertron_docks = {}
     global.spidertrons_docked = {}
+
     global.open_gui_elements = {}
     remote_interface.connect_to_remote_interfaces()
     settings_changed()
