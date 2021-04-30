@@ -11,7 +11,7 @@ data:extend{
       },
       {
         type = "unlock-recipe",
-        recipe = "sp-spidertron-remote-patrol"
+        recipe = "sp-spidertron-patrol-remote"
       },
     },
     prerequisites = {

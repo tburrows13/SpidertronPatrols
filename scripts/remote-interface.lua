@@ -13,7 +13,7 @@ local on_spidertron_given_new_destination = script.generate_event_name()
 remote.add_interface("SpidertronPatrols", {get_events = function() return {on_spidertron_given_new_destination = on_spidertron_given_new_destination} end,
                                              clear_waypoints = function(unit_number) clear_spidertron_waypoints(nil, unit_number) end,
                                              assign_waypoints = function(spidertron, waypoints) remote_interface_assign_waypoints(spidertron, waypoints, true, false, "spidertron-remote-waypoint") end,
-                                             assign_patrol = function(spidertron, waypoints) remote_interface_assign_waypoints(spidertron, waypoints, false, true, "spidertron-remote-patrol") end,
+                                             assign_patrol = function(spidertron, waypoints) remote_interface_assign_waypoints(spidertron, waypoints, false, true, "spidertron-patrol-remote") end,
                                             }
 )
 

@@ -5,7 +5,7 @@ script.on_event({defines.events.on_player_cursor_stack_changed, defines.events.o
     --[[
     local player = game.get_player(event.player_index)
     local cursor_stack = player.cursor_stack
-    if cursor_stack and cursor_stack.valid_for_read and cursor_stack.name == "sp-spidertron-remote-patrol" then
+    if cursor_stack and cursor_stack.valid_for_read and cursor_stack.name == "sp-spidertron-patrol-remote" then
       local spidertron = cursor_stack.connected_entity
       if spidertron then
         local waypoint_info = get_waypoint_info(spidertron)

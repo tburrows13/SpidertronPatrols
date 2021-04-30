@@ -161,8 +161,9 @@ script.on_event(defines.events.on_entity_destroyed,
   end
 )
 
+--[[
 local function settings_changed()
-  global.scroll_modes = {"spidertron-remote"}
+    global.scroll_modes = {"spidertron-remote"}
   if settings.global["spidertron-waypoints-include-waypoint"].value then
     table.insert(global.scroll_modes, "spidertron-remote-waypoint")
   end
@@ -171,6 +172,7 @@ local function settings_changed()
   end
 end
 script.on_event(defines.events.on_runtime_mod_setting_changed, settings_changed)
+]]
 
 local function setup()
     global.spidertron_waypoints = {}
