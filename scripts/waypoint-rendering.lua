@@ -1,3 +1,4 @@
+-- Unused
 script.on_event({defines.events.on_player_cursor_stack_changed, defines.events.on_player_configured_spider_remote},
   function(event)
     return

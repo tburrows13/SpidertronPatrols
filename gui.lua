@@ -1,3 +1,4 @@
+-- Unused
 local slider_values = {1, 2, 5, 10, 15, 20, 30, 45, 60, 120, 240, 600}
 slider_values[0] = 0
 
