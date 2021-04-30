@@ -1,23 +1,7 @@
-local function generate_bounding_box(position, offset)
-  return {{position.x - offset, position.y - offset}, {position.x + offset, position.y + offset}}
-end
-
--- Stop other players being able to select the waypoint entities
-script.on_event(defines.events.on_selected_entity_changed,
-  function(event)
-    local player = game.get_player(event.player_index)
-    local entity = player.selected
-    if entity and entity.name == "sp-spidertron-waypoint" then
-      --local player_index = global.waypoint_entities[entity.unit_number]
-      if player.index ~= entity.last_user.index then
-        player.selected = nil
-      end
-    end
-  end
-)
-
 script.on_event({defines.events.on_player_cursor_stack_changed, defines.events.on_player_configured_spider_remote},
   function(event)
+    return
+    --[[
     local player = game.get_player(event.player_index)
     local cursor_stack = player.cursor_stack
     if cursor_stack and cursor_stack.valid_for_read and cursor_stack.name == "sp-spidertron-remote-patrol" then
@@ -50,7 +34,7 @@ script.on_event({defines.events.on_player_cursor_stack_changed, defines.events.o
           waypoint_entity.destroy()
         end
       end
-    end
+    end]]
   end
 )
 

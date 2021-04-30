@@ -92,7 +92,8 @@ end
 
 --[[
 local function create_spidertron_dock(inventory_size)
-  -- TODO Fix map colors and collision masks
+  -- Fix map colors and collision masks before using
+  -- Overall, "container" is preferred because it supports circuits and is blueprintable
   return {
     type = "car",
     name = "sp-spidertron-dock-" .. inventory_size,

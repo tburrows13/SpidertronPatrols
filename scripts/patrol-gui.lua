@@ -104,7 +104,7 @@ local function build_waypoint_frames(waypoint_info)
         {type = "flow", style = "player_input_horizontal_flow", children =
           build_waypoint_player_input(i, waypoint)
         },
-        {type = "empty-widget", style = "waypoints_empty_filler"},
+        {type = "empty-widget", style = "sp_empty_filler"},
         {
           type = "sprite-button", style = "train_schedule_delete_button",
           actions = {on_click = {action = "delete_waypoint", index = i}}, mouse_button_filter = {"left"}, sprite = "utility/close_white", hovered_sprite = "utility/close_black"
@@ -169,7 +169,7 @@ local function build_gui(player, spidertron)
                 build_on_patrol_switch(waypoint_info),
                 {type = "empty-widget", style = "sp_stretchable_empty_widget"},
                 {
-                  type = "sprite-button", style = "sp_clicked_tool_button", mouse_button_filter = {"left"}, sprite = "utility/center", tooltip = {"gui-patrol.center-on-spidertron"},
+                  type = "sprite-button", style = "sp_clicked_tool_button", mouse_button_filter = {"left"}, sprite = "utility/center", tooltip = {"patrol-gui.center-on-spidertron"},
                   ref = {"center_button"},
                   actions = {on_click = {action = "toggle_camera_center_on_spidertron"}},
                 }
@@ -257,7 +257,6 @@ script.on_event(defines.events.on_gui_opened,
     local player = game.get_player(event.player_index)
     local entity = event.entity
     if entity and entity.type == "spider-vehicle" then
-      global.open_gui_elements = global.open_gui_elements or {}  -- TODO Remove
       global.open_gui_elements[player.index] = build_gui(player, entity)
     end
   end
@@ -272,8 +271,6 @@ script.on_event(defines.events.on_gui_closed,
       if relative_frame then
         relative_frame.destroy()
       end
-      global.open_gui_elements = global.open_gui_elements or {}  -- TODO Remove
-
       global.open_gui_elements[player.index] = nil
     end
   end

@@ -14,20 +14,6 @@ local disconnect_remote_key = {
   consuming = "none",
   order = "ab"
 }
-local complete_patrol_key = {
-  type = "custom-input",
-  name = "waypoints-complete-patrol",
-  key_sequence = "ALT + mouse-button-1",
-  consuming = "none",
-  order = "ac"
-}
-local change_wait_time_key = {
-  type = "custom-input",
-  name = "waypoints-change-wait-conditions",
-  key_sequence = "Y",
-  consuming = "none",
-  order = "ad"
-}
 local change_default_wait_time_key = {
   type = "custom-input",
   name = "waypoints-change-default-wait-conditions",
@@ -41,7 +27,7 @@ local confirm_gui_key = {
   key_sequence = "",
   linked_game_control = "confirm-gui"
 }
-data:extend{clear_waypoints_key, disconnect_remote_key, complete_patrol_key, change_wait_time_key, change_default_wait_time_key, confirm_gui_key}
+data:extend{clear_waypoints_key, disconnect_remote_key, change_default_wait_time_key, confirm_gui_key}
 
 -- Allows getting movement control events to detect when to cancel a spidertron's waypoints
 data:extend{

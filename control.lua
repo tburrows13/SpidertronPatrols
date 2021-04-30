@@ -1,7 +1,6 @@
 local util = require "util"
 require "scripts.utils"
 require "scripts.mode_handling"
-local waypoint_rendering = require "scripts.waypoint-rendering"
 local remote_interface = require "scripts.remote-interface"
 local dock_script = require "scripts.dock"
 local patrol_gui = require "scripts.patrol-gui"
@@ -68,10 +67,7 @@ function clear_spidertron_waypoints(spidertron, unit_number)
     end
   end
 
-  -- TODO Remove waypoint visualisations
-
   global.spidertron_waypoints[unit_number] = nil
-  global.spidertrons_waiting[unit_number] = nil
 end
 
 script.on_event("clear-spidertron-waypoints",

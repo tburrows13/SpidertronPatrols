@@ -1,4 +1,3 @@
--- TODO rename file
 local math2d = require "__core__.lualib.math2d"
 
 local function on_built(event)

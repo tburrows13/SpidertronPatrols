@@ -31,7 +31,7 @@ local function create_gui(player, waypoint_info, default_config)
 
   local vertical_flow_1 = frame.add{type="frame", style="item_and_count_select_background", direction="horizontal"}
   vertical_flow_1.add{type="label", style="heading_2_label", caption={"waypoints-gui.type"}, tooltip={"waypoints-gui.inactivity-explanation-tooltip"}}
-  vertical_flow_1.add{type="empty-widget", style="waypoints_empty_filler"}
+  vertical_flow_1.add{type="empty-widget", style="sp_empty_filler"}
   gui_elements.switch = vertical_flow_1.add{type="switch",
                                             style="waypoints_switch_padding",
                                             name="waypoints-countdown-type-switch",

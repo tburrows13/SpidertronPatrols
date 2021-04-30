@@ -27,12 +27,6 @@ local function spidertron_switched(event)
     global.spidertron_waypoints[previous_unit_number] = nil
   end
 
-  if global.spidertrons_waiting[previous_unit_number] then
-    global.spidertrons_waiting[spidertron.unit_number] = global.spidertrons_waiting[previous_unit_number]
-    global.spidertrons_waiting[spidertron.unit_number].spidertron = spidertron
-    global.spidertrons_waiting[previous_unit_number] = nil
-  end
-
   if global.spidertrons_docked[previous_unit_number] then
     local dock_unit_number = global.spidertrons_docked[previous_unit_number]
     global.spidertrons_docked[spidertron.unit_number] = dock_unit_number
