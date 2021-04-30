@@ -6,13 +6,14 @@ dropdown_contents = {
   {"description.no-limit"},
   {"gui-train.add-time-condition"},
   {"gui-train.add-inactivity-condition"},
-  {"gui-train.add-full-condition"},
-  {"gui-train.add-empty-condition"},
+  {"gui-patrol.full-inventory-condition"},
+  {"gui-patrol.empty-inventory-condition"},
   {"gui-train.add-item-count-condition"},
   {"gui-train.add-robots-inactive-condition"},
-  {"gui-train-wait-condition-description.passenger-present"},
-  {"gui-train-wait-condition-description.passenger-not-present"},
+  {"gui-patrol.driver-present"},
+  {"gui-patrol.driver-not-present"},
 }
+
 dropdown_index = {
   ["none"] = 1,
   ["time-passed"] = 2,
@@ -164,12 +165,13 @@ local function build_gui(player, spidertron)
             --}},
           }},
           {type = "frame", direction = "vertical", style = "inside_shallow_frame", children = {
+            -- TODO Fix styling, add clear-all button
             {type = "frame", direction = "horizontal", style = "stretchable_subheader_frame", children = {
               {type = "flow", style = "train_schedule_mode_switch_horizontal_flow", children = {
                 build_on_patrol_switch(waypoint_info),
                 {type = "empty-widget", style = "sp_stretchable_empty_widget"},
                 {
-                  type = "sprite-button", style = "sp_clicked_tool_button", mouse_button_filter = {"left"}, sprite = "utility/center", tooltip = {"patrol-gui.center-on-spidertron"},
+                  type = "sprite-button", style = "sp_clicked_tool_button", mouse_button_filter = {"left"}, sprite = "utility/center", tooltip = {"gui-patrol.center-on-spidertron"},
                   ref = {"center_button"},
                   actions = {on_click = {action = "toggle_camera_center_on_spidertron"}},
                 }
