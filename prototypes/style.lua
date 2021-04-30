@@ -28,10 +28,17 @@ styles.sp_empty_filler = {
   type = "empty_widget_style",
   horizontally_stretchable = "stretch_and_expand"
 }
-styles.stretchable_subheader_frame = {
+styles.sp_stretchable_subheader_frame = {
   type = "frame_style",
-  parent = "frame",
+  parent = "subheader_frame",
   horizontally_stretchable = "on",
+  horizontally_squashable = "on",
+}
+
+styles.sp_patrol_schedule_mode_switch_horizontal_flow = {
+  type = "horizontal_flow_style",
+  parent = "train_schedule_mode_switch_horizontal_flow",
+  vertical_align = "center",
 }
 
 styles.sp_spidertron_schedule_station_frame = {
