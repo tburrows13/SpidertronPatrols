@@ -1,4 +1,4 @@
-local gui = require "__SpidertronWaypoints__.scripts.gui-beta"
+local gui = require "__SpidertronPatrols__.scripts.gui-beta"
 
 patrol_gui = {}
 

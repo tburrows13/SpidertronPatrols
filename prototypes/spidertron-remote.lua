@@ -1,6 +1,6 @@
 local patrol_remote = table.deepcopy(data.raw["spidertron-remote"]["spidertron-remote"])
 patrol_remote.name = "sp-spidertron-remote-patrol"
-patrol_remote.icon = "__SpidertronWaypoints__/graphics/icon/patrol-remote.png"
+patrol_remote.icon = "__SpidertronPatrols__/graphics/icon/patrol-remote.png"
 patrol_remote.icon_mipmaps = 1
 patrol_remote.order = "b[personal-transport]-c[spidertron]-b[remote]-b[patrol-remote]"
 

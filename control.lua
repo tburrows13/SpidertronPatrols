@@ -189,8 +189,8 @@ local function config_changed_setup(changed_data)
   -- Only run when this mod was present in the previous save as well. Otherwise, on_init will run.
   local mod_changes = changed_data.mod_changes
   local old_version
-  if mod_changes and mod_changes["SpidertronWaypoints"] and mod_changes["SpidertronWaypoints"]["old_version"] then
-    old_version = mod_changes["SpidertronWaypoints"]["old_version"]
+  if mod_changes and mod_changes["SpidertronPatrols"] and mod_changes["SpidertronPatrols"]["old_version"] then
+    old_version = mod_changes["SpidertronPatrols"]["old_version"]
   else
     return
   end

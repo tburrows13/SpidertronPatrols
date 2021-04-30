@@ -45,7 +45,7 @@ end
 local function save_and_exit_gui(gui_elements, waypoint_info)
   local wait_time = gui_elements.textfield.text
 
-  local waypoint = waypoint_info.waypoints[gui_elements.frame.tags["SpidertronWaypoints"].index]
+  local waypoint = waypoint_info.waypoints[gui_elements.frame.tags["SpidertronPatrols"].index]
   waypoint.wait_time = wait_time
 
   gui_elements.frame.destroy()
@@ -64,7 +64,7 @@ function(event)
   if gui_elements then
     local time_select = gui_elements.time_select
     if time_select and time_select.frame and time_select.frame.valid then
-      local waypoint_info = global.spidertron_waypoints[time_select.frame.tags["SpidertronWaypoints"].unit_number]
+      local waypoint_info = global.spidertron_waypoints[time_select.frame.tags["SpidertronPatrols"].unit_number]
       save_and_exit_gui(time_select, waypoint_info)
     end
   end
