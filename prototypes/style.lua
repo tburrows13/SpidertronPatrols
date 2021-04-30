@@ -24,7 +24,10 @@ styles.sp_spidertron_schedule_scroll_pane = {
 -- Only used in gui.lua
 styles.waypoints_switch_padding = {type = "switch_style", parent = "switch", top_padding = 3}  -- Fixes height of switch to be the same as its labels
 
-styles.sp_empty_filler = {type = "empty_widget_style", horizontally_stretchable = "on"}
+styles.sp_empty_filler = {
+  type = "empty_widget_style",
+  horizontally_stretchable = "stretch_and_expand"
+}
 styles.stretchable_subheader_frame = {
   type = "frame_style",
   parent = "frame",
@@ -76,10 +79,20 @@ styles.sp_stretchable_empty_widget = {
   horizontally_squashable = "on",
 }
 
+styles.sp_player_input_horizontal_flow = {
+  type = "horizontal_flow_style",
+  parent = "player_input_horizontal_flow",
+  --horizontally_stretchable = "stretch_and_expand",
+  horizontally_squashable = "on",
+}
+
 styles.sp_compact_notched_slider = {
   type = "slider_style",
   parent = "notched_slider",
-  maximal_width = 115,
+  horizontally_squashable = "on",
+  -- maximal_width = 115,
+  natural_width = 300,
+  minimal_width = 50,
 }
 
 styles.sp_compact_slider_value_textfield = {

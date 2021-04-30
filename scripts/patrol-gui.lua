@@ -102,7 +102,7 @@ local function build_waypoint_frames(waypoint_info)
           ref = {"waypoint_dropdown", i},
           actions = {on_selection_state_changed = {action = "waypoint_type_changed", index = i}}
         },
-        {type = "flow", style = "player_input_horizontal_flow", children =
+        {type = "flow", style = "sp_player_input_horizontal_flow", children =
           build_waypoint_player_input(i, waypoint)
         },
         {type = "empty-widget", style = "sp_empty_filler"},
@@ -418,6 +418,7 @@ local function set_waypoint_time(wait_time, spidertron, waypoint_index)
   waypoint.wait_time = wait_time
 end
 
+-- Slider moved
 script.on_event(defines.events.on_gui_value_changed,
   function(event)
     local action = gui.read_action(event)
@@ -435,6 +436,7 @@ script.on_event(defines.events.on_gui_value_changed,
   end
 )
 
+-- Textfield text changed
 script.on_event(defines.events.on_gui_text_changed,
   function(event)
     local action = gui.read_action(event)
