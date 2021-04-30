@@ -31,6 +31,7 @@ local function create_spidertron_dock(inventory_size)
     type = "container",
     name = "sp-spidertron-dock-" .. inventory_size,
     localised_name = {"entity-name.sp-spidertron-dock"},
+    localised_description = {"entity-description.sp-spidertron-dock"},
     icon = "__SpidertronPatrols__/graphics/icon/spidertron-dock.png",
     icon_size = 64,
     inventory_size = inventory_size,
