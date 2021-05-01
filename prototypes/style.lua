@@ -2,7 +2,9 @@ local styles = data.raw["gui-style"]["default"]
 
 styles.sp_relative_stretchable_frame = {
   type = "frame_style",
-  vertically_stretchable = "stretch_and_expand",
+  --vertically_stretchable = "off",
+  --vertically_squashable = "on",
+  maximal_height = 930,
 }
 
 styles.sp_spidertron_schedule_scroll_pane = {
