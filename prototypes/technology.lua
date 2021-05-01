@@ -36,7 +36,7 @@ data:extend{
   {
     type = "technology",
     name = "sp-spidertron-automation",
-    icon = "__base__/graphics/technology/spidertron.png",
+    icon = "__SpidertronPatrols__/graphics/technology/spidertron-automation.png",
     icon_size = 256, icon_mipmaps = 4,
     effects = {
       {
