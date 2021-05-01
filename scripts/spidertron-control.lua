@@ -8,7 +8,7 @@ local function check_condition(condition, a, b)
     return a < b
   elseif condition == 3 then
     return a == b
-  elseif condition == 4 then 
+  elseif condition == 4 then
     return a >= b
   elseif condition == 5 then
     return a <= b
@@ -50,7 +50,6 @@ function on_patrol_command_issued(player, spidertron, position)
   end
   patrol_gui.update_gui_schedule(waypoint_info)
   update_render_text(spidertron)  -- Inserts text at the position that we have just added
-
 end
 
 

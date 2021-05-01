@@ -450,7 +450,7 @@ script.on_event(defines.events.on_gui_selection_state_changed,
             waypoint.wait_time = nil
           end
           if new_waypoint_type == "item-count" then
-            waypoint.item_count_info = {item_name = nil, condition = 2, count = 0}
+            waypoint.item_count_info = {item_name = nil, condition = 4, count = 100}
           else
             waypoint.item_count_info = nil
           end

@@ -13,7 +13,7 @@ spiderling = util.merge{
     inventory_size = 20,  -- default = 80
     torso_rotation_speed = 0.007,  -- default = 0.005
     height = spiderling.height * 1.3,
-    chunk_exploration_radius = 1,  -- default = 3
+    chunk_exploration_radius = 2,  -- default = 3
     minable = {result = "sp-spiderling"},
     max_health = 1000,  -- default = 3000
     minimap_representation = {scale = 0.3},  -- default = 0.5
