@@ -307,6 +307,9 @@ script.on_event(defines.events.on_gui_closed,
         relative_frame.destroy()
       end
       global.open_gui_elements[player.index] = nil
+
+      -- Spidertron's color could have changed
+      update_render_text(entity)
     end
   end
 )
