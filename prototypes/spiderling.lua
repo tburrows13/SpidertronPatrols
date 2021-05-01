@@ -3,7 +3,7 @@ create_spidertron{
   scale = 0.7,
   leg_scale = 0.75, -- relative to scale
   leg_thickness = 1.2, -- relative to leg_scale
-  leg_movement_speed = 0.6
+  leg_movement_speed = 0.55
 }
 
 local spiderling = data.raw["spider-vehicle"]["sp-spiderling"]

@@ -14,6 +14,7 @@ local disconnect_remote_key = {
   consuming = "none",
   order = "ab"
 }
+--[[
 local change_default_wait_time_key = {
   type = "custom-input",
   name = "waypoints-change-default-wait-conditions",
@@ -21,15 +22,17 @@ local change_default_wait_time_key = {
   consuming = "none",
   order = "ae"
 }
+]]
+
 local confirm_gui_key = {
   type = "custom-input",
   name = "sp-confirm-gui",
   key_sequence = "",
   linked_game_control = "confirm-gui"
 }
-data:extend{clear_waypoints_key, disconnect_remote_key, change_default_wait_time_key, confirm_gui_key}
+data:extend{clear_waypoints_key, disconnect_remote_key, confirm_gui_key}
 
--- Allows getting movement control events to detect when to cancel a spidertron's waypoints
+-- Allows getting movement control events to detect when to turn on 'manual' mode
 data:extend{
   {
     type = "custom-input",
