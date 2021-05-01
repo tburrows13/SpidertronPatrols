@@ -17,8 +17,8 @@ remote.add_interface("SpidertronPatrols", {get_events = function() return {on_sp
                                             }
 )
 
-local function spidertron_switched(event)
-  -- Called in response to Spidertron Weapon Switcher event
+local function spidertron_replaced(event)
+  -- Called in response to Spidertron Weapon Switcher or Spidertron Enhancements event
   local previous_unit_number = event.old_spidertron.unit_number
   local spidertron = event.new_spidertron
   if global.spidertron_waypoints[previous_unit_number] then
@@ -45,9 +45,12 @@ end
 
 local function connect_to_remote_interfaces()
   if remote.interfaces["SpidertronWeaponSwitcher"] then
-    on_spidertron_switched = remote.call("SpidertronWeaponSwitcher", "get_events").on_spidertron_switched
-    log("Creating event")
-    script.on_event(on_spidertron_switched, spidertron_switched)
+    local on_spidertron_switched = remote.call("SpidertronWeaponSwitcher", "get_events").on_spidertron_switched
+    script.on_event(on_spidertron_switched, spidertron_replaced)
+  end
+  if remote.interfaces["SpidertronEnhancements"] then
+    local on_spidertron_replaced = remote.call("SpidertronEnhancements", "get_events").on_spidertron_replaced
+    script.on_event(on_spidertron_replaced, spidertron_replaced)
   end
 end
 script.on_load(connect_to_remote_interfaces)

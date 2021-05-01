@@ -289,6 +289,10 @@ script.on_event(defines.events.on_gui_opened,
     local player = game.get_player(event.player_index)
     local entity = event.entity
     if entity and entity.type == "spider-vehicle" then
+      local relative_frame = player.gui.relative["sp-relative-frame"]
+      if relative_frame then
+        relative_frame.destroy()
+      end
       global.open_gui_elements[player.index] = build_gui(player, entity)
     end
   end
