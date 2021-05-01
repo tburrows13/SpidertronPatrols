@@ -51,6 +51,7 @@ function clear_spidertron_waypoints(spidertron, unit_number)
   local waypoint_info
   if spidertron then
     waypoint_info = get_waypoint_info(spidertron)
+    spidertron.autopilot_destination = nil
   else
     waypoint_info = global.spidertron_waypoints[unit_number]
     if not waypoint_info then return end
