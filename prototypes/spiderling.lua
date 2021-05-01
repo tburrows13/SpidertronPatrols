@@ -61,7 +61,7 @@ local spiderling_recipe = {
   {
     {"exoskeleton-equipment", 2},
     {"solar-panel-equipment", 10},
-    {"rocket-launcher", 1},  -- TODO Depends on weapons, add dependency
+    {"rocket-launcher", 1},
     {"rocket-control-unit", 4},
     {"low-density-structure", 50},
     {"radar", 1},

@@ -189,7 +189,6 @@ local function build_gui(player, spidertron)
             --}},
           }},
           {type = "frame", direction = "vertical", style = "inside_shallow_frame", children = {
-            -- TODO Add clear-all button?
             {type = "frame", direction = "horizontal", style = "sp_stretchable_subheader_frame", children = {
               {type = "flow", style = "sp_patrol_schedule_mode_switch_horizontal_flow", children = {
                 build_on_patrol_switch(waypoint_info),

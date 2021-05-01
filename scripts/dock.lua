@@ -141,7 +141,7 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
 
   local new_spidertron_contents = spidertron_inventory.get_contents()
   local new_dock_contents = dock_inventory.get_contents()
-  assert(table_equals(new_spidertron_contents, new_dock_contents))  -- TODO Remove for release
+  --assert(table_equals(new_spidertron_contents, new_dock_contents))  -- TODO Remove for release
   return new_spidertron_contents
 end
 
