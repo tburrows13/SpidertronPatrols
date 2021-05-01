@@ -1,5 +1,22 @@
 -- Handles on_player_used_spider_remote, on_spider_command_completed, and wait conditions
 
+local function check_condition(condition, a, b)
+  -- Using list order: {">", "<", "=", "≥", "≤", "≠"}
+  if condition == 1 then
+    return a > b
+  elseif condition == 2 then
+    return a < b
+  elseif condition == 3 then
+    return a == b
+  elseif condition == 4 then 
+    return a >= b
+  elseif condition == 5 then
+    return a <= b
+  elseif condition == 6 then
+    return a ~= b
+  end
+end
+
 function on_patrol_command_issued(player, spidertron, position)
   -- Called when remote used and on remote interface call
   local waypoint_info = get_waypoint_info(spidertron)
@@ -132,7 +149,13 @@ function handle_wait_timers()
           go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "item-count" then
-        -- TODO
+        local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
+        local inventory_contents = inventory.get_contents()
+        local item_count_info = waypoint.item_count_info
+        local item_count = inventory_contents[item_count_info.item_name] or 0
+        if check_condition(item_count_info.condition, item_count, item_count_info.count) then
+          go_to_next_waypoint(spidertron)
+        end
       elseif waypoint_type == "robots-inactive" then
         local logistic_network = spidertron.logistic_network
         if logistic_network.all_construction_robots == logistic_network.available_construction_robots then

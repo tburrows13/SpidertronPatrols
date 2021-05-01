@@ -91,6 +91,7 @@ styles.sp_player_input_horizontal_flow = {
   parent = "player_input_horizontal_flow",
   --horizontally_stretchable = "stretch_and_expand",
   horizontally_squashable = "on",
+  horizontal_spacing = 4
 }
 
 styles.sp_compact_notched_slider = {

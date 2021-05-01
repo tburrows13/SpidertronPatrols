@@ -38,6 +38,10 @@ dropdown_index_lookup = {
   "passenger-not-present",
 }
 
+
+condition_dropdown_contents = {">", "<", "=", "≥", "≤", "≠"}
+
+
 local slider_values = {5, 10, 20, 30, 60, 120, 240, 600}
 slider_values[0] = 0
 
@@ -54,7 +58,8 @@ end
 
 
 local function build_waypoint_player_input(i, waypoint)
-  if waypoint.type == "time-passed" or waypoint.type == "inactivity" then
+  local waypoint_type = waypoint.type
+  if waypoint_type == "time-passed" or waypoint_type == "inactivity" then
     return {
       {
         type = "slider", style = "sp_compact_notched_slider", minimum_value = 0, maximum_value = #slider_values, value = slider_value_index(waypoint.wait_time), discrete_slider = true,
@@ -62,10 +67,26 @@ local function build_waypoint_player_input(i, waypoint)
         actions = {on_value_changed = {action = "update_text_field", index = i}}
       },
       {
-        type = "textfield", style = "sp_compact_slider_value_textfield", numeric = true, allow_decimal = false, allow_negative = false, text = tostring(waypoint.wait_time) .. " s", lose_focus_on_confirm = true,
+        type = "textfield", style = "sp_compact_slider_value_textfield", text = tostring(waypoint.wait_time) .. " s",  numeric = true, allow_decimal = false, allow_negative = false, lose_focus_on_confirm = true,
         ref = {"time_textfield", i},
         actions = {on_text_changed = {action = "update_slider", index = i}, on_click = {action = "remove_s", index = i}, on_confirmed = {action = "add_s", index = i}}
       }
+    }
+  elseif waypoint_type == "item-count" then
+    local info = waypoint.item_count_info
+    return {
+      {
+        type = "choose-elem-button", style = "train_schedule_item_select_button", elem_type = "item", item = info.item_name,
+        actions = {on_elem_changed = {action = "item_selected", index = i}}
+      },
+      {
+        type = "drop-down", style = "circuit_condition_comparator_dropdown", items = condition_dropdown_contents, selected_index = info.condition,
+        actions = {on_selection_state_changed = {action = "condition_changed", index = i}}
+      },
+      {
+        type = "textfield", style = "sp_compact_slider_value_textfield", text = tostring(info.count), numeric = true, allow_decimal = false, allow_negative = false, lose_focus_on_confirm = true,
+        actions = {on_text_changed = {action = "item_count_changed", index = i}}
+      },
     }
   end
 end
@@ -387,8 +408,6 @@ script.on_event(defines.events.on_gui_switch_state_changed,
     if action then
       local player = game.get_player(event.player_index)
       local spidertron = player.opened
-      assert(spidertron.type == "spider-vehicle")
-      log(serpent.block(action))
       if action.action == "toggle_on_patrol" then
         local gui_elements = global.open_gui_elements[player.index]
         if gui_elements then
@@ -402,14 +421,13 @@ script.on_event(defines.events.on_gui_switch_state_changed,
   end
 )
 
+-- Dropdown selection changed
 script.on_event(defines.events.on_gui_selection_state_changed,
   function(event)
     local action = gui.read_action(event)
     if action then
       local player = game.get_player(event.player_index)
       local spidertron = player.opened
-      assert(spidertron.type == "spider-vehicle")
-      log(serpent.block(action))
       if action.action == "waypoint_type_changed" then
         local gui_elements = global.open_gui_elements[player.index]
         local dropdown = gui_elements.waypoint_dropdown[action.index]
@@ -425,8 +443,18 @@ script.on_event(defines.events.on_gui_selection_state_changed,
           else
             waypoint.wait_time = nil
           end
+          if new_waypoint_type == "item-count" then
+            waypoint.item_count_info = {item_name = nil, condition = 2, count = 0}
+          else
+            waypoint.item_count_info = nil
+          end
           patrol_gui.update_gui_schedule(waypoint_info)
         end
+      elseif action.action == "condition_changed" then
+        local dropdown = event.element
+        local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
+        local item_count_info = waypoint_info.waypoints[action.index].item_count_info
+        item_count_info.condition = dropdown.selected_index
       end
     end
   end
@@ -456,6 +484,22 @@ script.on_event(defines.events.on_gui_value_changed,
   end
 )
 
+script.on_event(defines.events.on_gui_elem_changed,
+  function(event)
+    local action = gui.read_action(event)
+    if action then
+      if action.action == "item_selected" then
+        local elem_button = event.element
+        local player = game.get_player(event.player_index)
+        local spidertron = player.opened
+        local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
+        local item_count_info = waypoint_info.waypoints[action.index].item_count_info
+        item_count_info.item_name = elem_button.elem_value
+      end
+    end
+  end
+)
+
 -- Textfield text changed
 script.on_event(defines.events.on_gui_text_changed,
   function(event)
@@ -466,13 +510,20 @@ script.on_event(defines.events.on_gui_text_changed,
 
         local gui_elements = global.open_gui_elements[player.index]
         local text = gui_elements.time_textfield[action.index].text
-        if text == "" then
-          text = "0"
-        end
+        if text == "" then text = "0" end
         local wait_time = tonumber(text)
         gui_elements.time_slider[action.index].slider_value = slider_value_index(wait_time)
 
         set_waypoint_time(wait_time, player.opened, action.index)
+      elseif action.action == "item_count_changed" then
+        local player = game.get_player(event.player_index)
+        local spidertron = player.opened
+        local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
+        local item_count_info = waypoint_info.waypoints[action.index].item_count_info
+        local text = event.element.text
+        if text == "" then text = "0" end
+        local item_count = tonumber(text)
+        item_count_info.count = item_count
       end
     end
   end

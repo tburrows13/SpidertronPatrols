@@ -15,6 +15,10 @@ global.spidertron_waypoints: indexed by spidertron.unit_number:
     type :: string ("none", "time-passed", "inactivity", "full-inventory", "empty-inventory", "robots-inactive", "passenger-present", "passenger-not-present", "item-count")
     position :: Position (Concept)
     wait_time :: int (in seconds, only with "time-passed" or "inactivity")
+    item_count_info :: array containing
+      item_name :: string
+      condition :: int (index of condition_dropdown_contents)
+      count :: int
     [TBC "item-count" condition info]
     render_id :: int
   current_index :: int (index of waypoints)
@@ -185,7 +189,7 @@ local function setup()
 
     global.open_gui_elements = {}
     remote_interface.connect_to_remote_interfaces()
-    settings_changed()
+    --settings_changed()
   end
 
 local function config_changed_setup(changed_data)
@@ -208,7 +212,7 @@ local function config_changed_setup(changed_data)
   --if old_version[1] == 1 then
   --  if old_version[2] < 2 then
 
-  settings_changed()
+  --settings_changed()
 end
 
 script.on_init(setup)
