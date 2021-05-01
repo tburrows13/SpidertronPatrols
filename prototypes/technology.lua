@@ -19,6 +19,8 @@ data:extend{
       "power-armor",
       "exoskeleton-equipment",
       "effectivity-module-2",
+      "rocketry",
+      "rocket-control-unit",
     },
     unit = {
       count = 250,
@@ -49,7 +51,6 @@ data:extend{
     prerequisites = {
       "sp-spiderling",
       "automated-rail-transportation",
-      "rocket-control-unit",
     },
     unit = {
       count = 500,
@@ -80,15 +81,15 @@ rcu_tech.unit.ingredients =
 }
 rcu_tech.unit.time = 30  -- Was 45
 
--- Add spiderling, remove exoskeleton from spidertron prereqs
+-- Add spiderling, remove exoskeleton, rocketry and rocket-control-unit from spidertron prereqs because they are covered in spiderling
 local spidertron_tech = data.raw.technology.spidertron
 spidertron_tech.prerequisites = {
   "sp-spiderling",  -- Added
   "military-4",
   --"exoskeleton-equipment",
   "fusion-reactor-equipment",
-  "rocketry",
-  "rocket-control-unit",
+  --"rocketry",
+  --"rocket-control-unit",
   "effectivity-module-3"
 }
 table.remove(spidertron_tech.effects, 2)  -- Remove spidertron remote unlock

@@ -15,11 +15,29 @@ spiderling = util.merge{
     height = spiderling.height * 1.3,
     chunk_exploration_radius = 1,  -- default = 3
     minable = {result = "sp-spiderling"},
-    minimap_representation = {scale = 0.3}  -- default = 0.5
+    max_health = 1000,  -- default = 3000
+    minimap_representation = {scale = 0.3},  -- default = 0.5
+    automatic_weapon_cycling = false,
+    chain_shooting_cooldown_modifier = 1,  -- default 0.5, has no effect because automatic_weapon_cycling = false
+    equipment_grid = "sp-spiderling-equipment-grid",
   }
 }
-
+spiderling.guns = {"sp-spiderling-rocket-launcher"}
 data.raw["spider-vehicle"]["sp-spiderling"] = spiderling
+
+data:extend{
+  util.merge{
+    data.raw["gun"]["spidertron-rocket-launcher-2"],
+    {
+      name = "sp-spiderling-rocket-launcher",
+      attack_parameters = {
+        range = 24,  -- default = 36
+        cooldown = 120,  -- default = 60 (ticks)
+      }
+    }
+  }
+}
+data.raw["gun"]["sp-spiderling-rocket-launcher"].localised_name = nil
 
 local spiderling_item = {
   type = "item-with-entity-data",
@@ -43,7 +61,7 @@ local spiderling_recipe = {
   {
     {"exoskeleton-equipment", 2},
     {"solar-panel-equipment", 10},
-    {"rocket-launcher", 4},  -- TODO Depends on weapons, add dependency
+    {"rocket-launcher", 1},  -- TODO Depends on weapons, add dependency
     {"rocket-control-unit", 4},
     {"low-density-structure", 50},
     {"radar", 1},
