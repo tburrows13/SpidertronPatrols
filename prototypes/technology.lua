@@ -2,8 +2,8 @@ data:extend{
   {
     type = "technology",
     name = "sp-spiderling",
-    icon = "__base__/graphics/technology/spidertron.png",
-    icon_size = 256, icon_mipmaps = 4,
+    icon = "__SpidertronPatrols__/graphics/technology/spiderling.png",
+    icon_size = 256, icon_mipmaps = 1,
     effects = {
       {
         type = "unlock-recipe",
