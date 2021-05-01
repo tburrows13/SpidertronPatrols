@@ -7,20 +7,3 @@
         allowed_values = {"never", "contextual", "always"}
     }
 })]]
-
-data:extend({
-    {
-        type = "bool-setting",
-        name = "spidertron-waypoints-include-waypoint",
-        setting_type = "runtime-global",
-        default_value = true
-    }
-})
-data:extend({
-    {
-        type = "bool-setting",
-        name = "spidertron-waypoints-include-patrol",
-        setting_type = "runtime-global",
-        default_value = true
-    }
-})
