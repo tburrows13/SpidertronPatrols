@@ -1,91 +1,59 @@
-Spidertron Waypoints
-==================
+# Spidertron Patrols
 
-Have more control over your spidertrons with waypoints! Set up your spidertrons with one-time waypoints or permanent patrols. Even though basic waypoints are now available in 1.1, this mod goes far beyond that by adding infinitely-repeating patrols and customizable wait conditions similar to train stations/stops.
-
-![Waypoints gif](https://i.imgur.com/FJW3E7V.gif)
+Replaces [Spidertron Waypoints](https://mods.factorio.com/mod/SpidertronWaypoints).
 
 -----
-You can see Xterminator's Mod Spotlight here:
+## Features
 
-[![Xterminator Mod Spotlight](https://img.youtube.com/vi/RggwfbKXqoQ/0.jpg)](https://www.youtube.com/watch?v=RggwfbKXqoQ)
+### Patrol Schedule
 
------
-Features
------
+- Use the patrol remote to create a series of waypoints
+- Open the inventory of a spidertron with waypoints to see the schedule editor
 
-- In waypoint mode, *Click* with the spidertron remote to add a waypoint
-- In patrol mode, *Click* to mark the position sequence, then *Click* on the **1** or *Alt + Click* to finish the sequence and the spidertron will start following it
-- Press *Y* after placing a waypoint whilst holding a remote to set the countdown duration and type for it
-- Wait condition types: **Time passed** will wait for X seconds; **Inactivity** will wait for X seconds of inactivity (i.e. no changes to inventory or ammo)
-- Press *Y* at any other time or *Shift + Y* to configure the default wait condition
-- *Shift + Left Click* whilst holding a spidertron remote to clear all waypoints for that spidertron
-- *Shift + Right Click* whilst holding a spidertron remote to disconnect it from its spidertron
-- Switch to direct, waypoint and patrol modes with *Shift + F*, *Shift + C*, *Shift + X* respectively (notice the 'circle' that they make around *WASD*!)
-- Cycle through all 3 modes with *Shift + Scroll* or *+* and *-* (you can remove modes from this cycle in the mod settings)
-- Switch modes by mouse in the shortcut bar and easily view which mode is active
+### Spidertron Docks
+
+- Docks connect to a spidertron standing above them and share its inventory, so that inserters can interact with the spidertron
+- Circuits wires can be connected to docks to allow its contents to be read
+
+### Spiderling
+
+- Spiderling is a slower, smaller and weaker spidertron unlocked by chemical (blue) science
+- Added so that patrols and docks can be used before the spidertron is unlocked at the end of the game
 
 -----
-Recommendations
------
+## Recommendations
 
-- *Shift + Scroll* controls are derived from **Blueprint book next** and **Blueprint book previous**. If you have rebound these controls, this mod's shift-scrolling will not work
-- Remove *Shift + Mouse wheel up* and *Shift + Mouse wheel down* from **Zoom in** and **Zoom out** controls if you are using the *Shift + Scroll* controls
-- Try using 1.1's spidertron logistics tab to autofill your patrolling spidertrons or use with **Inactivity** waypoints to wait until item requests are completed before returning to a building site
+- [Spidertron Enhancements](https://mods.factorio.com/mod/SpidertronEnhancements) is a required dependency which, amongst other features, allows you to open a spidertron's inventory (and patrol schedule) from anywhere whilst holding a connected remote by pressing `Shift + E`
 
 -----
-Known Bugs / Limitations
------
+## Known Bugs / Limitations
 
+- Each patrol waypoint can only have one wait condition set. If you need more, you can usually just set multiple waypoints in the same position, each with a different wait condition.
+- Spidertron docks cannot be filtered so if you connect a spidertron with filters in its inventory and the inventory becomes full or nearly full, items can be lost (not possible to fix because it requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=97967 - please post there in support of the addition)
+- For performance reasons, when items with associated data (such as modular armor) in a spidertron inventory are taken out of a connected dock's inventory, they lose all their data. This loses all the equipment in that armor's equipment grid 
 - Waypoint markers cannot be seen in map view (not possible to add because it requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=76539&p=510027) - please post there in support of the addition)
-- Changing a waypoint's countdown length whilst a spidertron is at that waypoint changes the waypoint text but has no effect on the spidertron's remaining time
+- Performance is good, but not insignificant:
+  - Docks are limited so that only 20 are updated each tick. Adding lots of docks will simply increase the update delay for each dock instead of reducing UPS
+  - Spidertrons waiting at waypoints also add to the mod update time. The "Inactivity" wait condition is particularly expensive
+  - If you are running into performance problems, send me the save and I can probably make some improvements to the mod to help you
+- Incompatible with [Spidertron Logistics System](https://mods.factorio.com/mod/spidertron-logistics) due to [some bugs in that mod](https://mods.factorio.com/mod/spidertron-logistics/discussion/60732e64d576fb35748cbe2b)
+
 
 -----
-Future Updates?
------
+## Future Updates?
 
-- Compatibility with [Spidertron squad control](https://mods.factorio.com/mod/Spider_Control) (you can follow the development of that [here](https://github.com/npc-strider/spidertron-squad-control/pull/2))
+- Support for copy-pasting schedules between spidertrons
+- Buttons to reorder schedule waypoints
+- Progress bars for wait conditions inside schedule user interface
+- Better patrol route visualisations with lines on the ground
+- Shortcut that toggles spidertron "Automatic"/"Manual"
+- Settings to enable/disable specific parts of the mod
 
 -----
-Translation
------
+## Translation
 
 You can help by translating this mod into your language using [CrowdIn](https://crowdin.com/project/factorio-mods-localization). Any translations made will be included in the next release.
 
 -----
-Mod Compatibility
------
 
-For compatibility with other mods that use `on_player_used_spider_remote`, this mod provides a remote interface. The new event `on_spidertron_given_new_destination` is raised when a spidertron has been given a new `autopilot_target`, and comes with an `event` table containing `player_index`, `vehicle`, `position`, and `success` (always set to true). Note that `event.player` does not exist. The following example should be placed in `on_init` and `on_load`:
-
-```
-if game.active_mods["SpidertronWaypoints"] then
-    local event_ids = remote.call("SpidertronWaypoints", "get_events")
-    local on_spidertron_given_new_destination = event_ids.on_spidertron_given_new_destination
-    script.on_event(on_spidertron_given_new_destination, function(event)
-        -- Do stuff here instead of in `on_player_used_spider_remote`
-    end)
-end
-```
-
-Additionally, there are remote functions that allow other mods to use waypoints and patrols:
-
-`clear_waypoints(unit_number)`
-Clears all waypoints for the spidertron associated with `unit_number`
-
-`assign_waypoints(spidertron, waypoints)`
-Sends the spidertron to each waypoint sequentially
-Parameters
-`spidertron` :: LuaEntity
-`waypoints` :: array of tables with keys `position` (Position), `wait_time` (int - default `0`) in seconds and `wait_type` (string - either `"time_passed"` or `"inactivity"` - default `"time_passed"`)
-
-`assign_patrol(spidertron, waypoints)`
-Same as `assign_waypoints`, but creates and starts a persistent patrol
-
-Let me know if you plan on using these and I can help you with debugging or adding new features if you need them.
-
------
-
-Thank you to [danatron1](https://www.reddit.com/r/factorio/comments/iitlvi/i_made_a_mod_that_allows_you_to_set_waypoints/g3dzt1h) for creating the patrol remote icon (which also doubles up as a cool thumbnail!) and [smokefumus](https://sketchfab.com/smokefumus) for creating the waypoint remote icon.
-
-Check out my other mods: [Spidertron Engineer](https://mods.factorio.com/mod/SpidertronEngineer) and [Spidertron Weapon Switcher](https://mods.factorio.com/mod/SpidertronWeaponSwitcher)
+Thank you to [danatron1](https://www.reddit.com/r/factorio/comments/iitlvi/i_made_a_mod_that_allows_you_to_set_waypoints/g3dzt1h) for creating the patrol remote icon.

@@ -5,5 +5,5 @@
     "author": "Xorimuth",
     "description": "Send spidertrons on patrols and automatically load or unload them using docks. Also adds mid-game spiderling to allow the new features to be used sooner.",
     "factorio_version": "1.1",
-    "dependencies": ["base", "? SpidertronEnhancements", "! spidertron-logistics", "(?) SpidertronWeaponSwitcher >= 1.2.0"]
+    "dependencies": ["base", "SpidertronEnhancements >= 1.5.0", "! spidertron-logistics", "(?) SpidertronWeaponSwitcher >= 1.2.0"]
 }

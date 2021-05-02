@@ -1,8 +1,12 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.0.0
-Date: ???
+Date: 2 May 2021
   Features:
-    - Everything has been changed!
+    - Everything has changed!
+    - Name changed from Spidertron Waypoints to Spidertron Patrols
+    - Patrol schedule interface
+    - Spidertron docks that can interface between spidertron inventories and inserters
+    - Spiderling: mid-game, weaker version of spidertron
 ---------------------------------------------------------------------------------------------------
 Version: 1.7.3
 Date: 1 January 2021
