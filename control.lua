@@ -1,6 +1,5 @@
 local util = require "util"
 require "scripts.utils"
-require "scripts.mode_handling"
 local remote_interface = require "scripts.remote-interface"
 local dock_script = require "scripts.dock"
 local patrol_gui = require "scripts.patrol-gui"
@@ -69,7 +68,7 @@ function clear_spidertron_waypoints(spidertron, unit_number)
   global.spidertron_waypoints[unit_number] = nil
 end
 
-script.on_event("clear-spidertron-waypoints",
+script.on_event("sp-delete-all-waypoints",
   function(event)
     local player = game.get_player(event.player_index)
     if player.cursor_stack.valid_for_read and player.cursor_stack.type == "spidertron-remote" then

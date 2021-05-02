@@ -1,18 +1,10 @@
 -- Misc inputs
-local clear_waypoints_key = {
+local delete_waypoints_key = {
   type = "custom-input",
-  name = "clear-spidertron-waypoints",
+  name = "sp-delete-all-waypoints",
   key_sequence = "CONTROL + mouse-button-2",
   consuming = "none",
   order = "aa"
-}
-local disconnect_remote_key = {
-  type = "custom-input",
-  name = "waypoints-disconnect-remote",
-  key_sequence = "",
-  linked_game_control = "stack-split",  -- SHIFT + mouse-button-2 by default
-  consuming = "none",
-  order = "ab"
 }
 --[[
 local change_default_wait_time_key = {
@@ -30,7 +22,7 @@ local confirm_gui_key = {
   key_sequence = "",
   linked_game_control = "confirm-gui"
 }
-data:extend{clear_waypoints_key, disconnect_remote_key, confirm_gui_key}
+data:extend{delete_waypoints_key, confirm_gui_key}
 
 -- Allows getting movement control events to detect when to turn on 'manual' mode
 data:extend{
