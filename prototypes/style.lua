@@ -7,6 +7,17 @@ styles.sp_relative_stretchable_frame = {
   maximal_height = 930,
 }
 
+-- Copied from flib_titlebar_drag_handle
+styles.sp_titlebar_drag_handle = {
+  type = "empty_widget_style",
+  parent = "draggable_space",
+  left_margin = 4,
+  right_margin = 4,
+  height = 24,
+  horizontally_stretchable = "on"
+}
+
+
 styles.sp_spidertron_schedule_scroll_pane = {
   type = "scroll_pane_style",
   parent = "train_schedule_scroll_pane",
