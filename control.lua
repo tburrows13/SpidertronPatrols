@@ -136,7 +136,7 @@ function update_render_text(spidertron)
       end
     else
       -- We need to create the text
-      render_id = rendering.draw_text{text = tostring(i), surface = spidertron.surface, target = {waypoint.position.x, waypoint.position.y - 1.2}, color = spidertron.color, scale = 4.5, alignment = "center"}
+      render_id = rendering.draw_text{text = tostring(i), surface = spidertron.surface, target = {waypoint.position.x, waypoint.position.y - 1.5}, color = spidertron.color, scale = 5, alignment = "center"}
       waypoint.render_id = render_id
     end
   end
