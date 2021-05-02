@@ -28,14 +28,14 @@ Replaces [Spidertron Waypoints](https://mods.factorio.com/mod/SpidertronWaypoint
 -----
 ## Known Bugs / Limitations
 
-- Each patrol waypoint can only have one wait condition set. If you need more, you can usually just set multiple waypoints in the same position, each with a different wait condition.
-- Spidertron docks cannot be filtered so if you connect a spidertron with filters in its inventory and the inventory becomes full or nearly full, items can be lost (not possible to fix because it requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=97967 - please post there in support of the addition)
+- Each patrol waypoint can only have one wait condition set. If you need more, you can usually just set multiple waypoints in the same position, each with a different wait condition
+- Spidertron docks cannot be filtered so if you connect a spidertron with filters in its inventory and the inventory becomes full or nearly full, items can be lost (not possible to fix because it requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=97967) - please post there in support of the addition)
 - For performance reasons, when items with associated data (such as modular armor) in a spidertron inventory are taken out of a connected dock's inventory, they lose all their data. This loses all the equipment in that armor's equipment grid 
 - Waypoint markers cannot be seen in map view (not possible to add because it requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=76539&p=510027) - please post there in support of the addition)
 - Performance is good, but not insignificant:
-  - Docks are limited so that only 20 are updated each tick. Adding lots of docks will simply increase the update delay for each dock instead of reducing UPS
-  - Spidertrons waiting at waypoints also add to the mod update time. The "Inactivity" wait condition is particularly expensive
-  - If you are running into performance problems, send me the save and I can probably make some improvements to the mod to help you
+    - Docks are limited so that only 20 are updated each tick. Adding lots of docks will simply increase the update delay for each dock instead of reducing UPS
+    - Spidertrons waiting at waypoints also add to the mod update time. The "Inactivity" wait condition is particularly expensive
+    - If you are running into performance problems, send me the save and I can probably make some improvements to the mod to help you
 - Incompatible with [Spidertron Logistics System](https://mods.factorio.com/mod/spidertron-logistics) due to [some bugs in that mod](https://mods.factorio.com/mod/spidertron-logistics/discussion/60732e64d576fb35748cbe2b)
 
 
