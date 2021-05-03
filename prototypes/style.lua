@@ -67,13 +67,22 @@ local button_style = styles["button"]
 styles.sp_clicked_train_schedule_action_button = {
   type = "button_style",
   parent = "train_schedule_action_button",
-  default_graphical_set = button_style.clicked_graphical_set,
-  --clicked_graphical_set = button_style.default_graphical_set
+  default_font_color = button_style.selected_font_color,
+  default_graphical_set = button_style.selected_graphical_set,
+  hovered_font_color = button_style.selected_hovered_font_color,
+  hovered_graphical_set = button_style.selected_hovered_graphical_set,
+  clicked_font_color = button_style.selected_clicked_font_color,
+  clicked_graphical_set = button_style.selected_clicked_graphical_set
 }
 styles.sp_clicked_tool_button = {
   type = "button_style",
   parent = "tool_button",
-  default_graphical_set = button_style.clicked_graphical_set,
+  default_font_color = button_style.selected_font_color,
+  default_graphical_set = button_style.selected_graphical_set,
+  hovered_font_color = button_style.selected_hovered_font_color,
+  hovered_graphical_set = button_style.selected_hovered_graphical_set,
+  clicked_font_color = button_style.selected_clicked_font_color,
+  clicked_graphical_set = button_style.selected_clicked_graphical_set
 }
 
 styles.sp_spidertron_camera = {
