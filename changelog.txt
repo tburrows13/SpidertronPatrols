@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.0.1
 Date: ???
+  Features:
+    - Added startup settings to disable patrols, docks and spiderling individually
   Bugfixes:
     - Fixed waypoint visualisations not being centered vertically
 ---------------------------------------------------------------------------------------------------

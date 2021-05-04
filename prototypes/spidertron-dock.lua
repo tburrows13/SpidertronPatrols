@@ -1,3 +1,8 @@
+if not settings.startup["sp-enable-dock"].value then
+  return
+end
+
+
 local circuit_connections = require "circuit-connections"
 
 local dock_item = {

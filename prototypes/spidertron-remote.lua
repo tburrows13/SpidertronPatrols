@@ -1,3 +1,8 @@
+if not settings.startup["sp-enable-patrol-remote"].value then
+  return
+end
+
+
 local patrol_remote = table.deepcopy(data.raw["spidertron-remote"]["spidertron-remote"])
 patrol_remote.name = "sp-spidertron-patrol-remote"
 patrol_remote.icon = "__SpidertronPatrols__/graphics/icon/patrol-remote.png"
