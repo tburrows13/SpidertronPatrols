@@ -3,6 +3,7 @@ Version: 2.0.1
 Date: ???
   Features:
     - Added startup settings to disable patrols, docks and spiderling individually
+    - Copy-paste now copies spidertron schedules
   Bugfixes:
     - Fixed waypoint visualisations not being centered vertically
 ---------------------------------------------------------------------------------------------------

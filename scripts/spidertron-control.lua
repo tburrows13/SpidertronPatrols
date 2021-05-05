@@ -199,4 +199,26 @@ script.on_event(defines.events.on_spider_command_completed,
   end
 )
 
+
+script.on_event(defines.events.on_entity_settings_pasted,
+  function(event)
+    local source = event.source
+    local destination = event.destination
+    if source.type == "spider-vehicle" and destination.type == "spider-vehicle" then
+      local waypoint_info = util.table.deepcopy(get_waypoint_info(source))
+      waypoint_info.on_patrol = false  -- Mimics train copying logic
+      waypoint_info.spidertron = destination
+
+      -- Erase all render ids so that new ones can be recreated by update_render_text
+      for _, waypoint in pairs(waypoint_info.waypoints) do
+        waypoint.render_id = nil
+      end
+
+      global.spidertron_waypoints[destination.unit_number] = waypoint_info
+      patrol_gui.update_gui_schedule(waypoint_info)
+      update_render_text(destination)  -- Inserts text at the position that we have just added    
+    end
+  end
+)
+
 return {go_to_next_waypoint = go_to_next_waypoint}

@@ -1,4 +1,4 @@
-local util = require "util"
+util = require "util"
 require "scripts.utils"
 local remote_interface = require "scripts.remote-interface"
 local dock_script = require "scripts.dock"
