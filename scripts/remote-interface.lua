@@ -53,9 +53,9 @@ local function connect_to_remote_interfaces()
     local on_spidertron_replaced = events.on_spidertron_replaced
     script.on_event(on_spidertron_replaced, spidertron_replaced)
 
-    local on_spider_remote_disconnected = events.on_spider_remote_disconnected
-    if on_spider_remote_disconnected then
-      script.on_event(on_spider_remote_disconnected, function(event) update_player_render_paths(game.get_player(event.player_index)) end)
+    local on_player_disconnected_spider_remote = events.on_player_disconnected_spider_remote
+    if on_player_disconnected_spider_remote then
+      script.on_event(on_player_disconnected_spider_remote, function(event) update_player_render_paths(game.get_player(event.player_index)) end)
     end
   end
 end
