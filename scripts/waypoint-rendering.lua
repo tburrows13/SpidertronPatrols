@@ -1,58 +1,137 @@
--- Unused
+local function create_render_paths(spidertron, player)
+  waypoint_info = get_waypoint_info(spidertron)
+
+  local color = spidertron.color
+  local surface = spidertron.surface.name
+
+  local path_render_ids = {}
+
+  local waypoints = waypoint_info.waypoints
+  local number_of_waypoints = #waypoints
+  for i, waypoint in pairs(waypoints) do
+    local next_waypoint = waypoints[i + 1]
+    if i == number_of_waypoints then
+      if number_of_waypoints == 2 then
+        -- If there are only 2 waypoints, then we don't need to draw the same line twice
+        break
+      end
+      next_waypoint = waypoints[1]
+    end
+
+    local render_id = rendering.draw_line{
+      color = color,
+      width = 4,
+      gap_length = 1,
+      dash_length = 1.2,
+      from = waypoint.position,
+      to = next_waypoint.position,
+      surface = surface,
+      players = {player}
+    }
+
+    table.insert(path_render_ids, render_id)
+  end
+
+  global.path_renders[player.index] = {spidertron = spidertron.unit_number, render_ids = path_render_ids}
+end
+
+function update_player_render_paths(player)
+  -- Clear up any previous renders
+  local path_render_info = global.path_renders[player.index]
+  if path_render_info then
+    -- There are render ids to cleanup
+    local path_render_ids = path_render_info.render_ids
+    for _, render_id in pairs(path_render_ids) do
+      rendering.destroy(render_id)
+    end
+    global.path_renders[player.index] = nil
+  end
+
+  -- Create new path renders if necessary
+  local cursor_stack = player.cursor_stack
+  if cursor_stack and cursor_stack.valid_for_read and cursor_stack.name == "sp-spidertron-patrol-remote" then
+    local spidertron = cursor_stack.connected_entity
+    if spidertron then
+      create_render_paths(spidertron, player)
+    end
+  end
+end
+
 script.on_event({defines.events.on_player_cursor_stack_changed, defines.events.on_player_configured_spider_remote},
   function(event)
-    return
-    --[[
     local player = game.get_player(event.player_index)
-    local cursor_stack = player.cursor_stack
-    if cursor_stack and cursor_stack.valid_for_read and cursor_stack.name == "sp-spidertron-patrol-remote" then
-      local spidertron = cursor_stack.connected_entity
-      if spidertron then
-        local waypoint_info = get_waypoint_info(spidertron)
-        local visualisation_info = {player = player, waypoint_entities = {}}
-        local waypoint_entities = visualisation_info.waypoint_entities
-        for _, waypoint in pairs(waypoint_info.waypoints) do
-          local waypoint_entity = spidertron.surface.create_entity{name = "sp-spidertron-waypoint",
-                                           --bounding_box = generate_bounding_box(waypoint.position, 1),
-                                           position = waypoint.position,
-                                           force = spidertron.force,
-                                          player = player}
-                                           --box_type = "train-visualization",
-                                           --render_player_index = 65535}
-          table.insert(waypoint_entities, waypoint_entity)
-          --global.waypoint_entities[waypoint_entity.unit_number] = player.index
-        end
-
-        global.waypoint_visualisations[player.index] = visualisation_info
-      end
-
-    else
-      -- Clear up
-      local waypoint_visualisations = global.waypoint_visualisations[player.index]
-      if waypoint_visualisations then
-        for _, waypoint_entity in pairs(waypoint_visualisations.waypoint_entities) do
-          --global.waypoint_entities[waypoint_entity.unit_number] = nil
-          waypoint_entity.destroy()
-        end
-      end
-    end]]
+    update_player_render_paths(player)
   end
 )
 
-local function on_waypoint_added(player, spidertron, position)
-  local waypoint_visualisations = global.waypoint_visualisations[player.index]
-
-  local waypoint_entities = waypoint_visualisations.waypoint_entities
-  local waypoint_entity = spidertron.surface.create_entity{name = "sp-spidertron-waypoint",
-                            --bounding_box = generate_bounding_box(waypoint.position, 1),
-                            position = position,
-                            force = spidertron.force,
-                          player = player}
-                            --box_type = "train-visualization",
-                            --render_player_index = 65535}
-  table.insert(waypoint_entities, waypoint_entity)
-
-
+function update_spidertron_render_paths(spidertron)
+  for player_index, path_render_info in pairs(global.path_renders) do
+    if path_render_info.spidertron == spidertron.unit_number then
+      update_player_render_paths(game.get_player(player_index))
+    end
+  end
 end
 
-return {on_waypoint_added = on_waypoint_added}
+
+function update_render_text(spidertron)
+  -- Updates numbered text on ground for given spidertron
+  local waypoint_info = get_waypoint_info(spidertron)
+  -- Re-render all waypoints
+  for i, waypoint in pairs(waypoint_info.waypoints) do
+    local render_id = waypoint.render_id
+    if render_id and rendering.is_valid(render_id) then
+      if rendering.get_text(render_id) ~= tostring(i) then
+        rendering.set_text(render_id, i)
+      end
+      if rendering.get_color(render_id) ~= spidertron.color then
+        rendering.set_color(render_id, spidertron.color)
+      end
+    else
+      -- We need to create the text
+      render_id = rendering.draw_text{text = tostring(i), surface = spidertron.surface, target = {waypoint.position.x, waypoint.position.y - 1.5}, color = spidertron.color, scale = 5, alignment = "center"}
+      waypoint.render_id = render_id
+    end
+  end
+
+  update_spidertron_render_paths(spidertron)
+end
+
+
+--[[
+function generate_sub_text(waypoint, spidertron)
+  local wait_data = global.spidertrons_waiting[spidertron.unit_number]
+
+  if waypoint.wait_time and waypoint.wait_time > 0 then
+    local string = tostring(waypoint.wait_time) .. "s"
+    if wait_data and wait_data.waypoint == waypoint then
+      string = tostring(wait_data.wait_time) .. "/" .. string
+    end
+    if waypoint.wait_type and waypoint.wait_type == "right" then
+      string = string .. " inactivity"
+    end
+    return string
+  end
+end
+
+function update_sub_text(waypoint, parent_render_id, spidertron)
+  -- TODO check if parent_render_id is valid
+  local render_id = global.sub_render_ids[parent_render_id]
+  local intended_text = generate_sub_text(waypoint, spidertron)
+  if render_id and rendering.is_valid(render_id) then
+    -- Check if we need to update it
+    local current_text = rendering.get_text(render_id)
+    if current_text ~= intended_text then
+      if intended_text then
+        rendering.set_text(render_id, intended_text)
+        rendering.set_color(render_id, spidertron.color)  -- In case the color has changed as well
+      else
+        rendering.destroy(render_id)
+      end
+    end
+  elseif intended_text then
+    -- Create new text
+    render_id = rendering.draw_text{text = intended_text, surface = spidertron.surface, target = {waypoint.position.x, waypoint.position.y+0.5}, color = spidertron.color, scale = 2, alignment = "center"}
+    global.sub_render_ids[parent_render_id] = render_id
+  end
+end
+]]
