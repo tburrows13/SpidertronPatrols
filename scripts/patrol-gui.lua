@@ -192,7 +192,7 @@ local function build_gui(player, spidertron)
           {type = "frame", style = "inside_shallow_frame", children = {
             --{type = "frame", style = "sp_spidertron_minimap_frame", children = {
               {
-                type = "camera", style = "sp_spidertron_camera", position = spidertron.position, surface_index = spidertron.surface.index, zoom = 0.5, elem_mods = {entity = spidertron},
+                type = "camera", style = "sp_spidertron_camera", position = spidertron.position, surface_index = spidertron.surface.index, zoom = 0.75, elem_mods = {entity = spidertron},
                 ref = {"camera"},
               },
 
