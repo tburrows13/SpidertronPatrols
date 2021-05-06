@@ -205,6 +205,13 @@ script.on_event(defines.events.on_entity_settings_pasted,
     local source = event.source
     local destination = event.destination
     if source.type == "spider-vehicle" and destination.type == "spider-vehicle" then
+
+      -- Erase render ids from receiving spidertron
+      local destination_waypoint_info = get_waypoint_info(destination)
+      for _, waypoint in pairs(destination_waypoint_info.waypoints) do
+        rendering.destroy(waypoint.render_id)
+      end
+
       local waypoint_info = util.table.deepcopy(get_waypoint_info(source))
       waypoint_info.on_patrol = false  -- Mimics train copying logic
       waypoint_info.spidertron = destination
