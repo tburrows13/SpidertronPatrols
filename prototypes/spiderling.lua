@@ -47,9 +47,9 @@ data.raw["gun"]["sp-spiderling-rocket-launcher"].localised_name = nil
 local spiderling_item = {
   type = "item-with-entity-data",
   name = "sp-spiderling",
-  icon = "__SpidertronPatrols__/graphics/icon/spiderling.png",
-  icon_tintable = "__SpidertronPatrols__/graphics/icon/spiderling-tintable.png",
-  icon_tintable_mask = "__SpidertronPatrols__/graphics/icon/spiderling-tintable-mask.png",
+  icon = "__SpidertronPatrols__/graphics/icons/spiderling.png",
+  icon_tintable = "__SpidertronPatrols__/graphics/icons/spiderling-tintable.png",
+  icon_tintable_mask = "__SpidertronPatrols__/graphics/icons/spiderling-tintable-mask.png",
   icon_size = 64, icon_mipmaps = 1,
   subgroup = "transport",
   order = "b[personal-transport]-c[spidertron]-a[[spiderling]",
