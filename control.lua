@@ -108,6 +108,13 @@ script.on_event(defines.events.on_entity_destroyed,
   end
 )
 
+script.on_event(defines.events.on_tick,
+  function(event)
+    dock_script.on_tick()
+    patrol_gui.update_gui_highlights()
+  end
+)
+
 --[[
 local function settings_changed()
     global.scroll_modes = {"spidertron-remote"}
@@ -130,6 +137,7 @@ local function setup()
     global.spidertrons_docked = {}
 
     global.open_gui_elements = {}
+    global.player_highlights = {}  -- Indexed by player.index
 
     remote_interface.connect_to_remote_interfaces()
     --settings_changed()
@@ -156,6 +164,7 @@ local function config_changed_setup(changed_data)
     if old_version[2] < 1 then
       -- Pre 2.1
       global.path_renders = {}
+      global.player_highlights = {}
     end
   end
 

@@ -129,15 +129,17 @@ local function build_waypoint_frames(waypoint_info)
         },
         {type = "empty-widget", style = "sp_empty_filler"},
         {
-          type = "sprite-button", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-down-white", hovered_sprite = "sp-down-black",
-          actions = {on_click = {action = "move_waypoint_down", index = i}}
-        },
-        {
-          type = "sprite-button", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-up-white", hovered_sprite = "sp-up-black",
+          type = "sprite-button", name = "up", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-up-white", hovered_sprite = "sp-up-black", clicked_sprite = "sp-up-black",
+          ref = {"waypoint_button", i, "up"},
           actions = {on_click = {action = "move_waypoint_up", index = i}}
         },
         {
-          type = "sprite-button", style = "train_schedule_delete_button", mouse_button_filter = {"left"}, sprite = "utility/close_white", hovered_sprite = "utility/close_black",
+          type = "sprite-button", name = "down", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-down-white", hovered_sprite = "sp-down-black", clicked_sprite = "sp-down-black",
+          ref = {"waypoint_button", i, "down"},
+          actions = {on_click = {action = "move_waypoint_down", index = i}}
+        },
+        {
+          type = "sprite-button", style = "train_schedule_delete_button", mouse_button_filter = {"left"}, sprite = "utility/close_white", hovered_sprite = "utility/close_black", clicked_sprite = "utility/close_black",
           actions = {on_click = {action = "delete_waypoint", index = i}}
         },
       }}
@@ -260,6 +262,7 @@ function patrol_gui.update_gui_schedule(waypoint_info)
         gui_elements.waypoint_dropdown = new_gui_elements.waypoint_dropdown
         gui_elements.time_slider = new_gui_elements.time_slider
         gui_elements.time_textfield = new_gui_elements.time_textfield
+        gui_elements.waypoint_button = new_gui_elements.waypoint_button
       else
         -- Clear GUI
         local relative_frame = player.gui.relative["sp-relative-frame"]
@@ -291,6 +294,35 @@ function patrol_gui.update_gui_switch(waypoint_info)
   end
 end
 
+function patrol_gui.update_gui_highlights()
+  -- Called every tick
+  for player_index, button_info in pairs(global.player_highlights) do
+    local button = button_info.button
+    local tick_started = button_info.tick_started
+    if button and button.valid then
+      if (game.tick - tick_started) > 20 then
+        button.style = "sp_schedule_move_button"
+        button.sprite = "sp-" .. button.name .. "-white"
+        global.player_highlights[player_index] = nil
+      end
+    else
+      global.player_highlights[player_index] = nil
+    end
+  end
+end
+
+
+function patrol_gui.clear_highlights_for_player(player)
+  local button_info = global.player_highlights[player.index]
+  if button_info then
+    local button = button_info.button
+    if button and button.valid then
+      button.style = "sp_schedule_move_button"
+      button.sprite = "sp-" .. button.name .. "-white"
+    end
+    global.player_highlights[player.index] = nil
+  end
+end
 
 script.on_event(defines.events.on_gui_opened,
   function(event)
@@ -358,8 +390,69 @@ script.on_event(defines.events.on_gui_click,
         end
         patrol_gui.update_gui_schedule(waypoint_info)
         update_render_text(spidertron)
+
       elseif action_name == "delete_all_waypoints" then
         clear_spidertron_waypoints(spidertron)
+
+      elseif action_name == "move_waypoint_up" then
+        local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
+        local waypoints = waypoint_info.waypoints
+        local index_to_move = action.index
+        if index_to_move ~= 1 then
+          local index_above = action.index - 1
+
+          local waypoint_to_move = util.table.deepcopy(waypoints[index_to_move])
+          local waypoint_above = util.table.deepcopy(waypoints[index_above])
+
+          waypoints[index_above] = waypoint_to_move
+          waypoints[index_to_move] = waypoint_above
+
+          local current_index = waypoint_info.current_index
+          if current_index then
+            if current_index == index_above then waypoint_info.current_index = index_to_move end
+            if current_index == index_to_move then waypoint_info.current_index = index_above end
+          end
+
+          patrol_gui.update_gui_schedule(waypoint_info)
+          update_render_text(spidertron)
+
+          local button = gui_elements.waypoint_button[index_above].up
+          button.style = "sp_selected_schedule_move_button"
+          button.sprite = "sp-up-black"
+
+          patrol_gui.clear_highlights_for_player(player)
+          global.player_highlights[player.index] = {button = button, tick_started = game.tick}
+        end
+      elseif action_name == "move_waypoint_down" then
+        local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
+        local waypoints = waypoint_info.waypoints
+        local index_to_move = action.index
+        if index_to_move ~= #waypoints then
+          local index_below = action.index + 1
+
+          local waypoint_to_move = util.table.deepcopy(waypoints[index_to_move])
+          local waypoint_below = util.table.deepcopy(waypoints[index_below])
+
+          waypoints[index_below] = waypoint_to_move
+          waypoints[index_to_move] = waypoint_below
+
+          local current_index = waypoint_info.current_index
+          if current_index then
+            if current_index == index_below then waypoint_info.current_index = index_to_move end
+            if current_index == index_to_move then waypoint_info.current_index = index_below end
+          end
+
+          patrol_gui.update_gui_schedule(waypoint_info)
+          update_render_text(spidertron)
+
+          local button = gui_elements.waypoint_button[index_below].down
+          button.style = "sp_selected_schedule_move_button"
+          button.sprite = "sp-down-black"
+
+          patrol_gui.clear_highlights_for_player(player)
+          global.player_highlights[player.index] = {button = button, tick_started = game.tick}
+        end
+
       elseif action_name == "open_location_in_map" then
         local camera = gui_elements.camera
         local entity = camera.entity

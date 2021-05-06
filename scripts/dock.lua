@@ -209,13 +209,12 @@ local function update_dock(dock_data)
   end
   return nil, delete  -- Deletes dock from global table
 end
-script.on_event(defines.events.on_tick,
-  function()
-    if next(global.spidertron_docks) then
-      -- TODO Replace '20' with configurable setting?
-      global.from_k = for_n_of(global.spidertron_docks, global.from_k, 20, update_dock)
-    end
-  end
-)
 
-return {on_entity_destroyed = on_entity_destroyed}
+local function on_tick()
+  if next(global.spidertron_docks) then
+    -- TODO Replace '20' with configurable setting?
+    global.from_k = for_n_of(global.spidertron_docks, global.from_k, 20, update_dock)
+  end
+end
+
+return {on_entity_destroyed = on_entity_destroyed, on_tick = on_tick}

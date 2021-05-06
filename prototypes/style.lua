@@ -59,12 +59,12 @@ styles.sp_spidertron_schedule_station_frame = {
   type = "frame_style",
   parent = "train_schedule_station_frame",
   width = frame_width,
-  horizontally_stretchable = "off"
+  horizontally_stretchable = "off",
 }
 
 
 -- TODO Make these behave more like train GUI clicked buttons
-local button_style = styles["button"]
+local button_style = styles.button
 styles.sp_clicked_train_schedule_action_button = {
   type = "button_style",
   parent = "train_schedule_action_button",
@@ -84,6 +84,23 @@ styles.sp_clicked_tool_button = {
   hovered_graphical_set = button_style.selected_hovered_graphical_set,
   clicked_font_color = button_style.selected_clicked_font_color,
   clicked_graphical_set = button_style.selected_clicked_graphical_set
+}
+
+styles.sp_schedule_move_button = {
+  type = "button_style",
+  parent = "train_schedule_delete_button",
+  right_margin = -4,
+  default_graphical_set = {
+    base = {position = {68, 0}, corner_size = 8},
+    shadow = {position = {399, 90}, corner_size = 4, draw_type = "outer"}  -- Removes black lines at right and bottom of shadow
+  }
+}
+
+styles.sp_selected_schedule_move_button = {
+  type = "button_style",
+  parent = "sp_schedule_move_button",
+  default_font_color = button_style.hovered_font_color,
+  default_graphical_set = button_style.hovered_graphical_set,
 }
 
 styles.sp_spidertron_camera = {
@@ -136,12 +153,3 @@ styles.sp_compact_slider_value_textfield = {
   width = 60,
 }
 
-styles.sp_schedule_move_button = {
-  type = "button_style",
-  parent = "train_schedule_delete_button",
-  right_margin = -4,
-  default_graphical_set = {
-    base = {position = {68, 0}, corner_size = 8},
-    shadow = {position = {399, 90}, corner_size = 4, draw_type = "outer"}  -- Removes black lines at right and bottom of shadow
-  }
-}
