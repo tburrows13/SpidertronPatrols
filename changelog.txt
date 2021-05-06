@@ -6,6 +6,7 @@ Date: ???
     - Copy-paste now copies spidertron schedules
     - Now shows dotted lines between waypoints whilst holding a connected patrol remote
   Bugfixes:
+    - Fixed repeated clicking on schedule time input text field would delete the last 2 digits
     - Fixed waypoint visualisations not being centered vertically
 ---------------------------------------------------------------------------------------------------
 Version: 2.0.0
