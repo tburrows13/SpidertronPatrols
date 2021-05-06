@@ -42,7 +42,7 @@ dropdown_index_lookup = {
 condition_dropdown_contents = {">", "<", "=", "≥", "≤", "≠"}
 
 
-local slider_values = {5, 10, 20, 30, 60, 120, 240, 600}
+local slider_values = {5, 10, 30, 60, 120, 600}
 slider_values[0] = 0
 
 local function slider_value_index(input_value)
@@ -123,14 +123,23 @@ local function build_waypoint_frames(waypoint_info)
           ref = {"waypoint_dropdown", i},
           actions = {on_selection_state_changed = {action = "waypoint_type_changed", index = i}}
         },
-        {type = "flow", style = "sp_player_input_horizontal_flow", children =
+        {
+          type = "flow", style = "sp_player_input_horizontal_flow", children =
           build_waypoint_player_input(i, waypoint)
         },
         {type = "empty-widget", style = "sp_empty_filler"},
         {
-          type = "sprite-button", style = "train_schedule_delete_button",
-          actions = {on_click = {action = "delete_waypoint", index = i}}, mouse_button_filter = {"left"}, sprite = "utility/close_white", hovered_sprite = "utility/close_black"
-        }
+          type = "sprite-button", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-down-white", hovered_sprite = "sp-down-black",
+          actions = {on_click = {action = "move_waypoint_down", index = i}}
+        },
+        {
+          type = "sprite-button", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-up-white", hovered_sprite = "sp-up-black",
+          actions = {on_click = {action = "move_waypoint_up", index = i}}
+        },
+        {
+          type = "sprite-button", style = "train_schedule_delete_button", mouse_button_filter = {"left"}, sprite = "utility/close_white", hovered_sprite = "utility/close_black",
+          actions = {on_click = {action = "delete_waypoint", index = i}}
+        },
       }}
     )
   end

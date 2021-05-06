@@ -1,0 +1,26 @@
+data:extend{
+  {
+    type = "sprite",
+    name = "sp-up-black",
+    filename = "__SpidertronPatrols__/graphics/gui/up-black.png",
+    size = 32,
+  },
+  {
+    type = "sprite",
+    name = "sp-up-white",
+    filename = "__SpidertronPatrols__/graphics/gui/up-white.png",
+    size = 32,
+  },
+  {
+    type = "sprite",
+    name = "sp-down-black",
+    filename = "__SpidertronPatrols__/graphics/gui/down-black.png",
+    size = 32,
+  },
+  {
+    type = "sprite",
+    name = "sp-down-white",
+    filename = "__SpidertronPatrols__/graphics/gui/down-white.png",
+    size = 32,
+  },
+}

@@ -1,10 +1,11 @@
 local styles = data.raw["gui-style"]["default"]
+local frame_width = 440
 
 styles.sp_relative_stretchable_frame = {
   type = "frame_style",
   --vertically_stretchable = "off",
   --vertically_squashable = "on",
-  maximal_height = 930,
+  maximal_height = 930,  -- Hardcoded to avoid https://forums.factorio.com/viewtopic.php?f=7&t=98151
 }
 
 -- Copied from flib_titlebar_drag_handle
@@ -25,7 +26,7 @@ styles.sp_spidertron_schedule_scroll_pane = {
   background_graphical_set = {
     position = {282, 17},
     corner_size = 8,
-    custom_horizontal_tiling_sizes = {28, 440},
+    custom_horizontal_tiling_sizes = {28, frame_width - 40},
     overall_tiling_horizontal_spacing = 8,
     overall_tiling_horizontal_padding = 4,
     overall_tiling_vertical_spacing = 12,
@@ -57,7 +58,7 @@ styles.sp_patrol_schedule_mode_switch_horizontal_flow = {
 styles.sp_spidertron_schedule_station_frame = {
   type = "frame_style",
   parent = "train_schedule_station_frame",
-  width = 480,
+  width = frame_width,
   horizontally_stretchable = "off"
 }
 
@@ -97,8 +98,10 @@ styles.sp_spidertron_waypoint_label = {
   type = "label_style",
   parent = "clickable_label",
   font = "default-bold",
-  left_padding = 4,
-  minimal_width = 32
+  horizontal_align = "center",
+  minimal_width = 32,
+  left_margin = -6,
+  right_margin = -6,
 }
 
 
@@ -111,22 +114,34 @@ styles.sp_stretchable_empty_widget = {
 styles.sp_player_input_horizontal_flow = {
   type = "horizontal_flow_style",
   parent = "player_input_horizontal_flow",
-  --horizontally_stretchable = "stretch_and_expand",
+  natural_width = 300,  -- Will be squashed down
   horizontally_squashable = "on",
-  horizontal_spacing = 4
+  --horizontally_stretchable = "stretch_and_expand",
+  horizontal_spacing = 4,
+  horizontal_align = "right",
+  right_margin = -8,
 }
 
 styles.sp_compact_notched_slider = {
   type = "slider_style",
   parent = "notched_slider",
   horizontally_squashable = "on",
-  -- maximal_width = 115,
-  natural_width = 300,
-  minimal_width = 50,
+  natural_width = 300,  -- Set width very high but it will always be squashed down whilst taking up as much space as possible
+  minimal_width = 20,
 }
 
 styles.sp_compact_slider_value_textfield = {
   type = "textbox_style",
   parent = "slider_value_textfield",
   width = 60,
+}
+
+styles.sp_schedule_move_button = {
+  type = "button_style",
+  parent = "train_schedule_delete_button",
+  right_margin = -4,
+  default_graphical_set = {
+    base = {position = {68, 0}, corner_size = 8},
+    shadow = {position = {399, 90}, corner_size = 4, draw_type = "outer"}  -- Removes black lines at right and bottom of shadow
+  }
 }
