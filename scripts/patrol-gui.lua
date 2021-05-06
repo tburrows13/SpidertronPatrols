@@ -214,7 +214,7 @@ local function build_gui(player, spidertron)
                   actions = {on_click = {action = "open_location_in_map"}},
                 },
                 {
-                  type = "sprite-button", style = "tool_button", mouse_button_filter = {"left"}, sprite = "utility/reset", tooltip = {"gui-patrol.delete-all-waypoints"},
+                  type = "sprite-button", style = "tool_button_red", mouse_button_filter = {"left"}, sprite = "utility/reset", tooltip = {"gui-patrol.delete-all-waypoints"},
                   actions = {on_click = {action = "delete_all_waypoints"}},
                 },
               }},
