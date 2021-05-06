@@ -90,6 +90,7 @@ styles.sp_schedule_move_button = {
   type = "button_style",
   parent = "train_schedule_delete_button",
   right_margin = -4,
+  padding = -1,
   default_graphical_set = {
     base = {position = {68, 0}, corner_size = 8},
     shadow = {position = {399, 90}, corner_size = 4, draw_type = "outer"}  -- Removes black lines at right and bottom of shadow

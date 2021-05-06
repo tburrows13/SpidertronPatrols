@@ -223,7 +223,7 @@ script.on_event(defines.events.on_entity_settings_pasted,
 
       global.spidertron_waypoints[destination.unit_number] = waypoint_info
       patrol_gui.update_gui_schedule(waypoint_info)
-      update_render_text(destination)  -- Inserts text at the position that we have just added    
+      update_render_text(destination)  -- Inserts text at the position that we have just added
     end
   end
 )
