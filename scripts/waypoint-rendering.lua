@@ -18,18 +18,36 @@ local function create_render_paths(spidertron, player)
       next_waypoint = waypoints[1]
     end
 
-    local render_id = rendering.draw_line{
-      color = color,
-      width = 4,
-      gap_length = 1,
-      dash_length = 1.2,
-      from = waypoint.position,
-      to = next_waypoint.position,
-      surface = surface,
-      players = {player}
-    }
+    -- Start and end the line a tile out from the waypoint center
+    -- so that it doesn't overlap the number
+    local a = waypoint.position
+    local b = next_waypoint.position
+    local D = util.distance(a, b)
+    local d = 1
 
-    table.insert(path_render_ids, render_id)
+    if D > d then
+      local a2 = {}
+      local b2 = {}
+      local dD = d / D
+      a2.x = a.x + dD * (b.x - a.x)
+      a2.y = a.y + dD * (b.y - a.y)
+
+      b2.x = b.x + dD * (a.x - b.x)
+      b2.y = b.y + dD * (a.y - b.y)
+
+      local render_id = rendering.draw_line{
+        color = color,
+        width = 4,
+        gap_length = 0.75,
+        dash_length = 1.5,
+        from = a2,
+        to = b2,
+        surface = surface,
+        players = {player}
+      }
+
+      table.insert(path_render_ids, render_id)
+    end
   end
 
   global.path_renders[player.index] = {spidertron = spidertron.unit_number, render_ids = path_render_ids}
@@ -72,6 +90,9 @@ function update_spidertron_render_paths(spidertron)
   end
 end
 
+local function add_alpha(color)
+  return {r = color.r, g = color.g, b = color.b, a = 0.75}
+end
 
 function update_render_text(spidertron)
   -- Updates numbered text on ground for given spidertron
@@ -83,12 +104,18 @@ function update_render_text(spidertron)
       if rendering.get_text(render_id) ~= tostring(i) then
         rendering.set_text(render_id, i)
       end
-      if rendering.get_color(render_id) ~= spidertron.color then
-        rendering.set_color(render_id, spidertron.color)
+      if rendering.get_color(render_id) ~= add_alpha(spidertron.color) then
+        rendering.set_color(render_id, add_alpha(spidertron.color))
       end
     else
       -- We need to create the text
-      render_id = rendering.draw_text{text = tostring(i), surface = spidertron.surface, target = {waypoint.position.x, waypoint.position.y - 1.5}, color = spidertron.color, scale = 5, alignment = "center"}
+      render_id = rendering.draw_text{
+        text = tostring(i),
+        surface = spidertron.surface,
+        target = {waypoint.position.x, waypoint.position.y - 1.5},
+        color = add_alpha(spidertron.color),
+        scale = 5,
+        alignment = "center"}
       waypoint.render_id = render_id
     end
   end
