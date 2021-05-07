@@ -82,9 +82,9 @@ script.on_event({defines.events.on_player_cursor_stack_changed, defines.events.o
   end
 )
 
-function update_spidertron_render_paths(spidertron)
+function update_spidertron_render_paths(unit_number)
   for player_index, path_render_info in pairs(global.path_renders) do
-    if path_render_info.spidertron == spidertron.unit_number then
+    if path_render_info.spidertron == unit_number then
       update_player_render_paths(game.get_player(player_index))
     end
   end
@@ -119,8 +119,7 @@ function update_render_text(spidertron)
       waypoint.render_id = render_id
     end
   end
-
-  update_spidertron_render_paths(spidertron)
+  update_spidertron_render_paths(spidertron.unit_number)
 end
 
 

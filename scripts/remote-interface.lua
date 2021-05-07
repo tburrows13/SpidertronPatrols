@@ -27,6 +27,12 @@ local function spidertron_replaced(event)
     global.spidertron_waypoints[previous_unit_number] = nil
   end
 
+  for player_index, path_render_info in pairs(global.path_renders) do
+    if path_render_info.spidertron == previous_unit_number then
+      global.path_renders[player_index].spidertron = spidertron.unit_number
+    end
+  end
+
   if global.spidertrons_docked[previous_unit_number] then
     local dock_unit_number = global.spidertrons_docked[previous_unit_number]
     global.spidertrons_docked[spidertron.unit_number] = dock_unit_number
