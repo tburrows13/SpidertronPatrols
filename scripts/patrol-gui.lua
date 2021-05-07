@@ -400,9 +400,13 @@ script.on_event(defines.events.on_gui_click,
         local index_to_move = action.index
         if index_to_move ~= 1 then
           local index_above = action.index - 1
+          
+          --[[
+          -- TODO Get shift-click working. Currently swaps top and current instead of shifting all down
           if event.shift then
             index_above = 1
           end
+          ]]
 
           local waypoint_to_move = util.table.deepcopy(waypoints[index_to_move])
           local waypoint_above = util.table.deepcopy(waypoints[index_above])
@@ -432,9 +436,12 @@ script.on_event(defines.events.on_gui_click,
         local index_to_move = action.index
         if index_to_move ~= #waypoints then
           local index_below = action.index + 1
+
+          -[[
           if event.shift then
             index_below = #waypoints
           end
+          ]]
 
           local waypoint_to_move = util.table.deepcopy(waypoints[index_to_move])
           local waypoint_below = util.table.deepcopy(waypoints[index_below])

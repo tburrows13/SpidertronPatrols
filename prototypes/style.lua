@@ -63,7 +63,6 @@ styles.sp_spidertron_schedule_station_frame = {
 }
 
 
--- TODO Make these behave more like train GUI clicked buttons
 local button_style = styles.button
 styles.sp_clicked_train_schedule_action_button = {
   type = "button_style",

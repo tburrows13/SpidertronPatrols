@@ -1,10 +1,14 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.1.0
-Date: ???
+Date: 7 May 2021
   Features:
+    - Change waypoint order with 'move up' and 'move down' buttons
     - Added startup settings to disable patrols, docks and spiderling individually
     - Copy-paste now copies spidertron schedules
     - Now shows dotted lines between waypoints whilst holding a connected patrol remote
+  Changes:
+    - Improved technology icons
+    - New thumbnail
   Bugfixes:
     - Fixed repeated clicking on schedule time input text field would delete the last 2 digits
     - Fixed waypoint visualisations not being centered vertically

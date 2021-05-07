@@ -1,9 +1,4 @@
-# Spidertron Patrols
-
-Replaces [Spidertron Waypoints](https://mods.factorio.com/mod/SpidertronWaypoints).
-
------
-## Features
+# Features
 
 ### Patrol Schedule
 
@@ -29,9 +24,9 @@ Replaces [Spidertron Waypoints](https://mods.factorio.com/mod/SpidertronWaypoint
 ## Known Bugs / Limitations
 
 - Each patrol waypoint can only have one wait condition set. If you need more, you can usually just set multiple waypoints in the same position, each with a different wait condition
-- Spidertron docks cannot be filtered so if you connect a spidertron with filters in its inventory and the inventory becomes full or nearly full, items can be lost (not possible to fix because it requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=97967) - please post there in support of the addition)
+- Spidertron docks cannot be filtered so if you connect a spidertron with filters in its inventory and the inventory becomes full or nearly full, items can be lost (not possible to fix because it requires [this API feature](https://forums.factorio.com/viewtopic.php?f=28&t=97967) - please post there in support)
 - For performance reasons, when items with associated data (such as modular armor) in a spidertron inventory are taken out of a connected dock's inventory, they lose all their data. This loses all the equipment in that armor's equipment grid 
-- Waypoint markers cannot be seen in map view (not possible to add because it requires [this API addition](https://forums.factorio.com/viewtopic.php?f=28&t=76539&p=510027) - please post there in support of the addition)
+- Waypoint markers cannot be seen in map view (not possible to add because it requires [this API feature](https://forums.factorio.com/viewtopic.php?f=28&t=76539&p=510027) - please post there in support)
 - Performance is good, but not insignificant:
     - Docks are limited so that only 20 are updated each tick. Adding lots of docks will simply increase the update delay for each dock instead of reducing UPS
     - Spidertrons waiting at waypoints also add to the mod update time. The "Inactivity" wait condition is particularly expensive
@@ -42,12 +37,8 @@ Replaces [Spidertron Waypoints](https://mods.factorio.com/mod/SpidertronWaypoint
 -----
 ## Future Updates?
 
-- Support for copy-pasting schedules between spidertrons
-- Buttons to reorder schedule waypoints
 - Progress bars for wait conditions inside schedule user interface
-- Better patrol route visualisations with lines on the ground
 - Shortcut that toggles spidertron "Automatic"/"Manual"
-- Settings to enable/disable specific parts of the mod
 
 -----
 ## Translation
@@ -56,4 +47,10 @@ You can help by translating this mod into your language using [CrowdIn](https://
 
 -----
 
-Thank you to [danatron1](https://www.reddit.com/r/factorio/comments/iitlvi/i_made_a_mod_that_allows_you_to_set_waypoints/g3dzt1h) for creating the patrol remote icon.
+Replaces [Spidertron Waypoints](https://mods.factorio.com/mod/SpidertronWaypoints).
+
+Thank you to:
+
+- [danatron1](https://www.reddit.com/r/factorio/comments/iitlvi/i_made_a_mod_that_allows_you_to_set_waypoints/g3dzt1h) for creating the patrol remote icon
+- [notnotmelon](https://mods.factorio.com/mod/spidertron-logistics) for some of the dock prototype code
+- [Raiguard](https://mods.factorio.com/mod/flib) for the GUI library and style tips
