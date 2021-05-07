@@ -158,7 +158,7 @@ function handle_wait_timers()
       elseif waypoint_type == "robots-inactive" then
         local logistic_network = spidertron.logistic_network
         -- Always wait some time in case "Enable logistics while moving" is false
-        if (game.tick - waypoint_info.tick_arrived) >= 120 and not next(logistic_network.construction_robots) then
+        if (game.tick - waypoint_info.tick_arrived) >= 120 and (not logistic_network or not next(logistic_network.construction_robots)) then
             --logistic_network.all_construction_robots == logistic_network.available_construction_robots then
           go_to_next_waypoint(spidertron)
         end

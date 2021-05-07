@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.1
+Date: ???
+  Bugfixes:
+    - Fix crash when spidertron with no roboports arrives at 'Robots inactive' waypoint 
+---------------------------------------------------------------------------------------------------
 Version: 2.1.0
 Date: 7 May 2021
   Features:
