@@ -165,6 +165,11 @@ local function build_gui(player, spidertron)
   local waypoint_info = get_waypoint_info(spidertron)
   local anchor = {gui = defines.relative_gui_type.spider_vehicle_gui, position = defines.relative_gui_position.right}
   if not next(waypoint_info.waypoints) then return end
+
+  -- Avoid by setting (configurable) max height https://forums.factorio.com/viewtopic.php?f=7&t=98151
+  local maximal_height = 930
+  if script.active_mods["AutoTrash"] then maximal_height = 650 end
+  maximal_height = maximal_height * player.mod_settings["sp-window-height-scale"].value
   return gui.build(player.gui.relative, {
     {
       type = "frame",
@@ -172,6 +177,7 @@ local function build_gui(player, spidertron)
       name = "sp-relative-frame",
       direction = "vertical",
       anchor = anchor,
+      style_mods = {maximal_height = maximal_height},
       children = {
         {type = "flow", ref = {"titlebar", "flow"}, children = {
           {type = "label", style = "frame_title", caption = {"gui-train.schedule"}, ignored_by_interaction = true},
@@ -192,7 +198,8 @@ local function build_gui(player, spidertron)
           {type = "frame", style = "inside_shallow_frame", children = {
             --{type = "frame", style = "sp_spidertron_minimap_frame", children = {
               {
-                type = "camera", style = "sp_spidertron_camera", position = spidertron.position, surface_index = spidertron.surface.index, zoom = 0.75, elem_mods = {entity = spidertron},
+                type = "camera", style = "sp_spidertron_camera", position = spidertron.position, surface_index = spidertron.surface.index, zoom = 0.75,
+                elem_mods = {entity = spidertron},
                 ref = {"camera"},
               },
 

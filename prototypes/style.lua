@@ -5,7 +5,8 @@ styles.sp_relative_stretchable_frame = {
   type = "frame_style",
   --vertically_stretchable = "off",
   --vertically_squashable = "on",
-  maximal_height = 930,  -- Hardcoded to avoid https://forums.factorio.com/viewtopic.php?f=7&t=98151
+  -- maximal_height = 930,
+  -- maximal_height is configurable and set at runtime
 }
 
 -- Copied from flib_titlebar_drag_handle

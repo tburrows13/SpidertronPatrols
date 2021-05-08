@@ -9,5 +9,5 @@ if mods["AutoTrash"] then
   local styles = data.raw["gui-style"].default
 
   styles.at_right_scroll_pane.maximal_height = 165
-  styles.sp_relative_stretchable_frame.maximal_height = 650
+  -- Spidertron Patrols frame height is configurable and set at runtime
 end

@@ -1,6 +1,6 @@
 {
     "name": "SpidertronPatrols",
-    "version": "2.1.1",
+    "version": "2.1.2",
     "title": "Spidertron Patrols",
     "author": "Xorimuth",
     "description": "Send spidertrons on patrols and automatically load and unload them using docks. Adds mid-game spiderling to allow the new features to be used sooner.",

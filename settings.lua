@@ -20,4 +20,13 @@ data:extend({
     default_value = true,
     order = "c"
   },
+  {
+    type = "double-setting",
+    name = "sp-window-height-scale",
+    setting_type = "runtime-per-user",
+    default_value = 1,
+    minimum_value = 0.2,
+    maximum_value = 5,
+    order = "a"
+  },
 })

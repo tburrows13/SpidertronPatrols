@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.1.2
-Date: ???
+Date: 8 May 2021
+  Features:
+    - Added 'Maximum window height scale' per-player setting to workaround the interface overflowing at the bottom with some screen resolutions and interface UI scales
   Bugfixes:
     - Fix spidertrons that have had a schedule pasted would sometimes spontaneously move to a waypoint
     - Fix schedule GUI being updated with other spidertron's statuses
