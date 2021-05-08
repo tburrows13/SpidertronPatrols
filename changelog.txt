@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.1.1
-Date: ???
+Date: 8 May 2021
+  Features:
+    - Added camera toggle button
   Bugfixes:
     - Fix crash when spidertron with no roboports arrives at 'Robots inactive' waypoint
     - Fixed GUI getting cut off at the bottom when AutoTrash is enabled

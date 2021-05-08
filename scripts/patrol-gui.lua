@@ -205,8 +205,13 @@ local function build_gui(player, spidertron)
                 build_on_patrol_switch(waypoint_info),
                 {type = "empty-widget", style = "sp_stretchable_empty_widget"},
                 {
-                  type = "sprite-button", style = "sp_clicked_tool_button", mouse_button_filter = {"left"}, sprite = "utility/center", tooltip = {"gui-patrol.center-on-spidertron"},
-                  ref = {"center_button"},
+                  type = "sprite-button", style = "sp_clicked_tool_button", mouse_button_filter = {"left"}, sprite = "sp-camera", tooltip = {"gui-patrol.toggle-camera"},
+                  ref = {"toggle_camera_button"},
+                  actions = {on_click = {action = "toggle_camera"}},
+                },
+                {
+                  type = "sprite-button", style = "sp_clicked_tool_button", mouse_button_filter = {"left"}, sprite = "utility/center", tooltip = {"gui-patrol.toggle-center-on-spidertron"},
+                  ref = {"toggle_center_button"},
                   actions = {on_click = {action = "toggle_camera_center_on_spidertron"}},
                 },
                 {
@@ -400,7 +405,7 @@ script.on_event(defines.events.on_gui_click,
         local index_to_move = action.index
         if index_to_move ~= 1 then
           local index_above = action.index - 1
-          
+
           --[[
           -- TODO Get shift-click working. Currently swaps top and current instead of shifting all down
           if event.shift then
@@ -476,10 +481,25 @@ script.on_event(defines.events.on_gui_click,
           player.open_map(camera.position, 0.109)
         end
         player.opened = nil
+      elseif action_name == "toggle_camera" then
+        if gui_elements then
+          local camera_button = gui_elements.toggle_camera_button
+          local camera = gui_elements.camera
+          if camera_button.style.name == "tool_button" then
+            -- Button was clicked
+            camera_button.style = "sp_clicked_tool_button"
+            camera.parent.visible = true
+          else
+            -- Button was unclicked
+            camera_button.style = "tool_button"
+            camera.parent.visible = false
+          end
+
+        end
       elseif action_name == "toggle_camera_center_on_spidertron" then
         -- Recenter button
         if gui_elements then
-          local center_button = gui_elements.center_button
+          local center_button = gui_elements.toggle_center_button
           local camera = gui_elements.camera
           if center_button.style.name == "tool_button" then
             -- Button was clicked
@@ -495,7 +515,7 @@ script.on_event(defines.events.on_gui_click,
       elseif action_name == "move_camera_to_waypoint" then
         -- Numbered labels
         if gui_elements then
-          local center_button = gui_elements.center_button
+          local center_button = gui_elements.toggle_center_button
           local camera = gui_elements.camera
           local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
 

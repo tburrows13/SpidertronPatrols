@@ -23,4 +23,10 @@ data:extend{
     filename = "__SpidertronPatrols__/graphics/gui/down-white.png",
     size = 32,
   },
+  {
+    type = "sprite",
+    name = "sp-camera",
+    filename = "__SpidertronPatrols__/graphics/gui/video-camera.png",
+    size = 32,
+  },
 }

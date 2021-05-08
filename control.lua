@@ -153,13 +153,22 @@ local function config_changed_setup(changed_data)
     return
   end
 
+  -- Close all spidertron GUIs
+  for _, player in pairs(game.players) do
+    if player.opened_gui_type == defines.gui_type.entity then
+      local entity = player.opened
+      if entity.type == "spider-vehicle" then
+        player.opened = nil
+      end
+    end
+  end
+
   log("Coming from old version: " .. old_version)
   old_version = util.split(old_version, ".")
   for i=1, #old_version do
     old_version[i] = tonumber(old_version[i])
   end
 
-  -- Example usage for migrations
   if old_version[1] == 2 then
     if old_version[2] < 1 then
       -- Pre 2.1
