@@ -1,11 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.3
+Date: ???
+  Bugfixes:
+    - Fixed missing settings locale strings
+---------------------------------------------------------------------------------------------------
 Version: 2.1.2
 Date: 8 May 2021
   Features:
     - Added 'Maximum window height scale' per-player setting to workaround the interface overflowing at the bottom with some screen resolutions and interface UI scales
   Bugfixes:
-    - Fix spidertrons that have had a schedule pasted would sometimes spontaneously move to a waypoint
-    - Fix schedule GUI being updated with other spidertron's statuses
+    - Fixed spidertrons that have had a schedule pasted would sometimes spontaneously move to a waypoint
+    - Fixed schedule GUI being updated with other spidertron's statuses
 ---------------------------------------------------------------------------------------------------
 Version: 2.1.1
 Date: 8 May 2021
