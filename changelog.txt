@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.2
+Date: ???
+  Bugfixes:
+    - Fix spidertrons that have had a schedule pasted would sometimes spontaneously move to a waypoint
+---------------------------------------------------------------------------------------------------
 Version: 2.1.1
 Date: 8 May 2021
   Features:

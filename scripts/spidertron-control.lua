@@ -113,8 +113,7 @@ end
 
 function handle_wait_timers()
   for _, waypoint_info in pairs(global.spidertron_waypoints) do
-    local tick_arrived = waypoint_info.tick_arrived
-    if tick_arrived then
+    if waypoint_info.on_patrol and waypoint_info.tick_arrived then
       -- Spidertron is waiting
       local spidertron = waypoint_info.spidertron
       local waypoint = waypoint_info.waypoints[waypoint_info.current_index]
@@ -213,8 +212,11 @@ script.on_event(defines.events.on_entity_settings_pasted,
       end
 
       local waypoint_info = util.table.deepcopy(get_waypoint_info(source))
-      waypoint_info.on_patrol = false  -- Mimics train copying logic
+      waypoint_info.on_patrol = destination_waypoint_info.on_patrol
       waypoint_info.spidertron = destination
+      waypoint_info.tick_arrived = nil
+      waypoint_info.tick_inactive = nil
+      waypoint_info.previous_inventories = nil
 
       -- Erase all render ids so that new ones can be recreated by update_render_text
       for _, waypoint in pairs(waypoint_info.waypoints) do
