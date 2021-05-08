@@ -3,7 +3,8 @@ Version: 2.1.1
 Date: ???
   Bugfixes:
     - Fix crash when spidertron with no roboports arrives at 'Robots inactive' waypoint
-    - Fixed GUI getting cut off at the bottom when AutoTrash is enabled 
+    - Fixed GUI getting cut off at the bottom when AutoTrash is enabled
+    - Fixed crash when pressing 'move down' in schedule
 ---------------------------------------------------------------------------------------------------
 Version: 2.1.0
 Date: 7 May 2021

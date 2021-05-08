@@ -437,7 +437,7 @@ script.on_event(defines.events.on_gui_click,
         if index_to_move ~= #waypoints then
           local index_below = action.index + 1
 
-          -[[
+          --[[
           if event.shift then
             index_below = #waypoints
           end
