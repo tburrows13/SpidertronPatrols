@@ -8,6 +8,6 @@ if mods["AutoTrash"] then
   -- Further workarounds for https://forums.factorio.com/viewtopic.php?f=7&t=98151
   local styles = data.raw["gui-style"].default
 
-  styles.at_right_scroll_pane.maximal_height = 150
-  styles.sp_relative_stretchable_frame.maximal_height = 670
+  styles.at_right_scroll_pane.maximal_height = 165
+  styles.sp_relative_stretchable_frame.maximal_height = 650
 end
