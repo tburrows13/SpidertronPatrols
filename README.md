@@ -33,7 +33,6 @@
     - If you are running into performance problems, send me the save and I can probably make some improvements to the mod to help you
 - Incompatible with [Spidertron Logistics System](https://mods.factorio.com/mod/spidertron-logistics) due to [some bugs in that mod](https://mods.factorio.com/mod/spidertron-logistics/discussion/60732e64d576fb35748cbe2b)
 
-
 -----
 ## Future Updates?
 
@@ -53,4 +52,4 @@ Thank you to:
 
 - [danatron1](https://www.reddit.com/r/factorio/comments/iitlvi/i_made_a_mod_that_allows_you_to_set_waypoints/g3dzt1h) for creating the patrol remote icon
 - [notnotmelon](https://mods.factorio.com/mod/spidertron-logistics) for some of the dock prototype code
-- [Raiguard](https://mods.factorio.com/mod/flib) for the GUI library and style tips
+- [raiguard](https://mods.factorio.com/mod/flib) for the GUI library and style tips
