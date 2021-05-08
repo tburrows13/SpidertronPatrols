@@ -239,14 +239,16 @@ function patrol_gui.update_gui_button_states(waypoint_info)
   -- Lightweight version of patrol_gui.update_gui_schedule that only touches the play/stop buttons
   -- Use when not the result of a GUI interaction
   for _, player in pairs(game.players) do
-    local gui_elements = global.open_gui_elements[player.index]
-    if gui_elements then
-      local scroll_pane = gui_elements["schedule-scroll-pane"]
-      for i, frame in pairs(scroll_pane.children) do
-        local button_status = generate_button_status(waypoint_info, i)
-        local status_button = frame.status_button
-        status_button.style = button_status.style
-        status_button.sprite = button_status.sprite
+    if player.opened_gui_type == defines.gui_type.entity and player.opened == waypoint_info.spidertron then
+      local gui_elements = global.open_gui_elements[player.index]
+      if gui_elements then
+        local scroll_pane = gui_elements["schedule-scroll-pane"]
+        for i, frame in pairs(scroll_pane.children) do
+          local button_status = generate_button_status(waypoint_info, i)
+          local status_button = frame.status_button
+          status_button.style = button_status.style
+          status_button.sprite = button_status.sprite
+        end
       end
     end
   end
@@ -256,29 +258,28 @@ function patrol_gui.update_gui_schedule(waypoint_info)
   local spidertron = waypoint_info.spidertron
 
   for _, player in pairs(game.players) do
-    local gui_elements = global.open_gui_elements[player.index]
-    if gui_elements then
-      local scroll_pane = gui_elements["schedule-scroll-pane"]
-      scroll_pane.clear()
-      local waypoint_frames = build_waypoint_frames(waypoint_info)
-      if next(waypoint_frames) then
-        local new_gui_elements = gui.build(scroll_pane, waypoint_frames)
-        -- Copy across new gui elements to global storage
-        gui_elements.waypoint_dropdown = new_gui_elements.waypoint_dropdown
-        gui_elements.time_slider = new_gui_elements.time_slider
-        gui_elements.time_textfield = new_gui_elements.time_textfield
-        gui_elements.waypoint_button = new_gui_elements.waypoint_button
-      else
-        -- Clear GUI
-        local relative_frame = player.gui.relative["sp-relative-frame"]
-        if relative_frame then
-          relative_frame.destroy()
+    if player.opened_gui_type == defines.gui_type.entity and player.opened == waypoint_info.spidertron then
+      local gui_elements = global.open_gui_elements[player.index]
+      if gui_elements then
+        local scroll_pane = gui_elements["schedule-scroll-pane"]
+        scroll_pane.clear()
+        local waypoint_frames = build_waypoint_frames(waypoint_info)
+        if next(waypoint_frames) then
+          local new_gui_elements = gui.build(scroll_pane, waypoint_frames)
+          -- Copy across new gui elements to global storage
+          gui_elements.waypoint_dropdown = new_gui_elements.waypoint_dropdown
+          gui_elements.time_slider = new_gui_elements.time_slider
+          gui_elements.time_textfield = new_gui_elements.time_textfield
+          gui_elements.waypoint_button = new_gui_elements.waypoint_button
+        else
+          -- Clear GUI
+          local relative_frame = player.gui.relative["sp-relative-frame"]
+          if relative_frame then
+            relative_frame.destroy()
+          end
+          global.open_gui_elements[player.index] = nil
         end
-        global.open_gui_elements[player.index] = nil
-      end
-    else
-      local opened_gui = player.opened
-      if opened_gui and player.opened_gui_type == defines.gui_type.entity and opened_gui.type == "spider-vehicle" then
+      else
         global.open_gui_elements[player.index] = build_gui(player, spidertron)
       end
     end
@@ -287,14 +288,16 @@ end
 
 function patrol_gui.update_gui_switch(waypoint_info)
   for _, player in pairs(game.players) do
-    local gui_elements = global.open_gui_elements[player.index]
-    if gui_elements then
-      local switch = gui_elements.on_patrol_switch
-      gui.update(
-        switch,
-        {elem_mods = {switch_state = build_on_patrol_switch(waypoint_info).switch_state}}
-      )
-      patrol_gui.update_gui_button_states(waypoint_info)
+    if player.opened_gui_type == defines.gui_type.entity and player.opened == waypoint_info.spidertron then
+      local gui_elements = global.open_gui_elements[player.index]
+      if gui_elements then
+        local switch = gui_elements.on_patrol_switch
+        gui.update(
+          switch,
+          {elem_mods = {switch_state = build_on_patrol_switch(waypoint_info).switch_state}}
+        )
+        patrol_gui.update_gui_button_states(waypoint_info)
+      end
     end
   end
 end
