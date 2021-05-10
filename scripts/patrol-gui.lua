@@ -397,6 +397,10 @@ script.on_event(defines.events.on_gui_click,
         end
         rendering.destroy(waypoints[index_to_delete].render_id)
         table.remove(waypoints, index_to_delete)
+        if not next(waypoints) then
+          -- All waypoints are gone, so cleanup
+          clear_spidertron_waypoints(spidertron)
+        end
         if not waypoints[index_to_delete] then
           waypoint_info.current_index = 1
         end
