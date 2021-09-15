@@ -112,10 +112,12 @@ function update_render_text(spidertron)
       render_id = rendering.draw_text{
         text = tostring(i),
         surface = spidertron.surface,
-        target = {waypoint.position.x, waypoint.position.y - 1.5},
+        target = {waypoint.position.x, waypoint.position.y},
         color = add_alpha(spidertron.color),
         scale = 5,
-        alignment = "center"}
+        alignment = "center",
+        vertical_alignment = "middle",
+      }
       waypoint.render_id = render_id
     end
   end
