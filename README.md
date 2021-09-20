@@ -31,7 +31,6 @@
     - Docks are limited so that only 20 are updated each tick. Adding lots of docks will simply increase the update delay for each dock instead of reducing UPS
     - Spidertrons waiting at waypoints also add to the mod update time. The "Inactivity" wait condition is particularly expensive
     - If you are running into performance problems, send me the save and I can probably make some improvements to the mod to help you
-- Incompatible with [Spidertron Logistics System](https://mods.factorio.com/mod/spidertron-logistics) due to [some bugs in that mod](https://mods.factorio.com/mod/spidertron-logistics/discussion/60732e64d576fb35748cbe2b)
 
 -----
 ## Future Updates?
