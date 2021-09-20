@@ -3,6 +3,8 @@ Version: 2.2.0
 Date: ???
   Features:
     - Added 'Add logistic requests to spidertron docks' setting (default: off)
+  Bugfixes:
+    - Fixed docks created by editor cloning not functioning
   Balancing:
     - Increased spiderling speed to just under walking speed
   Compatibility:
