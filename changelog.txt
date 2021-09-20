@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.2.0
 Date: ???
+  Features:
+    - Added 'Add logistic requests to spidertron docks' setting (default: off)
   Balancing:
     - Increased spiderling speed to just under walking speed
 ---------------------------------------------------------------------------------------------------

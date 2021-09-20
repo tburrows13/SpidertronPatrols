@@ -4,22 +4,30 @@ data:extend({
     name = "sp-enable-patrol-remote",
     setting_type = "startup",
     default_value = true,
-    order = "a"
+    order = "aa"
   },
   {
     type = "bool-setting",
     name = "sp-enable-dock",
     setting_type = "startup",
     default_value = true,
-    order = "b"
+    order = "ab"
   },
   {
     type = "bool-setting",
     name = "sp-enable-spiderling",
     setting_type = "startup",
     default_value = true,
-    order = "c"
+    order = "ac"
   },
+  {
+    type = "bool-setting",
+    name = "sp-dock-is-requester",
+    setting_type = "startup",
+    default_value = false,
+    order = "b"
+  },
+
   {
     type = "double-setting",
     name = "sp-window-height-scale",

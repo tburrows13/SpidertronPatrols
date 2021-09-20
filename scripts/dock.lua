@@ -71,6 +71,16 @@ function replace_dock(dock, new_dock_name)
   local circuit_connection_definitions = dock.circuit_connection_definitions
   local to_be_deconstructed = dock.to_be_deconstructed()
 
+  local request_from_buffers
+  local requests
+  if dock.type == "logistic-container" then
+    request_from_buffers = dock.request_from_buffers
+    requests = {}
+    for slot_index = 1, dock.request_slot_count do
+      requests[slot_index] = dock.get_request_slot(slot_index)
+    end
+  end
+
   local players_with_gui_open = {}
   for _, player in pairs(game.connected_players) do
     if player.opened == dock then
@@ -79,7 +89,7 @@ function replace_dock(dock, new_dock_name)
   end
 
   old_dock = dock
-  dock = dock.surface.create_entity{name = new_dock_name, position = dock.position, force = dock.force, spill = false, create_build_effect_smoke = false}
+  dock = dock.surface.create_entity{name = new_dock_name, position = dock.position, force = dock.force, spill = false, create_build_effect_smoke = false, fast_replace = true}
 
   dock.health = health
   dock.last_user = last_user
@@ -95,6 +105,16 @@ function replace_dock(dock, new_dock_name)
   if to_be_deconstructed then
     dock.order_deconstruction(dock.force)
   end
+
+  if request_from_buffers then
+    dock.request_from_buffers = request_from_buffers
+  end
+  if requests then
+    for slot_index, request in pairs(requests) do
+      dock.set_request_slot(request, slot_index)
+    end
+  end
+
 
   for _, player in pairs(players_with_gui_open) do
     if player.valid then
@@ -177,7 +197,7 @@ local function update_dock(dock_data)
         local nearby_spidertrons = surface.find_entities_filtered{type = "spider-vehicle", area = dock.bounding_box, force = dock.force}
         local spidertrons_docked = global.spidertrons_docked
         for _, spidertron in pairs(nearby_spidertrons) do
-          if not global.spidertrons_docked[spidertron.unit_number] and spidertron.speed < 0.1 and spidertron.name ~= "companion" then
+          if not spidertrons_docked[spidertron.unit_number] and spidertron.speed < 0.1 and spidertron.name ~= "companion" then
             local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
             local inventory_size = #inventory
             if inventory_size > 0 then

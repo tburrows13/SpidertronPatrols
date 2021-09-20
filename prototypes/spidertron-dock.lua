@@ -31,8 +31,15 @@ local dock_recipe = {
 
 -- "container" definition doesn't support filters, but does support circuit connections
 local function create_spidertron_dock(inventory_size)
+  local type = "container"
+  local logistic_mode
+  if settings.startup["sp-dock-is-requester"].value then
+    type = "logistic-container"
+    logistic_mode = "requester"
+  end
   return {
-    type = "container",
+    type = type,
+    logistic_mode = logistic_mode,
     name = "sp-spidertron-dock-" .. inventory_size,
     localised_name = {"entity-name.sp-spidertron-dock"},
     localised_description = {"entity-description.sp-spidertron-dock"},
