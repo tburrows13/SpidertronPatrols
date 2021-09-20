@@ -5,6 +5,8 @@ Date: ???
     - Added 'Add logistic requests to spidertron docks' setting (default: off)
   Balancing:
     - Increased spiderling speed to just under walking speed
+  Compatibility:
+    - Removed incompatibility with Spidertron Logistics System
 ---------------------------------------------------------------------------------------------------
 Version: 2.1.3
 Date: 10 May 2021
