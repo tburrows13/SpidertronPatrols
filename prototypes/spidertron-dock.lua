@@ -2,6 +2,8 @@ if not settings.startup["sp-enable-dock"].value then
   return
 end
 
+local sounds = require("__base__.prototypes.entity.sounds")
+local hit_effects = require ("__base__.prototypes.entity.hit-effects")
 
 local circuit_connections = require "circuit-connections"
 
@@ -89,6 +91,9 @@ local function create_spidertron_dock(inventory_size)
     minable = {mining_time = 1, result = "sp-spidertron-dock"},
     placeable_by = {item = "sp-spidertron-dock", count = 1},
     corpse = "artillery-turret-remnants",
+    dying_explosion = "assembling-machine-3-explosion",  -- artillery-turret-explosion is too tall
+    damaged_trigger_effect = hit_effects.entity(),
+    vehicle_impact_sound = sounds.generic_impact,
     close_sound = {
       filename = "__base__/sound/metallic-chest-close.ogg",
       volume = 0.6
@@ -97,9 +102,9 @@ local function create_spidertron_dock(inventory_size)
       filename = "__base__/sound/metallic-chest-open.ogg",
       volume = 0.6
     },
-    collision_box = {{-1.4, -1.4}, {1.4, 1.4}},
+    collision_box = {{-1.2, -1.2}, {1.2, 1.2}},
     selection_box = {{-1.5, -1.5}, {1.5, 1.5}},
-    flags = {"placeable-neutral", "player-creation"},
+    flags = {"placeable-neutral", "placeable-player", "player-creation"},
   }
 end
 
