@@ -176,6 +176,13 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
 end
 
 
+local function increase_bounding_box(bounding_box)
+  local left_top = bounding_box.left_top
+  local right_bottom = bounding_box.right_bottom
+  local increase = 1.5
+  return {left_top = {x = left_top.x - increase, y = left_top.y - increase}, right_bottom = {x = right_bottom.x + increase, y = right_bottom.y + increase}}
+end
+
 local function update_dock(dock_data)
   local dock = dock_data.dock
   local delete = false
@@ -183,11 +190,11 @@ local function update_dock(dock_data)
     local surface = dock.surface
     local spidertron = dock_data.connected_spidertron
     if spidertron and spidertron.valid then
-      -- Port is connected. Check update inventories, then undock if needed
+      -- Dock is connected. Check update inventories, then undock if needed
       dock_data.previous_contents = update_dock_inventory(dock, spidertron, dock_data.previous_contents)
 
       -- 0.1 * 216 ~ 20km/h
-      if dock.to_be_deconstructed() or spidertron.speed > 0.1 or not math2d.bounding_box.collides_with(dock.bounding_box, spidertron.bounding_box) then
+      if dock.to_be_deconstructed() or spidertron.speed > 0.2 or not math2d.bounding_box.collides_with(increase_bounding_box(dock.bounding_box), spidertron.bounding_box) then
         -- Spidertron needs to become undocked
         global.spidertrons_docked[spidertron.unit_number] = nil
         surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-undocked"}}
