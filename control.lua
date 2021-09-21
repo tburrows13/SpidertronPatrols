@@ -115,18 +115,17 @@ script.on_event(defines.events.on_tick,
   end
 )
 
---[[
-local function settings_changed()
-    global.scroll_modes = {"spidertron-remote"}
-  if settings.global["spidertron-waypoints-include-waypoint"].value then
-    table.insert(global.scroll_modes, "spidertron-remote-waypoint")
+script.on_event(defines.events.on_runtime_mod_setting_changed,
+  function(event)
+    if event.setting_type == "runtime-per-user" then
+      if event.setting == "sp-show-waypoint-numbers-in-alt-mode" then
+        update_render_players()
+      end
+    end
   end
-  if settings.global["spidertron-waypoints-include-patrol"].value then
-    table.insert(global.scroll_modes, "spidertron-remote-patrol")
-  end
-end
-script.on_event(defines.events.on_runtime_mod_setting_changed, settings_changed)
-]]
+)
+script.on_event(defines.events.on_player_joined_game, update_render_players)
+
 
 local function setup()
     global.spidertron_waypoints = {}     -- Indexed by spidertron.unit_number
@@ -140,6 +139,7 @@ local function setup()
     global.player_highlights = {}  -- Indexed by player.index
 
     remote_interface.connect_to_remote_interfaces()
+    update_render_players()
     --settings_changed()
   end
 
@@ -174,6 +174,20 @@ local function config_changed_setup(changed_data)
       -- Pre 2.1
       global.path_renders = {}
       global.player_highlights = {}
+    end
+    if old_version[2] < 2 then
+      -- Pre 2.2
+      update_render_players()
+      for _, waypoint_info in pairs(global.spidertron_waypoints) do
+        for _, waypoint in pairs(waypoint_info.waypoints) do
+          local render_id = waypoint.render_id
+          if render_id and rendering.is_valid(render_id) then
+            rendering.destroy(render_id)
+          end
+          waypoint.render_id = nil
+        end
+        update_render_text(waypoint_info.spidertron)
+      end
     end
   end
 

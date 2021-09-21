@@ -1,5 +1,9 @@
+local function add_alpha(color)
+  return {r = color.r, g = color.g, b = color.b, a = 0.75}
+end
+
 local function create_render_paths(spidertron, player)
-  waypoint_info = get_waypoint_info(spidertron)
+  local waypoint_info = get_waypoint_info(spidertron)
 
   local color = spidertron.color
   local surface = spidertron.surface.name
@@ -47,6 +51,19 @@ local function create_render_paths(spidertron, player)
       }
 
       table.insert(path_render_ids, render_id)
+
+      -- Also draw waypoint number like in update_render_text() in case alt-mode is not on
+      render_id = rendering.draw_text{
+        text = tostring(i),
+        surface = spidertron.surface,
+        target = {waypoint.position.x, waypoint.position.y},
+        color = add_alpha(spidertron.color),
+        scale = 5,
+        alignment = "center",
+        vertical_alignment = "middle",
+        players = {player},
+      }
+      table.insert(path_render_ids, render_id)
     end
   end
 
@@ -90,13 +107,13 @@ function update_spidertron_render_paths(unit_number)
   end
 end
 
-local function add_alpha(color)
-  return {r = color.r, g = color.g, b = color.b, a = 0.75}
-end
 
 function update_render_text(spidertron)
   -- Updates numbered text on ground for given spidertron
   local waypoint_info = get_waypoint_info(spidertron)
+
+  local viewing_players = global.render_players
+
   -- Re-render all waypoints
   for i, waypoint in pairs(waypoint_info.waypoints) do
     local render_id = waypoint.render_id
@@ -117,6 +134,8 @@ function update_render_text(spidertron)
         scale = 5,
         alignment = "center",
         vertical_alignment = "middle",
+        only_in_alt_mode = true,
+        players = viewing_players,
       }
       waypoint.render_id = render_id
     end
@@ -125,41 +144,27 @@ function update_render_text(spidertron)
 end
 
 
---[[
-function generate_sub_text(waypoint, spidertron)
-  local wait_data = global.spidertrons_waiting[spidertron.unit_number]
-
-  if waypoint.wait_time and waypoint.wait_time > 0 then
-    local string = tostring(waypoint.wait_time) .. "s"
-    if wait_data and wait_data.waypoint == waypoint then
-      string = tostring(wait_data.wait_time) .. "/" .. string
+function update_render_players()
+  -- Called when a player joins or changes the associated setting
+  local render_players = {}
+  for _, player in pairs(game.players) do
+    if player.mod_settings["sp-show-waypoint-numbers-in-alt-mode"].value then
+      table.insert(render_players, player)
     end
-    if waypoint.wait_type and waypoint.wait_type == "right" then
-      string = string .. " inactivity"
-    end
-    return string
   end
-end
+  local is_at_least_one_player = not not next(render_players)
 
-function update_sub_text(waypoint, parent_render_id, spidertron)
-  -- TODO check if parent_render_id is valid
-  local render_id = global.sub_render_ids[parent_render_id]
-  local intended_text = generate_sub_text(waypoint, spidertron)
-  if render_id and rendering.is_valid(render_id) then
-    -- Check if we need to update it
-    local current_text = rendering.get_text(render_id)
-    if current_text ~= intended_text then
-      if intended_text then
-        rendering.set_text(render_id, intended_text)
-        rendering.set_color(render_id, spidertron.color)  -- In case the color has changed as well
-      else
-        rendering.destroy(render_id)
+  for _, waypoint_info in pairs(global.spidertron_waypoints) do
+    for _, waypoint in pairs(waypoint_info.waypoints) do
+      local render_id = waypoint.render_id
+      if render_id and rendering.is_valid(render_id) then
+        rendering.set_players(render_id, render_players)
+
+        -- If render_players is empty then we need to hide the text: empty player list means as visible to all
+        rendering.set_visible(render_id, is_at_least_one_player)
       end
     end
-  elseif intended_text then
-    -- Create new text
-    render_id = rendering.draw_text{text = intended_text, surface = spidertron.surface, target = {waypoint.position.x, waypoint.position.y+0.5}, color = spidertron.color, scale = 2, alignment = "center"}
-    global.sub_render_ids[parent_render_id] = render_id
   end
+
+  global.render_players = render_players
 end
-]]

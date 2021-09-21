@@ -5,6 +5,7 @@ Date: ???
     - Added 'Add logistic requests to spidertron docks' setting (default: off)
   Changes:
     - Made unwanted undocking less common by only undocking at a further distance than is required for docking
+    - Waypoint numbers will only be shown to players that have alt-mode on and that have it enabled in per-player settings (default: on)
   Bugfixes:
     - Fixed docks created by editor cloning not functioning
   Balancing:

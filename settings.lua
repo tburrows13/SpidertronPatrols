@@ -27,6 +27,13 @@ data:extend({
     default_value = false,
     order = "b"
   },
+  {
+    type = "bool-setting",
+    name = "sp-show-waypoint-numbers-in-alt-mode",
+    setting_type = "runtime-per-user",
+    default_value = true,
+    order = "a"
+  },
 
   {
     type = "double-setting",
@@ -35,6 +42,6 @@ data:extend({
     default_value = 1,
     minimum_value = 0.2,
     maximum_value = 5,
-    order = "a"
+    order = "b"
   },
 })
