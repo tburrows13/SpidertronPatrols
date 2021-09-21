@@ -177,16 +177,14 @@ local function config_changed_setup(changed_data)
     end
     if old_version[2] < 2 then
       -- Pre 2.2
+      rendering.clear("SpidertronPatrols")
+      global.path_renders = {}
       update_render_players()
       for _, waypoint_info in pairs(global.spidertron_waypoints) do
-        for _, waypoint in pairs(waypoint_info.waypoints) do
-          local render_id = waypoint.render_id
-          if render_id and rendering.is_valid(render_id) then
-            rendering.destroy(render_id)
-          end
-          waypoint.render_id = nil
+        local spidertron = waypoint_info.spidertron
+        if spidertron and spidertron.valid then
+          update_render_text(waypoint_info.spidertron)
         end
-        update_render_text(waypoint_info.spidertron)
       end
     end
   end

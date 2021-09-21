@@ -67,32 +67,51 @@ local function create_render_paths(spidertron, player)
     end
   end
 
-  global.path_renders[player.index] = {spidertron = spidertron.unit_number, render_ids = path_render_ids}
+  player_render_ids = global.path_renders[player.index] or {}
+  player_render_ids[spidertron.unit_number] = path_render_ids
+  global.path_renders[player.index] = player_render_ids
 end
 
 function update_player_render_paths(player)
   -- Clear up any previous renders
-  local path_render_info = global.path_renders[player.index]
-  if path_render_info then
+  local player_render_ids = global.path_renders[player.index]
+  if player_render_ids then
     -- There are render ids to cleanup
-    local path_render_ids = path_render_info.render_ids
-    for _, render_id in pairs(path_render_ids) do
-      rendering.destroy(render_id)
+    for _, path_render_ids in pairs(player_render_ids) do
+      for _, render_id in pairs(path_render_ids) do
+        rendering.destroy(render_id)
+      end
     end
     global.path_renders[player.index] = nil
   end
 
   -- Create new path renders if necessary
+  rendered_spidertrons = {}  -- Ensure that we don't render the same spidertron's path twice if it falls into multiple of the following categories
   local cursor_stack = player.cursor_stack
-  if cursor_stack and cursor_stack.valid_for_read and cursor_stack.name == "sp-spidertron-patrol-remote" then
-    local spidertron = cursor_stack.connected_entity
-    if spidertron then
-      create_render_paths(spidertron, player)
-    end
+  if cursor_stack and cursor_stack.valid_for_read and cursor_stack.name == "sp-spidertron-patrol-remote" and cursor_stack.connected_entity then
+    create_render_paths(cursor_stack.connected_entity, player)
+    table.insert(rendered_spidertrons, cursor_stack.connected_entity.unit_number)
+  end
+  local vehicle = player.vehicle
+  if vehicle and vehicle.type == "spider-vehicle" and not contains(rendered_spidertrons, vehicle.unit_number) then
+    create_render_paths(vehicle, player)
+    table.insert(rendered_spidertrons, vehicle.unit_number)
+  end
+  local opened = player.opened
+  if opened and player.opened_gui_type == defines.gui_type.entity and opened.type == "spider-vehicle" and not contains(rendered_spidertrons, opened.unit_number) then
+    create_render_paths(opened, player)
+    table.insert(rendered_spidertrons, opened.unit_number)
+  end
+  local selected = player.selected
+  if selected and selected.type == "spider-vehicle" and not contains(rendered_spidertrons, selected.unit_number) then
+    create_render_paths(selected, player)
   end
 end
 
-script.on_event({defines.events.on_player_cursor_stack_changed, defines.events.on_player_configured_spider_remote},
+script.on_event({defines.events.on_player_cursor_stack_changed,
+                 defines.events.on_player_configured_spider_remote,
+                 defines.events.on_player_driving_changed_state,
+                 defines.events.on_selected_entity_changed},
   function(event)
     local player = game.get_player(event.player_index)
     update_player_render_paths(player)
@@ -100,8 +119,8 @@ script.on_event({defines.events.on_player_cursor_stack_changed, defines.events.o
 )
 
 function update_spidertron_render_paths(unit_number)
-  for player_index, path_render_info in pairs(global.path_renders) do
-    if path_render_info.spidertron == unit_number then
+  for player_index, player_render_ids in pairs(global.path_renders) do
+    if player_render_ids[unit_number] then
       update_player_render_paths(game.get_player(player_index))
     end
   end
