@@ -5,6 +5,7 @@ Date: ???
     - Added 'Add logistic requests to spidertron docks' setting (default: off)
     - Patrol waypoints will only be shown to players that have alt-mode on (added an option to disable showing even in alt-mode)
     - An individual spidertron's waypoints will also be shown when selecting, driving, or opening it (in addition to holding a connected remote)
+    - Added command /reset-sps-render-objects for use if render objects get in an unexpected state
   Changes:
     - Made unwanted undocking less common by only undocking at a further distance than is required for docking
     - Decreased dock collision box so that players can walk between them

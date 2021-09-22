@@ -177,20 +177,33 @@ local function config_changed_setup(changed_data)
     end
     if old_version[2] < 2 then
       -- Pre 2.2
-      rendering.clear("SpidertronPatrols")
-      global.path_renders = {}
-      update_render_players()
-      for _, waypoint_info in pairs(global.spidertron_waypoints) do
-        local spidertron = waypoint_info.spidertron
-        if spidertron and spidertron.valid then
-          update_render_text(waypoint_info.spidertron)
-        end
-      end
+      reset_render_objects()
     end
   end
-
-  --settings_changed()
 end
 
 script.on_init(setup)
 script.on_configuration_changed(config_changed_setup)
+
+function reset_render_objects()
+  rendering.clear("SpidertronPatrols")
+  global.path_renders = {}
+  update_render_players()
+  for _, waypoint_info in pairs(global.spidertron_waypoints) do
+    local spidertron = waypoint_info.spidertron
+    if spidertron and spidertron.valid then
+      update_render_text(waypoint_info.spidertron)
+    end
+  end
+  for _, player in pairs(game.players) do
+    update_player_render_paths(player)
+  end
+end
+
+commands.add_command("reset-sps-render-objects",
+  "Clears all render objects (numbers and lines on the ground) created by Spidertron Patrols and recreates only the objects that are supposed to exist. Use whenever render objects are behaving unexpectedly or have been permanently left behind due to a mod bug or incompatibility.",
+  function()
+    reset_render_objects()
+    game.print("Render objects reset")
+  end
+)
