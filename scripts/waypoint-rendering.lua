@@ -155,6 +155,7 @@ function update_render_text(spidertron)
         vertical_alignment = "middle",
         only_in_alt_mode = true,
         players = viewing_players,
+        forces = {spidertron.force}
       }
       waypoint.render_id = render_id
     end
