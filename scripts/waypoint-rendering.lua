@@ -13,6 +13,19 @@ local function create_render_paths(spidertron, player)
   local waypoints = waypoint_info.waypoints
   local number_of_waypoints = #waypoints
   for i, waypoint in pairs(waypoints) do
+    -- First draw waypoint number like in update_render_text() in case alt-mode is not on
+    local render_id = rendering.draw_text{
+      text = tostring(i),
+      surface = spidertron.surface,
+      target = {waypoint.position.x, waypoint.position.y},
+      color = add_alpha(spidertron.color),
+      scale = 5,
+      alignment = "center",
+      vertical_alignment = "middle",
+      players = {player},
+    }
+    table.insert(path_render_ids, render_id)
+
     local next_waypoint = waypoints[i + 1]
     if i == number_of_waypoints then
       if number_of_waypoints == 2 then
@@ -39,7 +52,7 @@ local function create_render_paths(spidertron, player)
       b2.x = b.x + dD * (a.x - b.x)
       b2.y = b.y + dD * (a.y - b.y)
 
-      local render_id = rendering.draw_line{
+      render_id = rendering.draw_line{
         color = color,
         width = 4,
         gap_length = 0.75,
@@ -50,19 +63,6 @@ local function create_render_paths(spidertron, player)
         players = {player}
       }
 
-      table.insert(path_render_ids, render_id)
-
-      -- Also draw waypoint number like in update_render_text() in case alt-mode is not on
-      render_id = rendering.draw_text{
-        text = tostring(i),
-        surface = spidertron.surface,
-        target = {waypoint.position.x, waypoint.position.y},
-        color = add_alpha(spidertron.color),
-        scale = 5,
-        alignment = "center",
-        vertical_alignment = "middle",
-        players = {player},
-      }
       table.insert(path_render_ids, render_id)
     end
   end
