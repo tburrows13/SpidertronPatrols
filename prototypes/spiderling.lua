@@ -15,6 +15,8 @@ local spiderling = data.raw["spider-vehicle"]["sp-spiderling"]
 spiderling = util.merge{
   spiderling,
   {
+    icon = "__SpidertronPatrols__/graphics/icons/spiderling.png",
+    icon_size = 64, icon_mipmaps = 1,
     inventory_size = 20,  -- default = 80
     torso_rotation_speed = 0.007,  -- default = 0.005
     height = spiderling.height * 1.3,
