@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.1
+Date: 18 April 2022
+  Bugfixes:
+    - Fixed spiderling entity (not item) having the spidertron's icon
+  Locale:
+    - Added complete Russian translations (thanks SeptiSe7en on Crowdin!)
+    - Added some German translations (thanks LineBeck on Crowdin!)
+    - Added some French translations (thanks DaiKy RaRaga on Crowdin!)
+---------------------------------------------------------------------------------------------------
 Version: 2.2.0
 Date: 22 September 2021
   Features:
