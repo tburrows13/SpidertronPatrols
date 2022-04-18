@@ -67,7 +67,7 @@ local function create_render_paths(spidertron, player)
     end
   end
 
-  player_render_ids = global.path_renders[player.index] or {}
+  local player_render_ids = global.path_renders[player.index] or {}
   player_render_ids[spidertron.unit_number] = path_render_ids
   global.path_renders[player.index] = player_render_ids
 end
@@ -86,7 +86,7 @@ function update_player_render_paths(player)
   end
 
   -- Create new path renders if necessary
-  rendered_spidertrons = {}  -- Ensure that we don't render the same spidertron's path twice if it falls into multiple of the following categories
+  local rendered_spidertrons = {}  -- Ensure that we don't render the same spidertron's path twice if it falls into multiple of the following categories
   local cursor_stack = player.cursor_stack
   if cursor_stack and cursor_stack.valid_for_read and cursor_stack.name == "sp-spidertron-patrol-remote" and cursor_stack.connected_entity then
     create_render_paths(cursor_stack.connected_entity, player)
