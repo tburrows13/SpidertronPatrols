@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.2.2
-Date: ???
+Date: 3 May 2022
   Features:
     - Added support for Spidertron Enhancement's patrol remote pipette ('Control + Shift + Q' by default)
   Changes:
