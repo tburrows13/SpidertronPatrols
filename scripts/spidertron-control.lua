@@ -62,7 +62,7 @@ script.on_event(defines.events.on_player_used_spider_remote,
     local remote = player.cursor_stack
 
     if event.success then
-      if remote.name == "sp-spidertron-patrol-remote" then
+      if remote.name == "sp-spidertron-patrol-remote" or remote.name == "spidertron-enhancements-temporary-sp-spidertron-patrol-remote" then
         on_patrol_command_issued(player, spidertron, position)
       else
         local waypoint_info = get_waypoint_info(spidertron)

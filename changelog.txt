@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.2.2
 Date: ???
+  Features:
+    - Added support for Spidertron Enhancement's patrol remote pipette ('Control + Shift + Q' by default)
   Changes:
     - Increased active waypoint opacity and decreased persistent waypoint opacity
   Bugfixes:
