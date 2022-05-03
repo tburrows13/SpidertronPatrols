@@ -11,7 +11,7 @@ data:extend{
     data.raw["equipment-grid"]["spidertron-equipment-grid"],
     {
       name = "sp-spiderling-equipment-grid",
-      width = 8,
+      width = 10,
       height = 4,
     }
   }

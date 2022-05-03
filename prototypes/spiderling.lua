@@ -8,7 +8,7 @@ create_spidertron{
   scale = 0.7,
   leg_scale = 0.75, -- relative to scale
   leg_thickness = 1.2, -- relative to leg_scale
-  leg_movement_speed = 0.8
+  leg_movement_speed = 0.62
 }
 
 local spiderling = data.raw["spider-vehicle"]["sp-spiderling"]
@@ -17,7 +17,7 @@ spiderling = util.merge{
   {
     icon = "__SpidertronPatrols__/graphics/icons/spiderling.png",
     icon_size = 64, icon_mipmaps = 1,
-    inventory_size = 20,  -- default = 80
+    inventory_size = 30,  -- default = 80
     torso_rotation_speed = 0.007,  -- default = 0.005
     height = spiderling.height * 1.3,
     chunk_exploration_radius = 2,  -- default = 3
@@ -67,10 +67,9 @@ local spiderling_recipe = {
   ingredients =
   {
     {"exoskeleton-equipment", 2},
-    {"solar-panel-equipment", 10},
     {"rocket-launcher", 1},
     {"rocket-control-unit", 4},
-    {"low-density-structure", 50},
+    {"low-density-structure", 40},
     {"radar", 1},
     {"effectivity-module-2", 2},
     {"raw-fish", 1}

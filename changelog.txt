@@ -4,6 +4,11 @@ Date: ???
   Features:
     - Added support for Spidertron Enhancement's patrol remote pipette ('Control + Shift + Q' by default)
   Changes:
+    - Spiderling equipment grid size increased (from 8x4 to 10x4)
+    - Spiderling inventory size increased (from 20 to 30)
+    - Spiderling base speed decreased
+    - Spiderling recipe no longer requires portable solar panels and requires fewer low density structures (from 50 to 40)
+    - Spidertron dock recipe requires fewer rocket control units (from 10 to 4)
     - Increased active waypoint opacity and decreased persistent waypoint opacity
   Bugfixes:
     - Fixed persistent waypoints rendering even though "Show patrol waypoints in alt-mode" is disabled 
