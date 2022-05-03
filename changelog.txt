@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.2
+Date: ???
+  Changes:
+    - Increased active waypoint opacity and decreased persistent waypoint opacity
+  Bugfixes:
+    - Fixed persistent waypoints rendering even though "Show patrol waypoints in alt-mode" is disabled 
+---------------------------------------------------------------------------------------------------
 Version: 2.2.1
 Date: 18 April 2022
   Bugfixes:

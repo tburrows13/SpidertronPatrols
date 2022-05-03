@@ -1,11 +1,19 @@
-local function add_alpha(color)
-  return {r = color.r, g = color.g, b = color.b, a = 0.75}
+local function add_alpha(color, active)
+  if active then
+    return {r = color.r, g = color.g, b = color.b, a = 0.85}
+  else
+    return {r = color.r, g = color.g, b = color.b, a = 0.55}
+  end
+end
+
+local function colors_eq(color1, color2)
+  return color1.r == color2.r and color1.g == color2.g and color1.b == color2.b and color1.a == color2.a
 end
 
 local function create_render_paths(spidertron, player)
   local waypoint_info = get_waypoint_info(spidertron)
 
-  local color = spidertron.color
+  local color = add_alpha(spidertron.color, true)
   local surface = spidertron.surface.name
 
   local path_render_ids = {}
@@ -18,7 +26,7 @@ local function create_render_paths(spidertron, player)
       text = tostring(i),
       surface = spidertron.surface,
       target = {waypoint.position.x, waypoint.position.y},
-      color = add_alpha(spidertron.color),
+      color = color,
       scale = 5,
       alignment = "center",
       vertical_alignment = "middle",
@@ -132,6 +140,9 @@ function update_render_text(spidertron)
   local waypoint_info = get_waypoint_info(spidertron)
 
   local viewing_players = global.render_players
+  local is_at_least_one_player = not not next(viewing_players)
+
+  local color = add_alpha(spidertron.color)
 
   -- Re-render all waypoints
   for i, waypoint in pairs(waypoint_info.waypoints) do
@@ -140,8 +151,8 @@ function update_render_text(spidertron)
       if rendering.get_text(render_id) ~= tostring(i) then
         rendering.set_text(render_id, i)
       end
-      if rendering.get_color(render_id) ~= add_alpha(spidertron.color) then
-        rendering.set_color(render_id, add_alpha(spidertron.color))
+      if not colors_eq(rendering.get_color(render_id), color) then
+        rendering.set_color(render_id, color)
       end
     else
       -- We need to create the text
@@ -149,7 +160,7 @@ function update_render_text(spidertron)
         text = tostring(i),
         surface = spidertron.surface,
         target = {waypoint.position.x, waypoint.position.y},
-        color = add_alpha(spidertron.color),
+        color = color,
         scale = 5,
         alignment = "center",
         vertical_alignment = "middle",
@@ -157,6 +168,7 @@ function update_render_text(spidertron)
         players = viewing_players,
         forces = {spidertron.force}
       }
+      rendering.set_visible(render_id, is_at_least_one_player)
       waypoint.render_id = render_id
     end
   end
