@@ -3,6 +3,7 @@ Version: 2.2.3
 Date: 4 May 2022
   Bugfixes:
     - Fixed docks with spiderlings docked at them being deleted when updating past v2.2.2 due to inventory size change
+    - Fixed docks not being placeable in space (with Space Exploration mod)
 ---------------------------------------------------------------------------------------------------
 Version: 2.2.2
 Date: 3 May 2022

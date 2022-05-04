@@ -105,6 +105,7 @@ local function create_spidertron_dock(inventory_size)
     collision_box = {{-1.2, -1.2}, {1.2, 1.2}},
     selection_box = {{-1.5, -1.5}, {1.5, 1.5}},
     flags = {"placeable-neutral", "placeable-player", "player-creation"},
+    se_allow_in_space = true,
   }
 end
 
