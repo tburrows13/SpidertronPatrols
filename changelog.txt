@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.4
+Date: ???
+  Bugfixes:
+    - Fixed spidertron with 'Full inventory' wait condition sometimes leaving before the inventory is actually full
+---------------------------------------------------------------------------------------------------
 Version: 2.2.3
 Date: 4 May 2022
   Bugfixes:
