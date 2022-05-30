@@ -39,10 +39,12 @@ local function create_spidertron_dock(inventory_size)
     type = "logistic-container"
     logistic_mode = "requester"
   end
-  return {
+  local name = "sp-spidertron-dock-" .. inventory_size
+  if data.raw[type][name] then return end
+  local dock = {
     type = type,
     logistic_mode = logistic_mode,
-    name = "sp-spidertron-dock-" .. inventory_size,
+    name = name,
     localised_name = {"entity-name.sp-spidertron-dock"},
     localised_description = {"entity-description.sp-spidertron-dock"},
     icon = "__SpidertronPatrols__/graphics/icons/spidertron-dock.png",
@@ -107,6 +109,7 @@ local function create_spidertron_dock(inventory_size)
     flags = {"placeable-neutral", "placeable-player", "player-creation"},
     se_allow_in_space = true,
   }
+  data:extend{dock}
 end
 
 --[[
@@ -194,11 +197,11 @@ end]]
 
 
 local sizes_created = {0}
-data:extend{create_spidertron_dock(0)}
+create_spidertron_dock(0)
 for _, spider_prototype in pairs(data.raw["spider-vehicle"]) do
   local inventory_size = spider_prototype.inventory_size
   if not contains(sizes_created, inventory_size) then
-    data:extend{create_spidertron_dock(inventory_size)}
+    create_spidertron_dock(inventory_size)
     table.insert(sizes_created, inventory_size)
   end
 end
