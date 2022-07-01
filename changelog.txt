@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.5
+Date: 1 July 2022
+  Bugfixes:
+    - Fixed broken tech tree with Space Exploration 0.6
+    - Removed duplicate info icons in mod settings (when using Factorio 1.1.61)
+---------------------------------------------------------------------------------------------------
 Version: 2.2.4
 Date: 31 May 2022
   Bugfixes:

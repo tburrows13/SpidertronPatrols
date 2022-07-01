@@ -88,7 +88,7 @@ if patrol_enabled or dock_enabled then
 end
 
 
-if spiderling_enabled or patrol_enabled or dock_enabled then
+if (spiderling_enabled or patrol_enabled or dock_enabled) and not mods["space-exploration"] then
   -- Why would the mod be installed if all 3 are disabled...? No idea...
 
   -- Move rocket control unit unlock earlier in the tech tree, so that spidertron remotes can also be crafed earlier but leave recipe unchanged
