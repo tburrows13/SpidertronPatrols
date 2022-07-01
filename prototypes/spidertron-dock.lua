@@ -50,6 +50,7 @@ local function create_spidertron_dock(inventory_size)
     icon = "__SpidertronPatrols__/graphics/icons/spidertron-dock.png",
     icon_size = 64,
     inventory_size = inventory_size,
+    inventory_type = "with_filters_and_bar",
     enable_inventory_bar = false,
     scale_info_icons = false,
     picture = {

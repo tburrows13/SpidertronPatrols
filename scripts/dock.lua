@@ -138,17 +138,54 @@ function replace_dock(dock, new_dock_name)
   return dock
 end
 
+local function get_filters(inventory)
+  if not inventory.is_filtered() then return {} end
+  local filters = {}
+  for i = 1, #inventory do
+    local filter = inventory.get_filter(i)
+    if filter then
+      filters[i] = filter
+    end
+  end
+  return filters
+end
 
 local function update_dock_inventory(dock, spidertron, previous_contents)
+  local previous_items = previous_contents.items
+  local previous_filters = previous_contents.filters
+  if not previous_items then
+    -- Pre-2.2.5 migration
+    previous_items = previous_contents
+    previous_filters = {}
+  end
+
   local spidertron_inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
   local spidertron_contents = spidertron_inventory.get_contents()
-
-  -- Can't deal with filters because "container" entities don't support them
+  local spidertron_filters = get_filters(spidertron_inventory)
 
   local dock_inventory = dock.get_inventory(defines.inventory.chest)
   local dock_contents = dock_inventory.get_contents()
+  local dock_filters = get_filters(dock_inventory)
 
-  local spidertron_diff = table_diff(spidertron_contents, previous_contents)
+  local spidertron_filter_diff = filter_table_diff(spidertron_filters, previous_filters)
+  for index, filter in pairs(spidertron_filter_diff) do
+    if filter == -1 then
+      dock_inventory.set_filter(index, nil)
+    else
+      dock_inventory.set_filter(index, filter)
+    end
+  end
+
+  local dock_filter_diff = filter_table_diff(dock_filters, previous_filters)
+  for index, filter in pairs(dock_filter_diff) do
+    if filter == -1 then
+      spidertron_inventory.set_filter(index, nil)
+    else
+      spidertron_inventory.set_filter(index, filter)
+    end
+  end
+
+  local spidertron_diff = table_diff(spidertron_contents, previous_items)
   for item_name, count in pairs(spidertron_diff) do
     if count > 0 then
       dock_inventory.insert{name = item_name, count = count}
@@ -157,7 +194,7 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
     end
   end
 
-  local dock_diff = table_diff(dock_contents, previous_contents)
+  local dock_diff = table_diff(dock_contents, previous_items)
   for item_name, count in pairs(dock_diff) do
     if count > 0 then
       spidertron_inventory.insert{name = item_name, count = count}
@@ -169,8 +206,8 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
   spidertron_inventory.sort_and_merge()
   dock_inventory.sort_and_merge()
 
-  local new_spidertron_contents = spidertron_inventory.get_contents()
-  local new_dock_contents = dock_inventory.get_contents()
+  local new_spidertron_contents = {items = spidertron_inventory.get_contents(), filters = get_filters(spidertron_inventory)}
+  --local new_dock_contents = dock_inventory.get_contents()
   --assert(table_equals(new_spidertron_contents, new_dock_contents))  -- TODO Remove for release
   return new_spidertron_contents
 end
@@ -229,9 +266,12 @@ local function update_dock(dock_data)
               --game.print("Spidertron docked")
               surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-docked"}}
 
-              local spidertron_contents = inventory.get_contents()
+              local spidertron_contents = {items = inventory.get_contents(), filters = get_filters(inventory)}
               local dock_inventory = dock.get_inventory(defines.inventory.chest)
-              for item_name, count in pairs(spidertron_contents) do
+              for index, filter in pairs(spidertron_contents.filters) do
+                dock_inventory.set_filter(index, filter)
+              end
+              for item_name, count in pairs(spidertron_contents.items) do
                 dock_inventory.insert{name = item_name, count = count}
               end
               dock_data.previous_contents = spidertron_contents
