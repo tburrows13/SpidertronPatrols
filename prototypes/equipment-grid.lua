@@ -5,10 +5,11 @@ if not settings.startup["sp-enable-spiderling"].value then
   return
 end
 
+local base_equipment_grid = data.raw["equipment-grid"][data.raw["spider-vehicle"]["spidertron"].equipment_grid]
 
 data:extend{
   util.merge{
-    data.raw["equipment-grid"]["spidertron-equipment-grid"],
+    base_equipment_grid,
     {
       name = "sp-spiderling-equipment-grid",
       width = 10,

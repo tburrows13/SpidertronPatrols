@@ -3,7 +3,7 @@ require "prototypes.spidertron-dock"  -- In case inventory sizes have changed si
 local spiderling_grid = data.raw["equipment-grid"]["sp-spiderling-equipment-grid"]
 if spiderling_grid then
   -- Won't exist if spiderlings are disabled or if another mod removes it
-  spiderling_grid.equipment_categories = data.raw["equipment-grid"]["spidertron-equipment-grid"].equipment_categories
+  spiderling_grid.equipment_categories = data.raw["equipment-grid"][data.raw["spider-vehicle"]["spidertron"].equipment_grid].equipment_categories
 end
 
 if mods["AutoTrash"] then

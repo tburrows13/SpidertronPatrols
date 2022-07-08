@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.6
+Date: ???
+  Compatibility:
+    - Fixed incorrect spiderling equipment grid categories with Krastorio2
+---------------------------------------------------------------------------------------------------
 Version: 2.2.5
 Date: 1 July 2022
   Bugfixes:
