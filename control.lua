@@ -2,7 +2,8 @@ util = require "util"
 require "scripts.utils"
 local remote_interface = require "scripts.remote-interface"
 local dock_script = require "scripts.dock"
-local patrol_gui = require "scripts.patrol-gui"
+require "scripts.common-gui"
+PatrolGui = require "scripts.patrol-gui"
 spidertron_control = require "scripts.spidertron-control"
 require "scripts.waypoint-rendering"
 
@@ -13,7 +14,8 @@ global.spidertron_waypoints: indexed by spidertron.unit_number:
   waypoints :: array of Waypoint
   Waypoint contains
     type :: string ("none", "time-passed", "inactivity", "full-inventory", "empty-inventory", "robots-inactive", "passenger-present", "passenger-not-present", "item-count")
-    position :: Position (Concept)
+    position? :: Position (Concept)
+    dock? :: int (unit_number of waypoint dock)
     wait_time :: int (in seconds, only with "time-passed" or "inactivity")
     item_count_info :: array containing
       item_name :: string
@@ -65,7 +67,7 @@ function clear_spidertron_waypoints(spidertron, unit_number)
     end]]
   end
   waypoint_info.waypoints = {}
-  patrol_gui.update_gui_schedule(waypoint_info)
+  PatrolGui.update_gui_schedule(waypoint_info)
   update_spidertron_render_paths(unit_number)
   global.spidertron_waypoints[unit_number] = nil
 end
@@ -94,7 +96,7 @@ script.on_event({"move-right-custom", "move-left-custom", "move-up-custom", "mov
     if vehicle and vehicle.type == "spider-vehicle" and player.render_mode == defines.render_mode.game then  -- Render mode means player isn't in map view...
       local waypoint_info = get_waypoint_info(vehicle)
       waypoint_info.on_patrol = false
-      patrol_gui.update_gui_switch(waypoint_info)
+      PatrolGui.update_gui_switch(waypoint_info)
       --clear_spidertron_waypoints(vehicle)
     end
   end
@@ -111,7 +113,7 @@ script.on_event(defines.events.on_entity_destroyed,
 script.on_event(defines.events.on_tick,
   function(event)
     dock_script.on_tick()
-    patrol_gui.update_gui_highlights()
+    PatrolGui.update_gui_highlights()
   end
 )
 
