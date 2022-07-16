@@ -1,5 +1,6 @@
+local gui = require "__SpidertronPatrols__.scripts.gui-beta"
 
-PatrolGui = {}
+local PatrolGui = {}
 
 dropdown_contents = {
   {"description.no-limit"},
@@ -372,7 +373,7 @@ function PatrolGui.on_gui_closed(event)
   end
 end
 
-function PatrolGui.handle_action(action)
+function PatrolGui.handle_action(action, event)
   local player = game.get_player(event.player_index)
   local spidertron = player.opened
   if not spidertron then return end

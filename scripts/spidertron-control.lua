@@ -1,3 +1,5 @@
+local PatrolGui = require "scripts.patrol-gui"
+
 -- Handles on_player_used_spider_remote, on_spider_command_completed, and wait conditions
 
 local function check_condition(condition, a, b)

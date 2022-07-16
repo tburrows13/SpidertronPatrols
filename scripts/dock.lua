@@ -4,14 +4,14 @@ local function on_built(event)
   local entity = event.created_entity or event.entity
   if entity then
     if entity.name == "sp-spidertron-dock-0" then
-      global.spidertron_docks[entity.unit_number] = {dock = entity}
+      global.spidertron_docks[entity.unit_number] = {dock = entity, name = "Default"}
       script.register_on_entity_destroyed(entity)
     elseif entity.type == "spider-vehicle" then
         script.register_on_entity_destroyed(entity)
     else
       -- from on_entity_cloned, a non-zero-capacity dock has been created
       entity = replace_dock(entity, "sp-spidertron-dock-0")
-      global.spidertron_docks[entity.unit_number] = {dock = entity}
+      global.spidertron_docks[entity.unit_number] = {dock = entity, name = "Default"}
     end
   end
 end
@@ -53,7 +53,7 @@ function on_entity_destroyed(event)
           dock.surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-removed"}}
 
           dock = replace_dock(dock, "sp-spidertron-dock-0")
-          global.spidertron_docks[dock.unit_number] = {dock = dock}
+          global.spidertron_docks[dock.unit_number] = {dock = dock, name = dock_data.name}
         end
       end
     end
@@ -237,13 +237,13 @@ local function update_dock(dock_data)
         surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-undocked"}}
 
         dock = replace_dock(dock, "sp-spidertron-dock-0")
-        global.spidertron_docks[dock.unit_number] = {dock = dock}
+        global.spidertron_docks[dock.unit_number] = {dock = dock, name = dock_data.name}
         delete = true
       end
     else
       if spidertron then
         -- `spidertron` is not valid
-        dock_data = {dock = dock_data.dock}
+        dock_data = {dock = dock_data.dock, name = dock_data.name}
       end
 
       -- Check if dock should initiate connection

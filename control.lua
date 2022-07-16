@@ -3,7 +3,7 @@ require "scripts.utils"
 local remote_interface = require "scripts.remote-interface"
 local dock_script = require "scripts.dock"
 require "scripts.common-gui"
-PatrolGui = require "scripts.patrol-gui"
+local PatrolGui = require "scripts.patrol-gui"
 spidertron_control = require "scripts.spidertron-control"
 require "scripts.waypoint-rendering"
 
@@ -28,6 +28,15 @@ global.spidertron_waypoints: indexed by spidertron.unit_number:
   tick_inactive :: int (only used whilst at an "inactivity" waypoint)
   previous_inventories :: table (only used whilst at an "inactivity" waypoint)
   on_patrol :: bool
+
+global.spidertron_docks: indexed by dock.unit_number
+  dock :: LuaEntity
+  name :: string
+  connected_spidertron? :: LuaEntity
+  previous_contents? :: table of LuaInventory::get_contents()
+
+global.spidertrons_docked: indexed by spidertron.unit_number
+   contains dock.unit_number
 ]]
 
 
@@ -155,11 +164,11 @@ local function config_changed_setup(changed_data)
     return
   end
 
-  -- Close all spidertron GUIs
+  -- Close all mod GUIs
   for _, player in pairs(game.players) do
     if player.opened_gui_type == defines.gui_type.entity then
       local entity = player.opened
-      if entity.type == "spider-vehicle" then
+      if entity and (entity.type == "spider-vehicle" or entity.type == "container" or entity.type == "logistic-container") then
         player.opened = nil
       end
     end
