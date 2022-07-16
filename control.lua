@@ -111,6 +111,19 @@ script.on_event({"move-right-custom", "move-left-custom", "move-up-custom", "mov
   end
 )
 
+script.on_event(defines.events.on_entity_settings_pasted,
+  function(event)
+    local source = event.source
+    local destination = event.destination
+    if source.type == "spider-vehicle" and destination.type == "spider-vehicle" then
+      spidertron_control.on_spidertron_settings_pasted(source, destination)
+    elseif source.type == "container" or source.type == "logistic-container"
+      and destination.type == "container" or destination.type == "logistic-container" then
+      dock_script.on_dock_settings_pasted(source, destination)
+    end
+  end
+)
+
 script.on_event(defines.events.on_entity_destroyed,
   function(event)
     local unit_number = event.unit_number

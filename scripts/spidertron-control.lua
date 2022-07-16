@@ -215,35 +215,28 @@ script.on_event(defines.events.on_spider_command_completed,
 )
 
 
-script.on_event(defines.events.on_entity_settings_pasted,
-  function(event)
-    local source = event.source
-    local destination = event.destination
-    if source.type == "spider-vehicle" and destination.type == "spider-vehicle" then
-
-      -- Erase render ids from receiving spidertron
-      local destination_waypoint_info = get_waypoint_info(destination)
-      for _, waypoint in pairs(destination_waypoint_info.waypoints) do
-        rendering.destroy(waypoint.render_id)
-      end
-
-      local waypoint_info = util.table.deepcopy(get_waypoint_info(source))
-      waypoint_info.on_patrol = destination_waypoint_info.on_patrol
-      waypoint_info.spidertron = destination
-      waypoint_info.tick_arrived = nil
-      waypoint_info.tick_inactive = nil
-      waypoint_info.previous_inventories = nil
-
-      -- Erase all render ids so that new ones can be recreated by update_render_text
-      for _, waypoint in pairs(waypoint_info.waypoints) do
-        waypoint.render_id = nil
-      end
-
-      global.spidertron_waypoints[destination.unit_number] = waypoint_info
-      PatrolGui.update_gui_schedule(waypoint_info)
-      update_render_text(destination)  -- Inserts text at the position that we have just added
-    end
+local function on_spidertron_settings_pasted(source, destination)
+  -- Erase render ids from receiving spidertron
+  local destination_waypoint_info = get_waypoint_info(destination)
+  for _, waypoint in pairs(destination_waypoint_info.waypoints) do
+    rendering.destroy(waypoint.render_id)
   end
-)
 
-return {go_to_next_waypoint = go_to_next_waypoint}
+  local waypoint_info = util.table.deepcopy(get_waypoint_info(source))
+  waypoint_info.on_patrol = destination_waypoint_info.on_patrol
+  waypoint_info.spidertron = destination
+  waypoint_info.tick_arrived = nil
+  waypoint_info.tick_inactive = nil
+  waypoint_info.previous_inventories = nil
+
+  -- Erase all render ids so that new ones can be recreated by update_render_text
+  for _, waypoint in pairs(waypoint_info.waypoints) do
+    waypoint.render_id = nil
+  end
+
+  global.spidertron_waypoints[destination.unit_number] = waypoint_info
+  PatrolGui.update_gui_schedule(waypoint_info)
+  update_render_text(destination)  -- Inserts text at the position that we have just added
+end
+
+return {go_to_next_waypoint = go_to_next_waypoint, on_spidertron_settings_pasted}

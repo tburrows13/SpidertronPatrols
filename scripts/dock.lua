@@ -73,6 +73,14 @@ script.on_event(defines.events.on_pre_player_mined_item,
   end
 )
 
+local function on_dock_settings_pasted(source, destination)
+  local source_data = global.spidertron_docks[source.unit_number]
+  local destination_data = global.spidertron_docks[destination.unit_number]
+
+  if source_data and destination_data then
+    destination_data.name = source_data.name
+  end
+end
 
 function replace_dock(dock, new_dock_name)
   local health = dock.health
@@ -294,4 +302,4 @@ local function on_tick()
   end
 end
 
-return {on_entity_destroyed = on_entity_destroyed, on_tick = on_tick}
+return {on_entity_destroyed = on_entity_destroyed, on_dock_settings_pasted = on_dock_settings_pasted, on_tick = on_tick}
