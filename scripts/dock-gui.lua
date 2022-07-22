@@ -69,6 +69,17 @@ function DockGui.on_gui_closed(event)
   local player = game.get_player(event.player_index)
   local entity = event.entity
   if entity and (entity.type == "container" or entity.type == "logistic-container") then
+    -- Save textbox value
+    local dock_data = global.spidertron_docks[entity.unit_number]
+    if dock_data then
+      local gui_elements = global.open_gui_elements[player.index]
+      local textbox = gui_elements.name_entry
+      local text = textbox.text
+      if text then
+        dock_data.name = text
+      end
+    end
+
     local relative_frame = player.gui.relative["sp-relative-frame"]
     if relative_frame then
       relative_frame.destroy()
