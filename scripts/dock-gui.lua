@@ -58,7 +58,9 @@ function DockGui.on_gui_opened(event)
       relative_frame.destroy()
     end
     local dock_data = global.spidertron_docks[entity.unit_number]
-    global.open_gui_elements[player.index] = build_gui(player, dock_data)
+    if dock_data then
+      global.open_gui_elements[player.index] = build_gui(player, dock_data)
+    end
   end
 end
 
