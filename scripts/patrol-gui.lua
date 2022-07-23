@@ -148,6 +148,15 @@ local function build_waypoint_frames(waypoint_info)
       }}
     )
   end
+  -- 'Add new waypoint' button
+  table.insert(frames,
+    {
+      type = "button",
+      style = "sp_spidertron_schedule_add_station_button",
+      mouse_button_filter = {"left"},
+      caption = {"gui-train.add-station"},
+      actions = {on_click = {gui = "patrol", action = "add_named_waypoint"}}
+    })
   return frames
 end
 

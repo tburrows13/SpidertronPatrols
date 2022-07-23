@@ -63,6 +63,13 @@ styles.sp_spidertron_schedule_station_frame = {
   horizontally_stretchable = "off",
 }
 
+styles.sp_spidertron_schedule_add_station_button = {
+  type = "button_style",
+  parent = "train_schedule_add_station_button",
+  width = frame_width,
+  horizontally_stretchable = "off",
+}
+
 
 local button_style = styles.button
 styles.sp_clicked_train_schedule_action_button = {
