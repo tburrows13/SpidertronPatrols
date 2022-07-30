@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.7
+Date: 30 July 2022
+  Bugfixes:
+    - Fixed docks not working with spidertrons that have inventory filters
+    - Temporary fix for fast spidertrons overshooting patrol points by teleporting them back into place
+---------------------------------------------------------------------------------------------------
 Version: 2.2.6
 Date: 7 July 2022
   Compatibility:

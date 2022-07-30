@@ -99,6 +99,7 @@ function go_to_next_waypoint(spidertron, next_index)
     waypoint_info.tick_arrived = nil
     waypoint_info.tick_inactive = nil
     waypoint_info.previous_inventories = nil
+    waypoint_info.teleported = nil
 
     next_index = next_index or ((waypoint_info.current_index) % number_of_waypoints) + 1
     local next_position = waypoint_info.waypoints[next_index].position
@@ -118,6 +119,14 @@ function handle_wait_timers()
       local spidertron = waypoint_info.spidertron
       local waypoint = waypoint_info.waypoints[waypoint_info.current_index]
       local waypoint_type = waypoint.type
+
+      -- Teleport spidertron back to waypoint
+      local speed = spidertron.speed
+      if not waypoint_info.teleported and speed < 0.03 then
+        spidertron.teleport(waypoint.position)
+        waypoint_info.teleported = true
+      end
+
       if waypoint_type == "none" then
         -- Can happen if waypoint type is changed whilst spidertron is at waypoint
         go_to_next_waypoint(spidertron)
