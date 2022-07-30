@@ -44,10 +44,28 @@ function table_diff(table1, table2)
     table2[item_name] = nil
   end
 
-  -- Only iterates through what is left of table 2, so all items are not in table1
+  -- Only iterates through what is left of table2, so all items are not in table1
   for item_name, count2 in pairs(table2) do
     diff[item_name] = -count2
   end
+  return diff
+end
+
+function filter_table_diff(table1, table2)
+  -- Returns a table `diff` containing subtables `added` and `removed`
+  local diff = {}
+  table2 = table.deepcopy(table2)
+  for index, filter in pairs(table1) do
+    if not table2[index] then
+      diff[index] = filter
+    end
+    table2[index] = nil
+  end
+  -- Only iterates through what is left of table2, so all filters are not in table1
+  for index, filter in pairs(table2) do
+    diff[index] = -1
+  end
+
   return diff
 end
 
