@@ -154,7 +154,7 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
   local previous_items = previous_contents.items
   local previous_filters = previous_contents.filters
   if not previous_items then
-    -- Pre-2.2.5 migration
+    -- Pre-2.2.7 migration
     previous_items = previous_contents
     previous_filters = {}
   end
