@@ -203,9 +203,7 @@ script.on_event(defines.events.on_spider_command_completed,
       if waypoint_type == "none" or ((waypoint_type == "time-passed" or waypoint_type == "inactivity") and waypoint.wait_time == 0) then
         go_to_next_waypoint(spidertron)
       else
-        if waypoint_type == "inactivity" then
-          waypoint_info.previous_inventories = {}
-        end
+        waypoint_info.previous_inventories = {}
         waypoint_info.tick_arrived = game.tick
         patrol_gui.update_gui_button_states(waypoint_info)
       end

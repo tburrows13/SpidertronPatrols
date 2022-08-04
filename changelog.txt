@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.8
+Date: 4 August 2022
+  Bugfixes:
+    - Fixed crash when setting a waypoint to 'Inactivity' whilst the spidertron is at that waypoint
+---------------------------------------------------------------------------------------------------
 Version: 2.2.7
 Date: 30 July 2022
   Bugfixes:
