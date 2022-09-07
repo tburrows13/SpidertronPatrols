@@ -1,5 +1,8 @@
 require "prototypes.spidertron-dock"  -- In case inventory sizes have changed since data-updates
 
+sp_data_stage = "data-final-fixes"
+require "prototypes.nullius"
+
 local spiderling_grid = data.raw["equipment-grid"]["sp-spiderling-equipment-grid"]
 if spiderling_grid then
   -- Won't exist if spiderlings are disabled or if another mod removes it
