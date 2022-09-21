@@ -55,20 +55,22 @@ end
 
 script.on_event(defines.events.on_player_used_spider_remote,
   function(event)
+    if not event.success then return end
+
     local player = game.get_player(event.player_index)
     local spidertron = event.vehicle
-    local position = event.position
+    -- Prevent remote working on docked spidertrons from Space Spidertron
+    if spidertron.name:sub(1, 10) == "ss-docked-" then return end
 
+    local position = event.position
     local remote = player.cursor_stack
 
-    if event.success then
-      if remote.name == "sp-spidertron-patrol-remote" or remote.name == "spidertron-enhancements-temporary-sp-spidertron-patrol-remote" then
-        on_patrol_command_issued(player, spidertron, position)
-      else
-        local waypoint_info = get_waypoint_info(spidertron)
-        waypoint_info.on_patrol = false
-        patrol_gui.update_gui_switch(waypoint_info)
-      end
+    if remote.name == "sp-spidertron-patrol-remote" or remote.name == "spidertron-enhancements-temporary-sp-spidertron-patrol-remote" then
+      on_patrol_command_issued(player, spidertron, position)
+    else
+      local waypoint_info = get_waypoint_info(spidertron)
+      waypoint_info.on_patrol = false
+      patrol_gui.update_gui_switch(waypoint_info)
     end
   end
 )
