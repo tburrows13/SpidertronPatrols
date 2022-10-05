@@ -19,6 +19,7 @@ spiderling = util.merge{
     icon_size = 64, icon_mipmaps = 1,
     inventory_size = 30,  -- default = 80
     torso_rotation_speed = 0.007,  -- default = 0.005
+    torso_bob_speed = 1.2,  -- default = 1
     height = spiderling.height * 1.3,
     chunk_exploration_radius = 2,  -- default = 3
     minable = {result = "sp-spiderling"},
