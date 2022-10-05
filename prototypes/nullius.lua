@@ -53,7 +53,6 @@ if spiderling_enabled then
   local entity = data.raw["spider-vehicle"]["sp-spiderling"]
   entity.localised_name = {"entity-name.nullius-sp-spiderling"}
   entity.order = "nullius-da"
-  entity.allow_passengers = false  -- Can only use spiderling for patrols
   entity.guns = nil
 
   local grid = data.raw["equipment-grid"]["sp-spiderling-equipment-grid"]

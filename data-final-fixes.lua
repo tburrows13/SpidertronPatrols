@@ -4,7 +4,7 @@ sp_data_stage = "data-final-fixes"
 require "prototypes.nullius"
 
 local spiderling_grid = data.raw["equipment-grid"]["sp-spiderling-equipment-grid"]
-if spiderling_grid then
+if spiderling_grid and not mods["nullius"] then
   -- Won't exist if spiderlings are disabled or if another mod removes it
   spiderling_grid.equipment_categories = data.raw["equipment-grid"][data.raw["spider-vehicle"]["spidertron"].equipment_grid].equipment_categories
 end
