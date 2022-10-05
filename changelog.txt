@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.2.8
-Date: ???
+Date: 6 October 2022
   Compatibility:
     - Complete Nullius integration (recipes, technologies, and locale)
   Bugfixes:
