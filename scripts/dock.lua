@@ -1,32 +1,26 @@
 local math2d = require "__core__.lualib.math2d"
 
 local function on_built(event)
-  local entity = event.created_entity or event.entity
+  local entity = event.created_entity or event.entity or event.destination
   if entity then
-    if entity.name == "sp-spidertron-dock-0" then
+    if entity.type == "spider-vehicle" then
+      script.register_on_entity_destroyed(entity)
+    elseif entity.name == "sp-spidertron-dock-0" then
       global.spidertron_docks[entity.unit_number] = {dock = entity}
       script.register_on_entity_destroyed(entity)
-    elseif entity.type == "spider-vehicle" then
-        script.register_on_entity_destroyed(entity)
-    else
-      -- from on_entity_cloned, a non-zero-capacity dock has been created
+    elseif entity.name:sub(0, 19) == "sp-spidertron-dock-" then
+      -- a non-zero-capacity dock has been created, from on_entity_cloned or built from blueprint
       entity = replace_dock(entity, "sp-spidertron-dock-0")
       global.spidertron_docks[entity.unit_number] = {dock = entity}
     end
   end
 end
-script.on_event(defines.events.on_built_entity, on_built, {{filter = "name", name = "sp-spidertron-dock-0"}, {filter = "type", type = "spider-vehicle"}})
-script.on_event(defines.events.on_robot_built_entity, on_built, {{filter = "name", name = "sp-spidertron-dock-0"}, {filter = "type", type = "spider-vehicle"}})
-script.on_event(defines.events.script_raised_revive, on_built, {{filter = "name", name = "sp-spidertron-dock-0"}, {filter = "type", type = "spider-vehicle"}})
-script.on_event(defines.events.script_raised_built, on_built, {{filter = "name", name = "sp-spidertron-dock-0"}, {filter = "type", type = "spider-vehicle"}})
-
-local function on_entity_cloned(event)
-  local entity = event.destination
-  if entity.type == "spider-vehicle" or string.sub(entity.name, 0, 19) == "sp-spidertron-dock-" then
-    on_built{entity = entity}
-  end
-end
-script.on_event(defines.events.on_entity_cloned, on_entity_cloned, {{filter = "type", type = "container"}, {filter = "type", type = "logistic-container"}, {filter = "type", type = "spider-vehicle"}})
+local on_built_filter = {{filter = "type", type = "container"}, {filter = "type", type = "logistic-container"}, {filter = "type", type = "spider-vehicle"}}
+script.on_event(defines.events.on_built_entity, on_built, on_built_filter)
+script.on_event(defines.events.on_robot_built_entity, on_built, on_built_filter)
+script.on_event(defines.events.script_raised_revive, on_built, on_built_filter)
+script.on_event(defines.events.script_raised_built, on_built, on_built_filter)
+script.on_event(defines.events.on_entity_cloned, on_built, on_built_filter)
 
 function on_entity_destroyed(event)
   local unit_number = event.unit_number
