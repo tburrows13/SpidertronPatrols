@@ -145,19 +145,8 @@ function handle_wait_timers()
           waypoint_info.tick_inactive = game.tick
         end
       elseif waypoint_type == "full-inventory" then
-        local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
-        if inventory.find_empty_stack() == nil then
-          local item_prototypes = game.item_prototypes
-          local inventory_full = true
-          for name, count in pairs(inventory.get_contents()) do
-            if count % item_prototypes[name].stack_size ~= 0 then
-              inventory_full = false
-              break
-            end
-          end
-          if inventory_full then
-            go_to_next_waypoint(spidertron)
-          end
+        if spidertron.get_inventory(defines.inventory.spider_trunk).is_full() then
+          go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "empty-inventory" then
         if spidertron.get_inventory(defines.inventory.spider_trunk).is_empty() then
