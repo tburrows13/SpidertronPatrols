@@ -239,7 +239,6 @@ local function build_gui(player, spidertron)
       }
     }
   })
-  --frame.add{type = "label", caption = player.name}
 end
 
 function patrol_gui.update_gui_button_states(waypoint_info)

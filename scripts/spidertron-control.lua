@@ -17,21 +17,15 @@ local function check_condition(condition, a, b)
   end
 end
 
-function on_patrol_command_issued(player, spidertron, position)
+function on_patrol_command_issued(spidertron, position)
   -- Called when remote used and on remote interface call
   local waypoint_info = get_waypoint_info(spidertron)
   -- We are in patrol mode
   log("Player used patrol remote on position " .. util.positiontostr(position))
 
   -- Add to patrol
-  if (not player.selected) or player.selected.name ~= "sp-spidertron-waypoint" then
-    local waypoint = {position = position, type = "none"}
-    --[[if player and global.wait_time_defaults[player.index] then
-      waypoint.wait_time = global.wait_time_defaults[player.index].wait_time
-      waypoint.wait_type = global.wait_time_defaults[player.index].wait_type
-    end]]
-    table.insert(waypoint_info.waypoints, waypoint)
-  end
+  local waypoint = {position = position, type = "none"}
+  table.insert(waypoint_info.waypoints, waypoint)
 
   if waypoint_info.on_patrol then
     -- Send the spidertron to current_index waypoint, and add all other waypoints to autopilot_destinations
@@ -39,12 +33,6 @@ function on_patrol_command_issued(player, spidertron, position)
     local number_of_waypoints = #waypoints
     local current_index = waypoint_info.current_index
     spidertron.autopilot_destination = waypoints[current_index].position
-    --[[
-    -- Still using 0-based index
-    for i = 0, number_of_waypoints do
-      local index = ((i + current_index) % number_of_waypoints)
-      spidertron.add_autopilot_destination(waypoints[index + 1].position)
-    end]]
   else
     spidertron.autopilot_destination = nil
   end
@@ -66,7 +54,7 @@ script.on_event(defines.events.on_player_used_spider_remote,
     local remote = player.cursor_stack
 
     if remote.name == "sp-spidertron-patrol-remote" or remote.name == "spidertron-enhancements-temporary-sp-spidertron-patrol-remote" then
-      on_patrol_command_issued(player, spidertron, position)
+      on_patrol_command_issued(spidertron, position)
     else
       local waypoint_info = get_waypoint_info(spidertron)
       waypoint_info.on_patrol = false
@@ -110,7 +98,7 @@ function go_to_next_waypoint(spidertron, next_index)
 
     patrol_gui.update_gui_button_states(waypoint_info)
     -- The spidertron is now walking towards a new waypoint
-    --script.raise_event(remote_interface.on_spidertron_given_new_destination, {player_index = nil, vehicle = spidertron, position = next_position, success = true})
+    script.raise_event(remote_interface.on_spidertron_given_new_destination, {player_index = nil, vehicle = spidertron, position = next_position, success = true})
   end
 end
 
@@ -164,7 +152,6 @@ function handle_wait_timers()
         local logistic_network = spidertron.logistic_network
         -- Always wait some time in case "Enable logistics while moving" is false
         if (game.tick - waypoint_info.tick_arrived) >= 120 and (not logistic_network or not next(logistic_network.construction_robots)) then
-            --logistic_network.all_construction_robots == logistic_network.available_construction_robots then
           go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "passenger-present" then

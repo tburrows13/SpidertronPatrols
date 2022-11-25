@@ -6,15 +6,6 @@ local delete_waypoints_key = {
   consuming = "none",
   order = "aa"
 }
---[[
-local change_default_wait_time_key = {
-  type = "custom-input",
-  name = "waypoints-change-default-wait-conditions",
-  key_sequence = "SHIFT + Y",
-  consuming = "none",
-  order = "ae"
-}
-]]
 
 local confirm_gui_key = {
   type = "custom-input",

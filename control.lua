@@ -1,6 +1,6 @@
 util = require "util"
 require "scripts.utils"
-local remote_interface = require "scripts.remote-interface"
+remote_interface = require "scripts.remote-interface"
 local dock_script = require "scripts.dock"
 local patrol_gui = require "scripts.patrol-gui"
 spidertron_control = require "scripts.spidertron-control"
@@ -14,17 +14,17 @@ global.spidertron_waypoints: indexed by spidertron.unit_number:
   Waypoint contains
     type :: string ("none", "time-passed", "inactivity", "full-inventory", "empty-inventory", "robots-inactive", "passenger-present", "passenger-not-present", "item-count")
     position :: Position (Concept)
-    wait_time :: int (in seconds, only with "time-passed" or "inactivity")
-    item_count_info :: array containing
+    wait_time? :: int (in seconds, only with "time-passed" or "inactivity")
+    item_count_info? :: array containing
       item_name :: string
       condition :: int (index of condition_dropdown_contents)
       count :: int
     [TBC "item-count" condition info]
     render_id :: int
   current_index :: int (index of waypoints)
-  tick_arrived :: int (only set when at a waypoint)
-  tick_inactive :: int (only used whilst at an "inactivity" waypoint)
-  previous_inventories :: table (only used whilst at an "inactivity" waypoint)
+  tick_arrived? :: int (only set when at a waypoint)
+  tick_inactive? :: int (only used whilst at an "inactivity" waypoint)
+  previous_inventories? :: table (only used whilst at an "inactivity" waypoint)
   on_patrol :: bool
 ]]
 
@@ -60,9 +60,6 @@ function clear_spidertron_waypoints(spidertron, unit_number)
   log("Clearing spidertron waypoints for unit number " .. unit_number)
   for _, waypoint in pairs(waypoint_info.waypoints) do
     rendering.destroy(waypoint.render_id)
-    --[[if global.sub_render_ids[render_id] then
-      rendering.destroy(global.sub_render_ids[render_id])
-    end]]
   end
   waypoint_info.waypoints = {}
   patrol_gui.update_gui_schedule(waypoint_info)
@@ -95,7 +92,6 @@ script.on_event({"move-right-custom", "move-left-custom", "move-up-custom", "mov
       local waypoint_info = get_waypoint_info(vehicle)
       waypoint_info.on_patrol = false
       patrol_gui.update_gui_switch(waypoint_info)
-      --clear_spidertron_waypoints(vehicle)
     end
   end
 )
@@ -130,7 +126,6 @@ script.on_event(defines.events.on_player_joined_game, update_render_players)
 local function setup()
     global.spidertron_waypoints = {}     -- Indexed by spidertron.unit_number
     global.path_renders = {}  -- Indexed by player.index
-    global.wait_time_defaults = {}
 
     global.spidertron_docks = {}
     global.spidertrons_docked = {}
@@ -162,6 +157,8 @@ local function config_changed_setup(changed_data)
       end
     end
   end
+
+  global.wait_time_defaults = nil
 
   log("Coming from old version: " .. old_version)
   old_version = util.split(old_version, ".")
