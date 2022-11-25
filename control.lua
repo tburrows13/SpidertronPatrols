@@ -108,6 +108,7 @@ script.on_event(defines.events.on_tick,
   function(event)
     dock_script.on_tick()
     patrol_gui.update_gui_highlights()
+    spidertron_control.handle_spider_stopping()
   end
 )
 

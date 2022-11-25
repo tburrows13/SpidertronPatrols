@@ -89,7 +89,8 @@ function go_to_next_waypoint(spidertron, next_index)
     waypoint_info.tick_arrived = nil
     waypoint_info.tick_inactive = nil
     waypoint_info.previous_inventories = nil
-    waypoint_info.teleported = nil
+    waypoint_info.stopped = nil
+    waypoint_info.last_distance = nil
 
     next_index = next_index or ((waypoint_info.current_index) % number_of_waypoints) + 1
     local next_position = waypoint_info.waypoints[next_index].position
@@ -102,6 +103,37 @@ function go_to_next_waypoint(spidertron, next_index)
   end
 end
 
+function handle_spider_stopping()
+  for _, waypoint_info in pairs(global.spidertron_waypoints) do
+    if waypoint_info.on_patrol and waypoint_info.tick_arrived and not waypoint_info.stopped then
+      local spidertron = waypoint_info.spidertron
+      local waypoint = waypoint_info.waypoints[waypoint_info.current_index]
+      local waypoint_position = waypoint.position
+
+      local distance = util.distance(spidertron.position, waypoint_position)
+      local speed = spidertron.speed
+
+      if speed < 0.005 then
+        -- Spidertron has stopped
+        if distance > 2 then
+          -- Spidertron is too far away
+          spidertron.teleport(waypoint_position)
+        end
+        waypoint_info.stopped = true
+      else
+        local last_distance = waypoint_info.last_distance
+        if distance < 0.3 or (last_distance and distance > last_distance) or speed > 0.4 then
+          -- We are either very close, getting further away, or going so fast that we need to stop ASAP
+          spidertron.stop_spider()
+          waypoint_info.last_distance = nil
+        else
+          waypoint_info.last_distance = distance
+        end
+      end
+    end
+  end
+end
+
 function handle_wait_timers()
   for _, waypoint_info in pairs(global.spidertron_waypoints) do
     if waypoint_info.on_patrol and waypoint_info.tick_arrived then
@@ -109,13 +141,6 @@ function handle_wait_timers()
       local spidertron = waypoint_info.spidertron
       local waypoint = waypoint_info.waypoints[waypoint_info.current_index]
       local waypoint_type = waypoint.type
-
-      -- Teleport spidertron back to waypoint
-      local speed = spidertron.speed
-      if not waypoint_info.teleported and speed < 0.03 then
-        spidertron.teleport(waypoint.position)
-        waypoint_info.teleported = true
-      end
 
       if waypoint_type == "none" then
         -- Can happen if waypoint type is changed whilst spidertron is at waypoint
@@ -221,4 +246,4 @@ script.on_event(defines.events.on_entity_settings_pasted,
   end
 )
 
-return {go_to_next_waypoint = go_to_next_waypoint}
+return {go_to_next_waypoint = go_to_next_waypoint, handle_spider_stopping = handle_spider_stopping}
