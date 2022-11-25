@@ -4,6 +4,7 @@ Date: 25 November 2022
   Bugfixes:
     - Fast spidertrons are now stopped when they reach the patrol point, teleporting is only used as a fallback
     - Fixed blueprinted docks not functioning if the blueprint was made when the dock was active
+    - Fixed spidertrons being considered full even if they have empty filtered slots 
 ---------------------------------------------------------------------------------------------------
 Version: 2.2.8
 Date: 6 October 2022
