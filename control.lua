@@ -12,14 +12,13 @@ global.spidertron_waypoints: indexed by spidertron.unit_number:
   spidertron :: LuaEntity
   waypoints :: array of Waypoint
   Waypoint contains
-    type :: string ("none", "time-passed", "inactivity", "full-inventory", "empty-inventory", "robots-inactive", "passenger-present", "passenger-not-present", "item-count")
+    type :: string ("none", "time-passed", "inactivity", "full-inventory", "empty-inventory", "robots-inactive", "passenger-present", "passenger-not-present", "item-count", "circuit-condition")
     position :: Position (Concept)
     wait_time? :: int (in seconds, only with "time-passed" or "inactivity")
     item_count_info? :: array containing
-      item_name :: string
+      item_name :: string or SignalID (depending on if type is "item-count" or "circuit-condition")
       condition :: int (index of condition_dropdown_contents)
       count :: int
-    [TBC "item-count" condition info]
     render_id :: int
   current_index :: int (index of waypoints)
   tick_arrived? :: int (only set when at a waypoint)

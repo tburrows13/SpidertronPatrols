@@ -173,6 +173,18 @@ function handle_wait_timers()
         if check_condition(item_count_info.condition, item_count, item_count_info.count) then
           go_to_next_waypoint(spidertron)
         end
+      elseif waypoint_type == "circuit-condition" then
+        local item_count_info = waypoint.item_count_info
+        local dock_unit_number = global.spidertrons_docked[spidertron.unit_number]
+        if dock_unit_number then
+          local dock = global.spidertron_docks[dock_unit_number].dock
+          if dock and dock.valid and item_count_info.item_name.name then
+            local signal_count = dock.get_merged_signal(item_count_info.item_name)
+            if check_condition(item_count_info.condition, signal_count, item_count_info.count) then
+              go_to_next_waypoint(spidertron)
+            end
+          end
+        end
       elseif waypoint_type == "robots-inactive" then
         local logistic_network = spidertron.logistic_network
         -- Always wait some time in case "Enable logistics while moving" is false

@@ -10,6 +10,7 @@ dropdown_contents = {
   {"gui-patrol.empty-inventory-condition"},
   {"gui-train.add-item-count-condition"},
   {"gui-train.add-robots-inactive-condition"},
+  {"gui-train.add-circuit-condition"},
   {"gui-patrol.driver-present"},
   {"gui-patrol.driver-not-present"},
 }
@@ -22,8 +23,9 @@ dropdown_index = {
   ["empty-inventory"] = 5,
   ["item-count"] = 6,
   ["robots-inactive"] = 7,
-  ["passenger-present"] = 8,
-  ["passenger-not-present"] = 9,
+  ["circuit-condition"] = 8,
+  ["passenger-present"] = 9,
+  ["passenger-not-present"] = 10,
 }
 
 dropdown_index_lookup = {
@@ -34,6 +36,7 @@ dropdown_index_lookup = {
   "empty-inventory",
   "item-count",
   "robots-inactive",
+  "circuit-condition",
   "passenger-present",
   "passenger-not-present",
 }
@@ -72,19 +75,20 @@ local function build_waypoint_player_input(i, waypoint)
         actions = {on_text_changed = {action = "update_slider", index = i}, on_click = {action = "remove_s", index = i}, on_confirmed = {action = "add_s", index = i}}
       }
     }
-  elseif waypoint_type == "item-count" then
+  elseif waypoint_type == "item-count" or waypoint_type == "circuit-condition" then
     local info = waypoint.item_count_info
+    local elem_type = waypoint_type == "item-count" and "item" or "signal"
     return {
       {
-        type = "choose-elem-button", style = "train_schedule_item_select_button", elem_type = "item", item = info.item_name,
+        type = "choose-elem-button", style = "train_schedule_item_select_button", elem_type = elem_type, item = info.item_name, signal = info.item_name,
         actions = {on_elem_changed = {action = "item_selected", index = i}}
       },
       {
         type = "drop-down", style = "circuit_condition_comparator_dropdown", items = condition_dropdown_contents, selected_index = info.condition,
-        actions = {on_selection_state_changed = {action = "condition_changed", index = i}}
+        actions = {on_selection_state_changed = {action = "item_condition_changed", index = i}}
       },
       {
-        type = "textfield", style = "sp_compact_slider_value_textfield", text = tostring(info.count), numeric = true, allow_decimal = false, allow_negative = false, lose_focus_on_confirm = true,
+        type = "textfield", style = "sp_compact_slider_value_textfield", text = tostring(info.count), numeric = true, allow_decimal = false, allow_negative = waypoint_type == "circuit-condition", lose_focus_on_confirm = true,
         actions = {on_text_changed = {action = "item_count_changed", index = i}}
       },
     }
@@ -605,12 +609,14 @@ script.on_event(defines.events.on_gui_selection_state_changed,
           end
           if new_waypoint_type == "item-count" then
             waypoint.item_count_info = {item_name = nil, condition = 4, count = 100}
+          elseif new_waypoint_type == "circuit-condition" then
+            waypoint.item_count_info = {item_name = nil, condition = 4, count = 0}
           else
             waypoint.item_count_info = nil
           end
           patrol_gui.update_gui_schedule(waypoint_info)
         end
-      elseif action.action == "condition_changed" then
+      elseif action.action == "item_condition_changed" then
         local dropdown = event.element
         local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
         local item_count_info = waypoint_info.waypoints[action.index].item_count_info
