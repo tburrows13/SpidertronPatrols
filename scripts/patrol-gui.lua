@@ -494,7 +494,6 @@ script.on_event(defines.events.on_gui_click,
           -- At 200% interface scale (display_scale=2), 1/8
           player.open_map(entity.position, (1/16) * player.display_scale)  
         else
-          log("Opening map in position, " .. serpent.block(camera.position))
           player.open_map(camera.position, (1/16) * player.display_scale)
         end
         player.opened = nil
