@@ -490,10 +490,12 @@ script.on_event(defines.events.on_gui_click,
         local camera = gui_elements.camera
         local entity = camera.entity
         if entity then
-          player.open_map(entity.position, 0.109)  -- 0.109 deduced by experimentation to be close to vanilla 'open in map' scale
+          -- At 100% interface scale (display_scale=1), 1/16 is identical to vanilla 'open in map' scale
+          -- At 200% interface scale (display_scale=2), 1/8
+          player.open_map(entity.position, (1/16) * player.display_scale)  
         else
           log("Opening map in position, " .. serpent.block(camera.position))
-          player.open_map(camera.position, 0.109)
+          player.open_map(camera.position, (1/16) * player.display_scale)
         end
         player.opened = nil
       elseif action_name == "toggle_camera" then
