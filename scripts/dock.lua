@@ -60,7 +60,7 @@ script.on_event(defines.events.on_pre_player_mined_item,
     -- Dock inventories should never return their contents to the player
     -- because all their items are duplicates from the spidertron's inventory
     local dock = event.entity
-    if dock and string.sub(dock.name, 0, 14) == "sp-spidertron-" then
+    if dock and dock.name:sub(0, 19) == "sp-spidertron-dock-" then
       local dock_inventory = dock.get_inventory(defines.inventory.chest)
       dock_inventory.clear()
     end

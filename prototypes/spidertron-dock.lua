@@ -19,8 +19,8 @@ local dock_item = {
 }
 
 local dock_recipe = {
-  type = 'recipe',
-  name = 'sp-spidertron-dock',
+  type = "recipe",
+  name = "sp-spidertron-dock",
   ingredients = {
     {"steel-chest", 4},
     {"rocket-control-unit", 4}

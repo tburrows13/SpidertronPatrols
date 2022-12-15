@@ -547,8 +547,8 @@ script.on_event(defines.events.on_gui_click,
       elseif action_name == "remove_s" then
         local textfield = gui_elements.time_textfield[action.index]
         local current_text = textfield.text
-        if string.sub(current_text, -2, -1) == " s" then
-          textfield.text = string.sub(textfield.text, 0, -3)
+        if current_text:sub(-2, -1) == " s" then
+          textfield.text = textfield.text:sub(0, -3)
         end
       end
     end
