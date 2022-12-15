@@ -125,6 +125,7 @@ local function build_waypoint_frames(waypoint_info)
         {
           type = "drop-down", items = dropdown_contents, selected_index = dropdown_index[waypoint.type],
           ref = {"waypoint_dropdown", i},
+          tooltip = waypoint.type == "circuit-condition" and {"gui-patrol.circuit-condition-tooltip"} or nil,
           actions = {on_selection_state_changed = {action = "waypoint_type_changed", index = i}}
         },
         {
@@ -600,6 +601,7 @@ script.on_event(defines.events.on_gui_selection_state_changed,
         local new_waypoint_type = dropdown_index_lookup[dropdown.selected_index]
         if waypoint.type ~= new_waypoint_type then
           waypoint.type = new_waypoint_type
+          event.element.tooltip = nil
           if new_waypoint_type == "time-passed" then
             waypoint.wait_time = 30
           elseif new_waypoint_type == "inactivity" then
@@ -611,6 +613,7 @@ script.on_event(defines.events.on_gui_selection_state_changed,
             waypoint.item_count_info = {item_name = nil, condition = 4, count = 100}
           elseif new_waypoint_type == "circuit-condition" then
             waypoint.item_count_info = {item_name = nil, condition = 1, count = 0}
+            event.element.tooltip = {"gui-patrol.circuit-condition-tooltip"}
           else
             waypoint.item_count_info = nil
           end
