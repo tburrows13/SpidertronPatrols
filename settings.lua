@@ -29,6 +29,13 @@ data:extend({
   },
   {
     type = "bool-setting",
+    name = "sp-remove-military-requirement",
+    setting_type = "startup",
+    default_value = false,
+    order = "c"
+  },
+  {
+    type = "bool-setting",
     name = "sp-show-waypoint-numbers-in-alt-mode",
     setting_type = "runtime-per-user",
     default_value = true,

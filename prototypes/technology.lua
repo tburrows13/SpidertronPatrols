@@ -64,6 +64,17 @@ local patrol_tech = {
   }
 }
 
+if settings.startup["sp-remove-military-requirement"].value then
+  for _, tech in pairs{spiderling_tech, patrol_tech, data.raw.technology["spidertron"]} do
+    for i, ingredient in pairs(tech.unit.ingredients) do
+      if ingredient[1] == "military-science-pack" then
+        table.remove(tech.unit.ingredients, i)
+        break
+      end
+    end
+  end
+end
+
 -- Modify the above if some features are disabled
 local spiderling_enabled = settings.startup["sp-enable-spiderling"].value
 local dock_enabled = settings.startup["sp-enable-dock"].value
