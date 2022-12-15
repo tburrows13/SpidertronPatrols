@@ -122,23 +122,33 @@ script.on_event(defines.events.on_runtime_mod_setting_changed,
 )
 script.on_event(defines.events.on_player_joined_game, update_render_players)
 
+local function set_base_version()
+  local version = game.active_mods["base"]
+  version = util.split(version, ".")
+  for i=1, #version do
+    version[i] = tonumber(version[i])
+  end
+  global.base_version = version
+end
 
 local function setup()
-    global.spidertron_waypoints = {}     -- Indexed by spidertron.unit_number
-    global.path_renders = {}  -- Indexed by player.index
+  set_base_version()
+  global.spidertron_waypoints = {}     -- Indexed by spidertron.unit_number
+  global.path_renders = {}  -- Indexed by player.index
 
-    global.spidertron_docks = {}
-    global.spidertrons_docked = {}
+  global.spidertron_docks = {}
+  global.spidertrons_docked = {}
 
-    global.open_gui_elements = {}
-    global.player_highlights = {}  -- Indexed by player.index
+  global.open_gui_elements = {}
+  global.player_highlights = {}  -- Indexed by player.index
 
-    remote_interface.connect_to_remote_interfaces()
-    update_render_players()
-    --settings_changed()
+  remote_interface.connect_to_remote_interfaces()
+  update_render_players()
+  --settings_changed()
   end
 
 local function config_changed_setup(changed_data)
+  set_base_version()
   -- Only run when this mod was present in the previous save as well. Otherwise, on_init will run.
   local mod_changes = changed_data.mod_changes
   local old_version

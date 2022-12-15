@@ -497,7 +497,12 @@ script.on_event(defines.events.on_gui_click,
         if entity then
           -- At 100% interface scale (display_scale=1), 1/16 is identical to vanilla 'open in map' scale
           -- At 200% interface scale (display_scale=2), 1/8
-          player.open_map(entity.position, (1/16) * player.display_scale)  
+          if global.base_version[2] > 1 or global.base_version[3] >= 75 then
+            -- base >= 1.1.75
+            player.open_map(entity.position, (1/16) * player.display_scale, entity)  
+          else
+            player.open_map(entity.position, (1/16) * player.display_scale)
+          end
         else
           player.open_map(camera.position, (1/16) * player.display_scale)
         end
