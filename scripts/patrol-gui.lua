@@ -9,8 +9,8 @@ dropdown_contents = {
   {"gui-patrol.full-inventory-condition"},
   {"gui-patrol.empty-inventory-condition"},
   {"gui-train.add-item-count-condition"},
-  {"gui-train.add-robots-inactive-condition"},
   {"gui-train.add-circuit-condition"},
+  {"gui-train.add-robots-inactive-condition"},
   {"gui-patrol.driver-present"},
   {"gui-patrol.driver-not-present"},
 }
@@ -22,8 +22,8 @@ dropdown_index = {
   ["full-inventory"] = 4,
   ["empty-inventory"] = 5,
   ["item-count"] = 6,
-  ["robots-inactive"] = 7,
-  ["circuit-condition"] = 8,
+  ["circuit-condition"] = 7,
+  ["robots-inactive"] = 8,
   ["passenger-present"] = 9,
   ["passenger-not-present"] = 10,
 }
@@ -35,8 +35,8 @@ dropdown_index_lookup = {
   "full-inventory",
   "empty-inventory",
   "item-count",
-  "robots-inactive",
   "circuit-condition",
+  "robots-inactive",
   "passenger-present",
   "passenger-not-present",
 }
@@ -610,7 +610,7 @@ script.on_event(defines.events.on_gui_selection_state_changed,
           if new_waypoint_type == "item-count" then
             waypoint.item_count_info = {item_name = nil, condition = 4, count = 100}
           elseif new_waypoint_type == "circuit-condition" then
-            waypoint.item_count_info = {item_name = nil, condition = 4, count = 0}
+            waypoint.item_count_info = {item_name = nil, condition = 1, count = 0}
           else
             waypoint.item_count_info = nil
           end
