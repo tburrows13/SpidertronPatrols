@@ -111,7 +111,7 @@ local function create_spidertron_dock(inventory_size, closing)
       filename = "__base__/sound/metallic-chest-open.ogg",
       volume = 0.6
     },
-    collision_box = {{-1.2, -1.2}, {1.2, 1.2}},
+    collision_box = {{-1.0, -1.0}, {1.0, 1.0}},
     selection_box = {{-1.5, -1.5}, {1.5, 1.5}},
     flags = {"placeable-neutral", "placeable-player", "player-creation"},
     se_allow_in_space = true,
