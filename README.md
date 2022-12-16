@@ -24,7 +24,6 @@
 ## Known Bugs / Limitations
 
 - Each patrol waypoint can only have one wait condition set. If you need more, you can usually just set multiple waypoints in the same position, each with a different wait condition
-- Spidertron docks cannot be filtered so if you connect a spidertron with filters in its inventory and the inventory becomes full or nearly full, items can be lost (not possible to fix because it requires [this API feature](https://forums.factorio.com/viewtopic.php?f=28&t=97967) - please post there in support)
 - For performance reasons, when items with associated data (such as modular armor) in a spidertron inventory are taken out of a connected dock's inventory, they lose all their data. This loses all the equipment in that armor's equipment grid 
 - Waypoint markers cannot be seen in map view (not possible to add because it requires [this API feature](https://forums.factorio.com/viewtopic.php?f=28&t=76539&p=510027) - please post there in support)
 - Performance is good, but not insignificant:
