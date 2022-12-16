@@ -8,7 +8,6 @@ Date: 16 December 2022
     - Added "Remove military science requirement" startup setting for peaceful mode
   Bugfixes:
     - Fixed 'Robots inactive' wait condition not triggering if the spidertron is in a roboport network with active robots
-    - Fixed blueprinted docks not functioning if the blueprint was made when the dock was active
 ---------------------------------------------------------------------------------------------------
 Version: 2.2.9
 Date: 25 November 2022
