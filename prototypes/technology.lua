@@ -75,6 +75,11 @@ if settings.startup["sp-remove-military-requirement"].value then
   end
 end
 
+if mods["Krastorio2"] then  -- SE undoes these changes
+  table.insert(spiderling_tech.prerequisites, "low-density-structure")
+  table.insert(spiderling_tech.prerequisites, "kr-radar")
+end
+
 -- Modify the above if some features are disabled
 local spiderling_enabled = settings.startup["sp-enable-spiderling"].value
 local dock_enabled = settings.startup["sp-enable-dock"].value
