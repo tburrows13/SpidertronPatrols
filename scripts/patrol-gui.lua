@@ -186,7 +186,7 @@ local function build_gui(player, spidertron)
       children = {
         {type = "flow", ref = {"titlebar", "flow"}, children = {
           {type = "label", style = "frame_title", caption = {"gui-train.schedule"}, ignored_by_interaction = true},
-          {type = "empty-widget", style = "sp_titlebar_drag_handle", ignored_by_interaction = true},
+          --{type = "empty-widget", style = "sp_titlebar_drag_handle", ignored_by_interaction = true},
           --[[{
             type = "sprite-button",
             style = "frame_action_button",
