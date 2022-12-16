@@ -67,8 +67,54 @@ script.on_event(defines.events.on_pre_player_mined_item,
   end
 )
 
+local function animate_dock(dock)
+  local frames = 32
+  local speed = 0.5
+  local tick = game.tick
+
+  local dock_name = dock.name
+
+  -- Schedule future replacement once closing animation has finished
+  if dock_name == "sp-spidertron-dock-closing" then
+    local schedule = global.scheduled_dock_replacements[tick + frames - 2] or {}
+    table.insert(schedule, dock)
+    global.scheduled_dock_replacements[tick + frames - 2] = schedule
+  end
+
+  -- Don't draw animation for already-closed dock
+  if dock_name == "sp-spidertron-dock-0" then return end
+
+  -- Draw animation
+  -- frame = ((tick * speed) + offset) % frames
+  animation_offset = -(tick * speed) % frames
+  animation_speed = 1
+  if dock_name == "sp-spidertron-dock-closing" then
+    animation_offset = frames - animation_offset - 1
+    animation_speed = -1
+  end
+
+  rendering.draw_animation{
+    animation = "sp-spidertron-dock-door",
+    target = dock,
+    surface = dock.surface,
+    time_to_live = frames,
+    animation_offset = animation_offset,
+    --animation_offset = (tick * (speed - speed') + offset) % #frames`
+
+    --animation_offset = new_dock_name == "sp-spidertron-dock-0" and (game.tick % 8) or (8 - (game.tick % 8)),
+    animation_speed = animation_speed,
+    render_layer = "higher-object-under",
+    target_offset = util.by_pixel_hr(-9, -46),
+  }
+end
+  
 
 function replace_dock(dock, new_dock_name)
+  if new_dock_name == "sp-spidertron-dock-0" and dock.name ~= "sp-spidertron-dock-closing" then
+    -- Need to use temporary dock entity whilst closing animation is playing
+    new_dock_name = "sp-spidertron-dock-closing"
+  end
+
   local health = dock.health
   local last_user = dock.last_user
   --local circuit_connected_entities = dock.circuit_connected_entities
@@ -128,6 +174,8 @@ function replace_dock(dock, new_dock_name)
 
   script.register_on_entity_destroyed(dock)
   old_dock.destroy()
+
+  animate_dock(dock)
 
   return dock
 end
@@ -217,7 +265,7 @@ end
 local function update_dock(dock_data)
   local dock = dock_data.dock
   local delete = false
-  if dock.valid then
+  if dock.valid and dock.name ~= "sp-spidertron-dock-closing" then
     local surface = dock.surface
     local spidertron = dock_data.connected_spidertron
     if spidertron and spidertron.valid then
@@ -281,7 +329,16 @@ local function update_dock(dock_data)
   return nil, delete  -- Deletes dock from global table
 end
 
-local function on_tick()
+local function on_tick(event)
+  local schedule = global.scheduled_dock_replacements[event.tick]
+  if schedule then
+    for _, dock in pairs(schedule) do
+      if dock.valid then
+        dock = replace_dock(dock, "sp-spidertron-dock-0")
+        global.spidertron_docks[dock.unit_number] = {dock = dock}
+      end
+    end
+  end
   if next(global.spidertron_docks) then
     -- TODO Replace '20' with configurable setting?
     global.from_k = for_n_of(global.spidertron_docks, global.from_k, 20, update_dock)

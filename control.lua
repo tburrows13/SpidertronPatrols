@@ -105,7 +105,7 @@ script.on_event(defines.events.on_entity_destroyed,
 
 script.on_event(defines.events.on_tick,
   function(event)
-    dock_script.on_tick()
+    dock_script.on_tick(event)
     patrol_gui.update_gui_highlights()
     spidertron_control.handle_spider_stopping()
   end
@@ -138,6 +138,7 @@ local function setup()
 
   global.spidertron_docks = {}
   global.spidertrons_docked = {}
+  global.scheduled_dock_replacements = {}
 
   global.open_gui_elements = {}
   global.player_highlights = {}  -- Indexed by player.index
@@ -185,6 +186,10 @@ local function config_changed_setup(changed_data)
     if old_version[2] < 2 then
       -- Pre 2.2
       reset_render_objects()
+    end
+    if old_version[2] < 3 then
+      -- Pre 2.3
+      global.scheduled_dock_replacements = {}
     end
   end
 end

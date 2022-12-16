@@ -32,7 +32,7 @@ local dock_recipe = {
 
 
 -- "container" definition doesn't support filters, but does support circuit connections
-local function create_spidertron_dock(inventory_size)
+local function create_spidertron_dock(inventory_size, closing)
   local type = "container"
   local logistic_mode
   if settings.startup["sp-dock-is-requester"].value then
@@ -40,7 +40,12 @@ local function create_spidertron_dock(inventory_size)
     logistic_mode = "requester"
   end
   local name = "sp-spidertron-dock-" .. inventory_size
+  if closing then name = "sp-spidertron-dock-closing" end
   if data.raw[type][name] then return end
+  local filename = "spidertron-dock-open.png"
+  if inventory_size == 0 and not closing then
+    filename = "spidertron-dock-closed.png"
+  end
   local dock = {
     type = type,
     logistic_mode = logistic_mode,
@@ -56,12 +61,13 @@ local function create_spidertron_dock(inventory_size)
     picture = {
       layers = {
         {
-          filename = "__base__/graphics/entity/artillery-turret/artillery-turret-base.png",
-          height = 100,
-          width = 104,
+          filename = "__SpidertronPatrols__/graphics/entity/hr-" .. filename,
+          height = 199,
+          width = 207,
           priority = "high",
+          scale = 0.5,
           hr_version = {
-            filename = "__base__/graphics/entity/artillery-turret/hr-artillery-turret-base.png",
+            filename = "__SpidertronPatrols__/graphics/entity/hr-" .. filename,
             height = 199,
             width = 207,
             priority = "high",
@@ -115,6 +121,7 @@ end
 
 local sizes_created = {0}
 create_spidertron_dock(0)
+create_spidertron_dock(0, true)  -- "closing" dock, used while the closing animation is being played
 for _, spider_prototype in pairs(data.raw["spider-vehicle"]) do
   local inventory_size = spider_prototype.inventory_size
   if not contains(sizes_created, inventory_size) then
@@ -123,4 +130,37 @@ for _, spider_prototype in pairs(data.raw["spider-vehicle"]) do
   end
 end
 
-data:extend{dock_item, dock_recipe}
+local open_animation = {
+  type = "animation",
+  name = "sp-spidertron-dock-door",
+  filename = "__SpidertronPatrols__/graphics/entity/hr-spidertron-dock-animation.png",
+  priority = "medium",
+  --width = 52,
+  --height = 20,
+  width = 97,
+  height = 79,
+  frame_count = 16,
+  animation_speed = 0.5,
+  --shift = {0.015625, -0.890625},
+  scale = 0.5,
+  hr_version =
+  {
+    filename = "__SpidertronPatrols__/graphics/entity/hr-spidertron-dock-animation.png",
+    priority = "medium",
+    width = 97,
+    height = 79,
+    frame_count = 16,
+    animation_speed = 0.5,
+    --shift = util.by_pixel(-0.25, -29.5),
+    scale = 0.5,
+  }
+}
+
+-- TODO sounds
+--[[
+  sounds.roboport_door_open,
+  sounds.roboport_door_close
+]]
+
+
+data:extend{dock_item, dock_recipe, open_animation}
