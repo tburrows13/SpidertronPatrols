@@ -178,7 +178,7 @@ function handle_wait_timers()
         local dock_unit_number = global.spidertrons_docked[spidertron.unit_number]
         if dock_unit_number then
           local dock = global.spidertron_docks[dock_unit_number].dock
-          if dock and dock.valid and item_count_info.item_name.name then
+          if dock and dock.valid and item_count_info.item_name and item_count_info.item_name.name then
             local signal_count = dock.get_merged_signal(item_count_info.item_name)
             if check_condition(item_count_info.condition, signal_count, item_count_info.count) then
               go_to_next_waypoint(spidertron)
