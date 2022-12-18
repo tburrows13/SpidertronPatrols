@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.3.1
+Date: 18 December 2022
+  Bugfixes:
+    - Fixed dock being placed as a 2x2 entity instead of 3x3
+    - Fixed crash when using 'Circuit condition' wait condition
+---------------------------------------------------------------------------------------------------
 Version: 2.3.0
 Date: 16 December 2022
   Features:
