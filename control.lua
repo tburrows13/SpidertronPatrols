@@ -135,6 +135,7 @@ local function setup()
   set_base_version()
   global.spidertron_waypoints = {}     -- Indexed by spidertron.unit_number
   global.path_renders = {}  -- Indexed by player.index
+  global.chart_tags = {} -- Indexed by render id
 
   global.spidertron_docks = {}
   global.spidertrons_docked = {}
@@ -190,6 +191,10 @@ local function config_changed_setup(changed_data)
     if old_version[2] < 3 then
       -- Pre 2.3
       global.scheduled_dock_replacements = {}
+    end
+    if old_version[2] < 4 then
+      -- Pre 2.4
+      global.chart_tags = {}
     end
   end
 end
