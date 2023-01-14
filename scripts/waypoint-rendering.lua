@@ -12,13 +12,15 @@ local function colors_eq(color1, color2)
   return color1.r == color2.r and color1.g == color2.g and color1.b == color2.b and color1.a == color2.a
 end
 
-local function create_render_paths(spidertron, player)
+local function create_render_paths(spidertron, player, create_chart_tags)
   local waypoint_info = get_waypoint_info(spidertron)
 
   local color = add_alpha(spidertron.color, true)
   local surface = spidertron.surface.name
 
   local path_render_ids = {}
+
+  create_chart_tags = create_chart_tags and #player.force.connected_players == 1 --tags are visible for everyone on the force, don't annoy people
 
   local waypoints = waypoint_info.waypoints
   local number_of_waypoints = #waypoints
@@ -36,7 +38,7 @@ local function create_render_paths(spidertron, player)
     }
     table.insert(path_render_ids, render_id)
 
-    if #player.force.connected_players == 1 then --tags are visible for everyone on the force, don't annoy people
+    if create_chart_tags then
       local tag = player.force.add_chart_tag(surface, {
         position = {waypoint.position.x, waypoint.position.y},
         text = tostring(i),
@@ -79,9 +81,9 @@ local function create_render_paths(spidertron, player)
 
       table.insert(path_render_ids, render_id)
 
-      if #player.force.connected_players == 1 then
+      if create_chart_tags then
         --ugly workaround to show patrol paths when zoomed out on map
-        local tag_spacing = 10
+        local tag_spacing = 20
         if D > tag_spacing * 2 then
           a2 = math2d.position.add(a, math2d.position.multiply_scalar(vec, tag_spacing))
           b2 = math2d.position.subtract(b, math2d.position.multiply_scalar(vec, tag_spacing))
@@ -144,22 +146,22 @@ function update_player_render_paths(player)
   if cursor_stack and cursor_stack.valid_for_read
       and (cursor_stack.name == "sp-spidertron-patrol-remote" or cursor_stack.name == "spidertron-enhancements-temporary-sp-spidertron-patrol-remote")
       and cursor_stack.connected_entity then
-    create_render_paths(cursor_stack.connected_entity, player)
+    create_render_paths(cursor_stack.connected_entity, player, true)
     table.insert(rendered_spidertrons, cursor_stack.connected_entity.unit_number)
   end
   local vehicle = player.vehicle
   if vehicle and vehicle.type == "spider-vehicle" and not contains(rendered_spidertrons, vehicle.unit_number) then
-    create_render_paths(vehicle, player)
+    create_render_paths(vehicle, player, false)
     table.insert(rendered_spidertrons, vehicle.unit_number)
   end
   local opened = player.opened
   if opened and player.opened_gui_type == defines.gui_type.entity and opened.type == "spider-vehicle" and not contains(rendered_spidertrons, opened.unit_number) then
-    create_render_paths(opened, player)
+    create_render_paths(opened, player, false)
     table.insert(rendered_spidertrons, opened.unit_number)
   end
   local selected = player.selected
   if selected and selected.type == "spider-vehicle" and not contains(rendered_spidertrons, selected.unit_number) then
-    create_render_paths(selected, player)
+    create_render_paths(selected, player, false)
   end
 end
 
