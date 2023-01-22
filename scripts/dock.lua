@@ -1,4 +1,4 @@
-local math2d = require "__core__.lualib.math2d"
+local math2d = require "math2d"
 
 local function on_built(event)
   local entity = event.created_entity or event.entity or event.destination
