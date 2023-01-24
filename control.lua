@@ -212,7 +212,7 @@ function reset_render_objects()
   end
 end
 
-commands.add_command("reset-sps-render-objects",
+commands.add_command("reset-sp-render-objects",
   "Clears all render objects (numbers and lines on the ground) created by Spidertron Patrols and recreates only the objects that are supposed to exist. Use whenever render objects are behaving unexpectedly or have been permanently left behind due to a mod bug or incompatibility.",
   function()
     reset_render_objects()
