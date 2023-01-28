@@ -156,6 +156,17 @@ local function build_waypoint_frames(waypoint_info)
       }}
     )
   end
+    -- 'Add new waypoint' button
+    table.insert(frames,
+    {
+      type = "button",
+      style = "sp_spidertron_schedule_add_station_button",
+      mouse_button_filter = {"left"},
+      caption = {"gui-patrol.add-waypoint"},
+      --tooltip = {"gui-patrol.add-waypoint-tooltip"},
+      tooltip = game.item_prototypes["sp-spidertron-patrol-remote"].localised_description,
+      handler = {[defines.events.on_gui_click] = PatrolGui.give_connected_remote},
+    })
   return frames
 end
 
@@ -428,10 +439,14 @@ function PatrolGui.toggle_on_patrol(player, spidertron, gui_elements)
   set_on_patrol(on_patrol, spidertron, waypoint_info)
 end
 
-local function set_waypoint_time(wait_time, spidertron, waypoint_index)
-  local waypoint_info = get_waypoint_info(spidertron)
-  local waypoint = waypoint_info.waypoints[waypoint_index]
-  waypoint.wait_time = wait_time
+function PatrolGui.give_connected_remote(player, spidertron, gui_elements)
+  if not player.is_cursor_empty() then
+    local cleared = player.clear_cursor()
+    if not cleared then return end
+  end
+  local cursor = player.cursor_stack
+  cursor.set_stack("sp-spidertron-patrol-remote")
+  cursor.connected_entity = spidertron
 end
 
 function PatrolGuiWaypoint.go_to_waypoint(player, spidertron, gui_elements, waypoint_info, index)
@@ -571,6 +586,12 @@ function PatrolGuiWaypoint.delete_waypoint(player, spidertron, gui_elements, way
   end
   PatrolGui.update_gui_schedule(waypoint_info)
   update_render_text(spidertron)
+end
+
+local function set_waypoint_time(wait_time, spidertron, waypoint_index)
+  local waypoint_info = get_waypoint_info(spidertron)
+  local waypoint = waypoint_info.waypoints[waypoint_index]
+  waypoint.wait_time = wait_time
 end
 
 function PatrolGuiWaypoint.update_text_field(player, spidertron, gui_elements, waypoint_info, index)

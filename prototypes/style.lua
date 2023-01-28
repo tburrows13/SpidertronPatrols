@@ -36,9 +36,6 @@ styles.sp_spidertron_schedule_scroll_pane = {
   }
 }
 
--- Only used in gui.lua
-styles.waypoints_switch_padding = {type = "switch_style", parent = "switch", top_padding = 3}  -- Fixes height of switch to be the same as its labels
-
 styles.sp_empty_filler = {
   type = "empty_widget_style",
   horizontally_stretchable = "stretch_and_expand"
@@ -154,3 +151,9 @@ styles.sp_compact_slider_value_textfield = {
   width = 60,
 }
 
+data.raw["gui-style"]["default"].sp_spidertron_schedule_add_station_button = {
+  type = "button_style",
+  parent = "train_schedule_add_station_button",
+  width = frame_width,
+  horizontally_stretchable = "off",
+}
