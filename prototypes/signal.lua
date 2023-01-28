@@ -4,7 +4,7 @@ data:extend(
         type = "item-subgroup",
         name = "virtual-signal-spidertron",
         group = "signals",
-        order = "f"
+        order = "z"
     },
     {
         type = "virtual-signal",

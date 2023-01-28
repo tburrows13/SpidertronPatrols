@@ -1,4 +1,4 @@
-local math2d = require "__core__.lualib.math2d"
+local math2d = require "math2d"
 
 local function add_alpha(color, active)
   if active then
@@ -17,10 +17,9 @@ local function create_render_paths(spidertron, player, create_chart_tags)
 
   local color = add_alpha(spidertron.color, true)
   local surface = spidertron.surface.name
+  local force = player.force
 
   local path_render_ids = {}
-
-  create_chart_tags = create_chart_tags and #player.force.connected_players == 1 --tags are visible for everyone on the force, don't annoy people
 
   local waypoints = waypoint_info.waypoints
   local number_of_waypoints = #waypoints
@@ -39,7 +38,7 @@ local function create_render_paths(spidertron, player, create_chart_tags)
     table.insert(path_render_ids, render_id)
 
     if create_chart_tags then
-      local tag = player.force.add_chart_tag(surface, {
+      local tag = force.add_chart_tag(surface, {
         position = {waypoint.position.x, waypoint.position.y},
         text = tostring(i),
         icon = {type = "virtual", name = "signal-waypoint"}
@@ -82,13 +81,13 @@ local function create_render_paths(spidertron, player, create_chart_tags)
       table.insert(path_render_ids, render_id)
 
       if create_chart_tags then
-        --ugly workaround to show patrol paths when zoomed out on map
+        -- Show patrol paths in map view using chart tags
         local tag_spacing = 20
         if D > tag_spacing * 2 then
           a2 = math2d.position.add(a, math2d.position.multiply_scalar(vec, tag_spacing))
           b2 = math2d.position.subtract(b, math2d.position.multiply_scalar(vec, tag_spacing))
 
-          global.chart_tags[render_id] = create_chart_tag_path(surface, player, a2, b2, tag_spacing)
+          global.chart_tags[render_id] = create_chart_tag_path(surface, player, force, a2, b2, tag_spacing)
         end
       end
     end
@@ -99,7 +98,7 @@ local function create_render_paths(spidertron, player, create_chart_tags)
   global.path_renders[player.index] = player_render_ids
 end
 
-function create_chart_tag_path(surface, player, from, to, tag_spacing)
+function create_chart_tag_path(surface, player, force, from, to, tag_spacing)
   local vec = math2d.position.subtract(to, from)
   local dist = math2d.position.vector_length(vec)
 
@@ -111,8 +110,8 @@ function create_chart_tag_path(surface, player, from, to, tag_spacing)
 
   local pos = from
   local tags = {}
-  for i = 1, steps + 1 do
-    local tag = player.force.add_chart_tag(surface, {position = pos, icon = {type = "virtual", name = "signal-orange-dot"}})
+  for _ = 1, steps + 1 do
+    local tag = force.add_chart_tag(surface, {position = pos, icon = {type = "virtual", name = "signal-orange-dot"}})
     if tag then table.insert(tags, tag) end
     pos = math2d.position.add(pos, step_vec)
   end

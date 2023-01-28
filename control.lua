@@ -184,17 +184,17 @@ local function config_changed_setup(changed_data)
       global.path_renders = {}
       global.player_highlights = {}
     end
-    if old_version[2] < 2 then
-      -- Pre 2.2
-      reset_render_objects()
-    end
     if old_version[2] < 3 then
       -- Pre 2.3
       global.scheduled_dock_replacements = {}
     end
-    if old_version[2] < 4 then
-      -- Pre 2.4
+    if old_version[2] < 3 or (old_version[2] == 3 and old_version[3] < 2) then
+      -- Pre 2.3.2
       global.chart_tags = {}
+    end
+    if old_version[2] < 2 then
+      -- Pre 2.2. Has to go at end so that globals can be initialized first.
+      reset_render_objects()
     end
   end
 end
