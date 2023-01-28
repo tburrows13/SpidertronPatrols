@@ -36,7 +36,7 @@ function on_patrol_command_issued(spidertron, position)
   else
     spidertron.autopilot_destination = nil
   end
-  patrol_gui.update_gui_schedule(waypoint_info)
+  PatrolGui.update_gui_schedule(waypoint_info)
   update_render_text(spidertron)  -- Inserts text at the position that we have just added
 end
 
@@ -58,7 +58,7 @@ script.on_event(defines.events.on_player_used_spider_remote,
     else
       local waypoint_info = get_waypoint_info(spidertron)
       waypoint_info.on_patrol = false
-      patrol_gui.update_gui_switch(waypoint_info)
+      PatrolGui.update_gui_switch(waypoint_info)
     end
   end
 )
@@ -97,7 +97,7 @@ function go_to_next_waypoint(spidertron, next_index)
     spidertron.autopilot_destination = next_position
     waypoint_info.current_index = next_index
 
-    patrol_gui.update_gui_button_states(waypoint_info)
+    PatrolGui.update_gui_button_states(waypoint_info)
     -- The spidertron is now walking towards a new waypoint
     script.raise_event(remote_interface.on_spidertron_given_new_destination, {player_index = nil, vehicle = spidertron, position = next_position, success = true})
   end
@@ -225,7 +225,7 @@ script.on_event(defines.events.on_spider_command_completed,
       else
         waypoint_info.previous_inventories = {}
         waypoint_info.tick_arrived = game.tick
-        patrol_gui.update_gui_button_states(waypoint_info)
+        PatrolGui.update_gui_button_states(waypoint_info)
       end
     end
   end
@@ -257,7 +257,7 @@ script.on_event(defines.events.on_entity_settings_pasted,
       end
 
       global.spidertron_waypoints[destination.unit_number] = waypoint_info
-      patrol_gui.update_gui_schedule(waypoint_info)
+      PatrolGui.update_gui_schedule(waypoint_info)
       update_render_text(destination)  -- Inserts text at the position that we have just added
     end
   end

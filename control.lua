@@ -2,7 +2,7 @@ util = require "util"
 require "scripts.utils"
 remote_interface = require "scripts.remote-interface"
 local dock_script = require "scripts.dock"
-local patrol_gui = require "scripts.patrol-gui"
+local PatrolGui = require "scripts.patrol-gui"
 spidertron_control = require "scripts.spidertron-control"
 require "scripts.waypoint-rendering"
 
@@ -61,7 +61,7 @@ function clear_spidertron_waypoints(spidertron, unit_number)
     rendering.destroy(waypoint.render_id)
   end
   waypoint_info.waypoints = {}
-  patrol_gui.update_gui_schedule(waypoint_info)
+  PatrolGui.update_gui_schedule(waypoint_info)
   update_spidertron_render_paths(unit_number)
   global.spidertron_waypoints[unit_number] = nil
 end
@@ -90,7 +90,7 @@ script.on_event({"move-right-custom", "move-left-custom", "move-up-custom", "mov
     if vehicle and vehicle.type == "spider-vehicle" and player.render_mode == defines.render_mode.game then  -- Render mode means player isn't in map view...
       local waypoint_info = get_waypoint_info(vehicle)
       waypoint_info.on_patrol = false
-      patrol_gui.update_gui_switch(waypoint_info)
+      PatrolGui.update_gui_switch(waypoint_info)
     end
   end
 )
@@ -106,7 +106,7 @@ script.on_event(defines.events.on_entity_destroyed,
 script.on_event(defines.events.on_tick,
   function(event)
     dock_script.on_tick(event)
-    patrol_gui.update_gui_highlights()
+    PatrolGui.update_gui_highlights()
     spidertron_control.handle_spider_stopping()
   end
 )
