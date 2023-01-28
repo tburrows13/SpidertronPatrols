@@ -413,7 +413,7 @@ end
 
 function set_on_patrol(on_patrol, spidertron, waypoint_info)
   if on_patrol then
-    spidertron_control.go_to_next_waypoint(spidertron, waypoint_info.current_index)
+    SpidertronControl.go_to_next_waypoint(spidertron, waypoint_info.current_index)
   else
     spidertron.autopilot_destination = nil
   end
@@ -438,7 +438,7 @@ function PatrolGuiWaypoint.go_to_waypoint(player, spidertron, gui_elements, wayp
   -- 'Play' button
   if not waypoint_info.on_patrol or index ~= waypoint_info.current_index then
     set_on_patrol(true, spidertron, waypoint_info)
-    spidertron_control.go_to_next_waypoint(spidertron, index)
+    SpidertronControl.go_to_next_waypoint(spidertron, index)
   end
 end
 
@@ -567,7 +567,7 @@ function PatrolGuiWaypoint.delete_waypoint(player, spidertron, gui_elements, way
     waypoint_info.current_index = 1
   end
   if waypoint_info.on_patrol then
-    spidertron_control.go_to_next_waypoint(spidertron, waypoint_info.current_index)
+    SpidertronControl.go_to_next_waypoint(spidertron, waypoint_info.current_index)
   end
   PatrolGui.update_gui_schedule(waypoint_info)
   update_render_text(spidertron)

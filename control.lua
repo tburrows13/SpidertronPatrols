@@ -1,9 +1,9 @@
 util = require "util"
 require "scripts.utils"
-remote_interface = require "scripts.remote-interface"
-local dock_script = require "scripts.dock"
+RemoteInterface = require "scripts.remote-interface"
+local Dock = require "scripts.dock"
 local PatrolGui = require "scripts.patrol-gui"
-spidertron_control = require "scripts.spidertron-control"
+SpidertronControl = require "scripts.spidertron-control"
 require "scripts.waypoint-rendering"
 
 --[[
@@ -80,8 +80,6 @@ script.on_event("sp-delete-all-waypoints",
   end
 )
 
-
-
 -- Detect when the player cancels a spidertron's autopilot_destination
 script.on_event({"move-right-custom", "move-left-custom", "move-up-custom", "move-down-custom"},
   function(event)
@@ -99,15 +97,15 @@ script.on_event(defines.events.on_entity_destroyed,
   function(event)
     local unit_number = event.unit_number
     clear_spidertron_waypoints(nil, unit_number)
-    dock_script.on_entity_destroyed(event)
+    Dock.on_entity_destroyed(event)
   end
 )
 
 script.on_event(defines.events.on_tick,
   function(event)
-    dock_script.on_tick(event)
+    Dock.on_tick(event)
     PatrolGui.update_gui_highlights()
-    spidertron_control.handle_spider_stopping()
+    SpidertronControl.handle_spider_stopping()
   end
 )
 
@@ -144,7 +142,7 @@ local function setup()
   global.open_gui_elements = {}
   global.player_highlights = {}  -- Indexed by player.index
 
-  remote_interface.connect_to_remote_interfaces()
+  RemoteInterface.connect_to_remote_interfaces()
   update_render_players()
   --settings_changed()
   end

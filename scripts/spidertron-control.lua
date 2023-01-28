@@ -1,5 +1,7 @@
 -- Handles on_player_used_spider_remote, on_spider_command_completed, and wait conditions
 
+local SpidertronControl = {}
+
 local function check_condition(condition, a, b)
   -- Using list order: {">", "<", "=", "≥", "≤", "≠"}
   if condition == 1 then
@@ -17,11 +19,11 @@ local function check_condition(condition, a, b)
   end
 end
 
-function on_patrol_command_issued(spidertron, position)
+function SpidertronControl.on_patrol_command_issued(spidertron, position)
   -- Called when remote used and on remote interface call
   local waypoint_info = get_waypoint_info(spidertron)
   -- We are in patrol mode
-  log("Player used patrol remote on position " .. util.positiontostr(position))
+  --log("Player used patrol remote on position " .. util.positiontostr(position))
 
   -- Add to patrol
   local waypoint = {position = position, type = "none"}
@@ -54,7 +56,7 @@ script.on_event(defines.events.on_player_used_spider_remote,
     local remote = player.cursor_stack
 
     if remote.name == "sp-spidertron-patrol-remote" or remote.name == "spidertron-enhancements-temporary-sp-spidertron-patrol-remote" then
-      on_patrol_command_issued(spidertron, position)
+      SpidertronControl.on_patrol_command_issued(spidertron, position)
     else
       local waypoint_info = get_waypoint_info(spidertron)
       waypoint_info.on_patrol = false
@@ -80,7 +82,7 @@ local function was_spidertron_inactive(spidertron, old_inventories)
 end
 
 
-function go_to_next_waypoint(spidertron, next_index)
+function SpidertronControl.go_to_next_waypoint(spidertron, next_index)
   local waypoint_info = get_waypoint_info(spidertron)
 
   local number_of_waypoints = #waypoint_info.waypoints
@@ -99,11 +101,11 @@ function go_to_next_waypoint(spidertron, next_index)
 
     PatrolGui.update_gui_button_states(waypoint_info)
     -- The spidertron is now walking towards a new waypoint
-    script.raise_event(remote_interface.on_spidertron_given_new_destination, {player_index = nil, vehicle = spidertron, position = next_position, success = true})
+    script.raise_event(RemoteInterface.on_spidertron_given_new_destination, {player_index = nil, vehicle = spidertron, position = next_position, success = true})
   end
 end
 
-function handle_spider_stopping()
+function SpidertronControl.handle_spider_stopping()
   for _, waypoint_info in pairs(global.spidertron_waypoints) do
     if waypoint_info.on_patrol and waypoint_info.tick_arrived and not waypoint_info.stopped then
       local spidertron = waypoint_info.spidertron
@@ -134,7 +136,7 @@ function handle_spider_stopping()
   end
 end
 
-function handle_wait_timers()
+local function handle_wait_timers()
   for _, waypoint_info in pairs(global.spidertron_waypoints) do
     if waypoint_info.on_patrol and waypoint_info.tick_arrived then
       -- Spidertron is waiting
@@ -144,26 +146,26 @@ function handle_wait_timers()
 
       if waypoint_type == "none" then
         -- Can happen if waypoint type is changed whilst spidertron is at waypoint
-        go_to_next_waypoint(spidertron)
+        SpidertronControl.go_to_next_waypoint(spidertron)
       elseif waypoint_type == "time-passed" then
         if (game.tick - waypoint_info.tick_arrived) >= waypoint.wait_time * 60 then
-          go_to_next_waypoint(spidertron)
+          SpidertronControl.go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "inactivity" then
         if was_spidertron_inactive(spidertron, waypoint_info.previous_inventories) then
           if (game.tick - waypoint_info.tick_inactive) >= waypoint.wait_time * 60 then
-            go_to_next_waypoint(spidertron)
+            SpidertronControl.go_to_next_waypoint(spidertron)
           end
         else
           waypoint_info.tick_inactive = game.tick
         end
       elseif waypoint_type == "full-inventory" then
         if spidertron.get_inventory(defines.inventory.spider_trunk).is_full() then
-          go_to_next_waypoint(spidertron)
+          SpidertronControl.go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "empty-inventory" then
         if spidertron.get_inventory(defines.inventory.spider_trunk).is_empty() then
-          go_to_next_waypoint(spidertron)
+          SpidertronControl.go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "item-count" then
         local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
@@ -171,7 +173,7 @@ function handle_wait_timers()
         local item_count_info = waypoint.item_count_info
         local item_count = inventory_contents[item_count_info.item_name] or 0
         if check_condition(item_count_info.condition, item_count, item_count_info.count) then
-          go_to_next_waypoint(spidertron)
+          SpidertronControl.go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "circuit-condition" then
         local item_count_info = waypoint.item_count_info
@@ -181,7 +183,7 @@ function handle_wait_timers()
           if dock and dock.valid and item_count_info.item_name and item_count_info.item_name.name then
             local signal_count = dock.get_merged_signal(item_count_info.item_name)
             if check_condition(item_count_info.condition, signal_count, item_count_info.count) then
-              go_to_next_waypoint(spidertron)
+              SpidertronControl.go_to_next_waypoint(spidertron)
             end
           end
         end
@@ -191,18 +193,18 @@ function handle_wait_timers()
           local logistic_network = logistic_cell.logistic_network
           -- Always wait some time in case "Enable logistics while moving" is false
           if (game.tick - waypoint_info.tick_arrived) >= 120 and (not logistic_network or not next(logistic_network.construction_robots)) then
-            go_to_next_waypoint(spidertron)
+            SpidertronControl.go_to_next_waypoint(spidertron)
           end
         else
-          go_to_next_waypoint(spidertron)
+          SpidertronControl.go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "passenger-present" then
         if spidertron.get_driver() or spidertron.get_passenger() then
-          go_to_next_waypoint(spidertron)
+          SpidertronControl.go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "passenger-not-present" then
         if not (spidertron.get_driver() or spidertron.get_passenger()) then
-          go_to_next_waypoint(spidertron)
+          SpidertronControl.go_to_next_waypoint(spidertron)
         end
       end
     end
@@ -221,7 +223,7 @@ script.on_event(defines.events.on_spider_command_completed,
       local waypoint_type = waypoint.type
 
       if waypoint_type == "none" or ((waypoint_type == "time-passed" or waypoint_type == "inactivity") and waypoint.wait_time == 0) then
-        go_to_next_waypoint(spidertron)
+        SpidertronControl.go_to_next_waypoint(spidertron)
       else
         waypoint_info.previous_inventories = {}
         waypoint_info.tick_arrived = game.tick
@@ -263,4 +265,4 @@ script.on_event(defines.events.on_entity_settings_pasted,
   end
 )
 
-return {go_to_next_waypoint = go_to_next_waypoint, handle_spider_stopping = handle_spider_stopping}
+return SpidertronControl

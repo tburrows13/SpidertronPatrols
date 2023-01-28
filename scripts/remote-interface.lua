@@ -1,6 +1,6 @@
 local function remote_interface_assign_waypoints(spidertron, waypoints)
   for _, waypoint in pairs(waypoints) do
-    on_patrol_command_issued(spidertron, waypoint.position)
+    SpidertronControl.on_patrol_command_issued(spidertron, waypoint.position)
   end
 end
 
