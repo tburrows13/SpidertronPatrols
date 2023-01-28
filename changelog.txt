@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.3.2
+Date: 28 January 2023
+  Features:
+    - Waypoints are now drawn in map view when holding a connected patrol remote
+---------------------------------------------------------------------------------------------------
 Version: 2.3.1
 Date: 18 December 2022
   Bugfixes:

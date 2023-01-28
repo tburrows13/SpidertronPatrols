@@ -1,3 +1,5 @@
+![Animated docks demo](https://cdn.discordapp.com/attachments/231518135231053825/1053131611971010570/animated-docks-demo.mp4)
+
 # Features
 
 ### Patrol Schedule
@@ -25,7 +27,6 @@
 
 - Each patrol waypoint can only have one wait condition set. If you need more, you can usually just set multiple waypoints in the same position, each with a different wait condition
 - For performance reasons, when items with associated data (such as modular armor) in a spidertron inventory are taken out of a connected dock's inventory, they lose all their data. This loses all the equipment in that armor's equipment grid 
-- Waypoint markers cannot be seen in map view (not possible to add because it requires [this API feature](https://forums.factorio.com/viewtopic.php?f=28&t=76539&p=510027) - please post there in support)
 - Performance is good, but not insignificant:
     - Docks are limited so that only 20 are updated each tick. Adding lots of docks will simply increase the update delay for each dock instead of reducing UPS
     - Spidertrons waiting at waypoints also add to the mod update time. The "Inactivity" wait condition is particularly expensive
@@ -46,9 +47,12 @@ You can help by translating this mod into your language using [CrowdIn](https://
 -----
 
 Replaces [Spidertron Waypoints](https://mods.factorio.com/mod/SpidertronWaypoints).
+Allows creating patrols for [Lex's Aircraft](https://mods.factorio.com/mod/lex-aircraft), since those aircraft are spidertrons internally.
+Fully compatible with Krastorio2, Space Exploration, and Nullius.
 
 Thank you to:
 
 - [danatron1](https://www.reddit.com/r/factorio/comments/iitlvi/i_made_a_mod_that_allows_you_to_set_waypoints/g3dzt1h) for creating the patrol remote icon
 - [notnotmelon](https://mods.factorio.com/mod/spidertron-logistics) for some of the dock prototype code
 - [raiguard](https://mods.factorio.com/mod/flib) for the GUI library and style tips
+- kumpuu for adding the ability to show patrol paths in map view
