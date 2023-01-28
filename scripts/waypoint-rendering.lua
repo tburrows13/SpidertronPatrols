@@ -1,3 +1,5 @@
+local math2d = require "__core__.lualib.math2d"
+
 local function add_alpha(color, active)
   if active then
     return {r = color.r, g = color.g, b = color.b, a = 0.85}
@@ -10,13 +12,15 @@ local function colors_eq(color1, color2)
   return color1.r == color2.r and color1.g == color2.g and color1.b == color2.b and color1.a == color2.a
 end
 
-local function create_render_paths(spidertron, player)
+local function create_render_paths(spidertron, player, create_chart_tags)
   local waypoint_info = get_waypoint_info(spidertron)
 
   local color = add_alpha(spidertron.color, true)
   local surface = spidertron.surface.name
 
   local path_render_ids = {}
+
+  create_chart_tags = create_chart_tags and #player.force.connected_players == 1 --tags are visible for everyone on the force, don't annoy people
 
   local waypoints = waypoint_info.waypoints
   local number_of_waypoints = #waypoints
@@ -34,6 +38,15 @@ local function create_render_paths(spidertron, player)
     }
     table.insert(path_render_ids, render_id)
 
+    if create_chart_tags then
+      local tag = player.force.add_chart_tag(surface, {
+        position = {waypoint.position.x, waypoint.position.y},
+        text = tostring(i),
+        icon = {type = "virtual", name = "signal-waypoint"}
+      })
+      if tag then global.chart_tags[render_id] = {tag} end
+    end
+
     local next_waypoint = waypoints[i + 1]
     if i == number_of_waypoints then
       if number_of_waypoints == 2 then
@@ -43,22 +56,17 @@ local function create_render_paths(spidertron, player)
       next_waypoint = waypoints[1]
     end
 
-    -- Start and end the line a tile out from the waypoint center
-    -- so that it doesn't overlap the number
     local a = waypoint.position
     local b = next_waypoint.position
     local D = util.distance(a, b)
     local d = 1
 
     if D > d then
-      local a2 = {}
-      local b2 = {}
-      local dD = d / D
-      a2.x = a.x + dD * (b.x - a.x)
-      a2.y = a.y + dD * (b.y - a.y)
-
-      b2.x = b.x + dD * (a.x - b.x)
-      b2.y = b.y + dD * (a.y - b.y)
+      -- Start and end the line a tile out from the waypoint center
+      -- so that it doesn't overlap the number
+      local vec = math2d.position.get_normalised(math2d.position.subtract(b, a))
+      local a2 = math2d.position.add(a, math2d.position.multiply_scalar(vec, d))
+      local b2 = math2d.position.subtract(b, math2d.position.multiply_scalar(vec, d))
 
       render_id = rendering.draw_line{
         color = color,
@@ -72,12 +80,44 @@ local function create_render_paths(spidertron, player)
       }
 
       table.insert(path_render_ids, render_id)
+
+      if create_chart_tags then
+        --ugly workaround to show patrol paths when zoomed out on map
+        local tag_spacing = 20
+        if D > tag_spacing * 2 then
+          a2 = math2d.position.add(a, math2d.position.multiply_scalar(vec, tag_spacing))
+          b2 = math2d.position.subtract(b, math2d.position.multiply_scalar(vec, tag_spacing))
+
+          global.chart_tags[render_id] = create_chart_tag_path(surface, player, a2, b2, tag_spacing)
+        end
+      end
     end
   end
 
   local player_render_ids = global.path_renders[player.index] or {}
   player_render_ids[spidertron.unit_number] = path_render_ids
   global.path_renders[player.index] = player_render_ids
+end
+
+function create_chart_tag_path(surface, player, from, to, tag_spacing)
+  local vec = math2d.position.subtract(to, from)
+  local dist = math2d.position.vector_length(vec)
+
+  local steps = dist / tag_spacing
+  steps = math.floor(steps + 0.5) --round to nearest int
+  local step_dist = dist / steps
+
+  local step_vec = math2d.position.multiply_scalar(math2d.position.get_normalised(vec), step_dist)
+
+  local pos = from
+  local tags = {}
+  for i = 1, steps + 1 do
+    local tag = player.force.add_chart_tag(surface, {position = pos, icon = {type = "virtual", name = "signal-orange-dot"}})
+    if tag then table.insert(tags, tag) end
+    pos = math2d.position.add(pos, step_vec)
+  end
+
+  return tags
 end
 
 function update_player_render_paths(player)
@@ -88,6 +128,13 @@ function update_player_render_paths(player)
     for _, path_render_ids in pairs(player_render_ids) do
       for _, render_id in pairs(path_render_ids) do
         rendering.destroy(render_id)
+
+        if global.chart_tags[render_id] then
+          for _, tag in pairs(global.chart_tags[render_id]) do
+            if tag and tag.valid then tag.destroy() end
+          end
+          global.chart_tags[render_id] = nil
+        end
       end
     end
     global.path_renders[player.index] = nil
@@ -99,22 +146,22 @@ function update_player_render_paths(player)
   if cursor_stack and cursor_stack.valid_for_read
       and (cursor_stack.name == "sp-spidertron-patrol-remote" or cursor_stack.name == "spidertron-enhancements-temporary-sp-spidertron-patrol-remote")
       and cursor_stack.connected_entity then
-    create_render_paths(cursor_stack.connected_entity, player)
+    create_render_paths(cursor_stack.connected_entity, player, true)
     table.insert(rendered_spidertrons, cursor_stack.connected_entity.unit_number)
   end
   local vehicle = player.vehicle
   if vehicle and vehicle.type == "spider-vehicle" and not contains(rendered_spidertrons, vehicle.unit_number) then
-    create_render_paths(vehicle, player)
+    create_render_paths(vehicle, player, false)
     table.insert(rendered_spidertrons, vehicle.unit_number)
   end
   local opened = player.opened
   if opened and player.opened_gui_type == defines.gui_type.entity and opened.type == "spider-vehicle" and not contains(rendered_spidertrons, opened.unit_number) then
-    create_render_paths(opened, player)
+    create_render_paths(opened, player, false)
     table.insert(rendered_spidertrons, opened.unit_number)
   end
   local selected = player.selected
   if selected and selected.type == "spider-vehicle" and not contains(rendered_spidertrons, selected.unit_number) then
-    create_render_paths(selected, player)
+    create_render_paths(selected, player, false)
   end
 end
 
