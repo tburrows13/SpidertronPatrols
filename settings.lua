@@ -52,3 +52,12 @@ data:extend({
     order = "b"
   },
 })
+
+-- Remove workaround for https://forums.factorio.com/98151
+local util = require "util"
+base_version = tonumber(util.split(mods["base"], ".")[3])
+if base_version >= 77 then
+  data.raw["double-setting"]["sp-window-height-scale"].default_value = 5
+  data.raw["double-setting"]["sp-window-height-scale"].allowed_values = {5}
+  data.raw["double-setting"]["sp-window-height-scale"].hidden = true
+end
