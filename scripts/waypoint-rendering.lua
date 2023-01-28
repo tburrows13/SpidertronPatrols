@@ -146,20 +146,20 @@ function update_player_render_paths(player)
       and (cursor_stack.name == "sp-spidertron-patrol-remote" or cursor_stack.name == "spidertron-enhancements-temporary-sp-spidertron-patrol-remote")
       and cursor_stack.connected_entity then
     create_render_paths(cursor_stack.connected_entity, player, true)
-    table.insert(rendered_spidertrons, cursor_stack.connected_entity.unit_number)
+    rendered_spidertrons[cursor_stack.connected_entity.unit_number] = true
   end
   local vehicle = player.vehicle
-  if vehicle and vehicle.type == "spider-vehicle" and not contains(rendered_spidertrons, vehicle.unit_number) then
+  if vehicle and vehicle.type == "spider-vehicle" and not rendered_spidertrons[vehicle.unit_number] then
     create_render_paths(vehicle, player, false)
-    table.insert(rendered_spidertrons, vehicle.unit_number)
+    rendered_spidertrons[vehicle.unit_number] = true
   end
   local opened = player.opened
-  if opened and player.opened_gui_type == defines.gui_type.entity and opened.type == "spider-vehicle" and not contains(rendered_spidertrons, opened.unit_number) then
+  if opened and player.opened_gui_type == defines.gui_type.entity and opened.type == "spider-vehicle" and not rendered_spidertrons[opened.unit_number] then
     create_render_paths(opened, player, false)
-    table.insert(rendered_spidertrons, opened.unit_number)
+    rendered_spidertrons[opened.unit_number] = true
   end
   local selected = player.selected
-  if selected and selected.type == "spider-vehicle" and not contains(rendered_spidertrons, selected.unit_number) then
+  if selected and selected.type == "spider-vehicle" and not rendered_spidertrons[selected.unit_number] then
     create_render_paths(selected, player, false)
   end
 end
