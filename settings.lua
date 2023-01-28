@@ -1,13 +1,6 @@
 data:extend({
   {
     type = "bool-setting",
-    name = "sp-enable-patrol-remote",
-    setting_type = "startup",
-    default_value = true,
-    order = "aa"
-  },
-  {
-    type = "bool-setting",
     name = "sp-enable-dock",
     setting_type = "startup",
     default_value = true,

@@ -2,9 +2,14 @@ if not mods["nullius"] then return end
 
 local spiderling_enabled = settings.startup["sp-enable-spiderling"].value
 local dock_enabled = settings.startup["sp-enable-dock"].value
-local patrol_enabled = settings.startup["sp-enable-patrol-remote"].value
 
-if not (spiderling_enabled or dock_enabled or patrol_enabled) then return end
+local patrol_remote = data.raw["spidertron-remote"]["sp-spidertron-patrol-remote"]
+patrol_remote.group = "equipment"
+patrol_remote.subgroup = "vehicle"
+patrol_remote.order = "nullius-dg"
+patrol_remote.localised_name = {"item-name.nullius-sp-spidertron-patrol-remote"}
+
+if not (spiderling_enabled or dock_enabled) then return end
 
 if sp_data_stage == "data" then
   local tech = table.deepcopy(data.raw.technology["nullius-personal-transportation-2"])
@@ -102,33 +107,6 @@ if dock_enabled and sp_data_stage ~= "data" then
     table.insert(tech.effects, 2, {
       type = "unlock-recipe",
       recipe = "sp-spidertron-dock"
-    })
-  end
-end
-
-if patrol_enabled then
-  local item = data.raw["spidertron-remote"]["sp-spidertron-patrol-remote"]
-  item.group = "equipment"
-  item.subgroup = "vehicle"
-  item.order = "nullius-dg"
-  item.localised_name = {"item-name.nullius-sp-spidertron-patrol-remote"}
-
-  local recipe = data.raw.recipe["sp-spidertron-patrol-remote"]
-  recipe.group = "equipment"
-  recipe.subgroup = "vehicle"
-  recipe.order = "nullius-dg"
-  recipe.category = "tiny-crafting"
-  recipe.energy_required = 20
-  recipe.ingredients = {
-    {"nullius-processor-1", 4},
-    {"nullius-scout-remote", 2}
-  }
-
-  if sp_data_stage == "data-updates" then
-    --local tech = data.raw.technology["nullius-personal-transportation-4"]
-    table.insert(tech.effects, {
-      type = "unlock-recipe",
-      recipe = "sp-spidertron-patrol-remote"
     })
   end
 end

@@ -43,10 +43,6 @@ local patrol_tech = {
       type = "unlock-recipe",
       recipe = "sp-spidertron-dock"
     },
-    {
-      type = "unlock-recipe",
-      recipe = "sp-spidertron-patrol-remote"
-    },
   },
   prerequisites = {
     "sp-spiderling",
@@ -83,28 +79,19 @@ end
 -- Modify the above if some features are disabled
 local spiderling_enabled = settings.startup["sp-enable-spiderling"].value
 local dock_enabled = settings.startup["sp-enable-dock"].value
-local patrol_enabled = settings.startup["sp-enable-patrol-remote"].value
 if not spiderling_enabled then
   patrol_tech.prerequisites = {"chemical-science-pack", "automated-rail-transportation",}
-end
-if not dock_enabled then
-  -- Just enable patrol
-  patrol_tech.effects = {{type = "unlock-recipe", recipe = "sp-spidertron-patrol-remote"}}
-end
-if not patrol_enabled then
-  -- Just enable dock
-  patrol_tech.effects = {{type = "unlock-recipe", recipe = "sp-spidertron-dock"}}
 end
 
 if spiderling_enabled then
   data:extend{spiderling_tech}
 end
-if patrol_enabled or dock_enabled then
+if dock_enabled then
   data:extend{patrol_tech}
 end
 
 
-if (spiderling_enabled or patrol_enabled or dock_enabled) and not (mods["space-exploration"] or mods["nullius"]) then
+if (spiderling_enabled or dock_enabled) and not (mods["space-exploration"] or mods["nullius"]) then
   -- Why would the mod be installed if all 3 are disabled...? No idea...
 
   -- Move rocket control unit unlock earlier in the tech tree, so that spidertron remotes can also be crafed earlier but leave recipe unchanged
