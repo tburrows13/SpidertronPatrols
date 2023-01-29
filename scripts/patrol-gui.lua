@@ -2,6 +2,7 @@ local gui = require "__SpidertronPatrols__.scripts.gui-lite"
 
 PatrolGui = {}
 local PatrolGuiWaypoint = {}
+local PatrolGuiGeneral = {}
 
 dropdown_contents = {
   {"description.no-limit"},
@@ -157,15 +158,13 @@ local function build_waypoint_frames(waypoint_info)
     )
   end
     -- 'Add new waypoint' button
-    table.insert(frames,
-    {
+    table.insert(frames, {
       type = "button",
       style = "sp_spidertron_schedule_add_station_button",
       mouse_button_filter = {"left"},
       caption = {"gui-patrol.add-waypoint"},
-      --tooltip = {"gui-patrol.add-waypoint-tooltip"},
       tooltip = game.item_prototypes["sp-spidertron-patrol-remote"].localised_description,
-      handler = {[defines.events.on_gui_click] = PatrolGui.give_connected_remote},
+      handler = {[defines.events.on_gui_click] = PatrolGuiGeneral.give_connected_remote},
     })
   return frames
 end
@@ -184,15 +183,49 @@ end
 
 
 local function build_gui(player, spidertron)
+  local relative_frame = player.gui.relative["sp-relative-frame"]
+  if relative_frame then
+    relative_frame.destroy()
+  end
+  global.open_gui_elements[player.index] = nil
+
   local waypoint_info = get_waypoint_info(spidertron)
   local anchor = {gui = defines.relative_gui_type.spider_vehicle_gui, position = defines.relative_gui_position.right}
-  if not next(waypoint_info.waypoints) then return end
+  if not next(waypoint_info.waypoints) then
+    -- Add minimal GUI that gives player a connected remote
+    gui.add(player.gui.relative, {
+      {
+        type = "frame",
+        style = "sp_relative_stretchable_frame",
+        style_mods = {padding = 4},
+        name = "sp-relative-frame",
+        anchor = anchor,
+        children = {
+          {
+            type = "frame",
+            style = "quick_bar_inner_panel",
+            children = {
+              {
+                type = "sprite-button",
+                style = "slot_sized_button",
+                mouse_button_filter = {"left"},
+                sprite = "item/sp-spidertron-patrol-remote",
+                tooltip = game.item_prototypes["sp-spidertron-patrol-remote"].localised_description,
+                handler = {[defines.events.on_gui_click] = PatrolGuiGeneral.give_connected_remote},
+              },
+            }
+          }
+        }
+      }
+    })
+    return
+  end
 
   -- Avoid by setting (configurable) max height https://forums.factorio.com/viewtopic.php?f=7&t=98151
   local maximal_height = 930
   if script.active_mods["AutoTrash"] then maximal_height = 650 end
   maximal_height = maximal_height * player.mod_settings["sp-window-height-scale"].value
-  return gui.add(player.gui.relative, {
+  global.open_gui_elements[player.index] = gui.add(player.gui.relative, {
     {
       type = "frame",
       style = "sp_relative_stretchable_frame",
@@ -201,7 +234,7 @@ local function build_gui(player, spidertron)
       anchor = anchor,
       style_mods = {maximal_height = maximal_height},
       children = {
-          {type = "label", style = "frame_title", caption = {"gui-train.schedule"}, ignored_by_interaction = true},
+        {type = "label", style = "frame_title", caption = {"gui-train.schedule"}, ignored_by_interaction = true},
         {type = "flow", direction = "vertical", style = "inset_frame_container_vertical_flow", children = {
           {type = "frame", style = "inside_shallow_frame", children = {
             {
@@ -277,23 +310,14 @@ function PatrolGui.update_gui_schedule(waypoint_info)
         local scroll_pane = gui_elements["schedule-scroll-pane"]
         scroll_pane.clear()
         local waypoint_frames = build_waypoint_frames(waypoint_info)
-        if next(waypoint_frames) then
-          local new_gui_elements = gui.add(scroll_pane, waypoint_frames)
-          -- Copy across new gui elements to global storage
-          gui_elements.waypoint_dropdown = new_gui_elements.waypoint_dropdown
-          gui_elements.time_slider = new_gui_elements.time_slider
-          gui_elements.time_textfield = new_gui_elements.time_textfield
-          gui_elements.waypoint_button = new_gui_elements.waypoint_button
-        else
-          -- Clear GUI
-          local relative_frame = player.gui.relative["sp-relative-frame"]
-          if relative_frame then
-            relative_frame.destroy()
-          end
-          global.open_gui_elements[player.index] = nil
-        end
+        local new_gui_elements = gui.add(scroll_pane, waypoint_frames)
+        -- Copy across new gui elements to global storage
+        gui_elements.waypoint_dropdown = new_gui_elements.waypoint_dropdown
+        gui_elements.time_slider = new_gui_elements.time_slider
+        gui_elements.time_textfield = new_gui_elements.time_textfield
+        gui_elements.waypoint_button = new_gui_elements.waypoint_button
       else
-        global.open_gui_elements[player.index] = build_gui(player, spidertron)
+        build_gui(player, spidertron)
       end
     end
   end
@@ -352,7 +376,7 @@ script.on_event(defines.events.on_gui_opened,
       if relative_frame then
         relative_frame.destroy()
       end
-      global.open_gui_elements[player.index] = build_gui(player, entity)
+      build_gui(player, entity)
     end
   end
 )
@@ -442,7 +466,8 @@ function PatrolGui.toggle_on_patrol(player, spidertron, gui_elements)
   set_on_patrol(on_patrol, spidertron, waypoint_info)
 end
 
-function PatrolGui.give_connected_remote(player, spidertron, gui_elements)
+function PatrolGuiGeneral.give_connected_remote(player, spidertron)
+  -- Can be called from addon GUI
   if not player.is_cursor_empty() then
     local cleared = player.clear_cursor()
     if not cleared then return end
@@ -645,6 +670,16 @@ function PatrolGuiWaypoint.item_count_changed(player, spidertron, gui_elements, 
   local item_count = tonumber(text)
   item_count_info.count = item_count
 end
+
+gui.add_handlers(PatrolGuiGeneral,  -- For handlers called from the addon GUI as well
+  function(event, handler)
+    local player = game.get_player(event.player_index)
+    local spidertron = player.opened
+    if player.gui.relative["sp-relative-frame"] then
+      handler(player, spidertron)
+    end
+  end
+)
 
 gui.add_handlers(PatrolGui,
   function(event, handler)
