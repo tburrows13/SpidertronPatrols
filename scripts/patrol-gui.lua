@@ -254,10 +254,13 @@ function PatrolGui.update_gui_button_states(waypoint_info)
       if gui_elements then
         local scroll_pane = gui_elements["schedule-scroll-pane"]
         for i, frame in pairs(scroll_pane.children) do
-          local button_status = generate_button_status(waypoint_info, i)
           local status_button = frame.status_button
-          status_button.style = button_status.style
-          status_button.sprite = button_status.sprite
+          if status_button then
+            -- Filters out "Add waypoints" button
+            local button_status = generate_button_status(waypoint_info, i)
+            status_button.style = button_status.style
+            status_button.sprite = button_status.sprite
+          end
         end
       end
     end
