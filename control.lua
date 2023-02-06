@@ -120,17 +120,27 @@ script.on_event(defines.events.on_runtime_mod_setting_changed,
 )
 script.on_event(defines.events.on_player_joined_game, update_render_players)
 
-local function set_base_version()
+local function process_active_mods()
   local version = game.active_mods["base"]
   version = util.split(version, ".")
   for i=1, #version do
     version[i] = tonumber(version[i])
   end
   global.base_version = version
+
+  global.freight_forwarding_enabled = game.active_mods["FreightForwarding"] ~= nil
+  global.freight_forwarding_container_items = {}
+  if global.freight_forwarding_enabled then
+    for name, _ in pairs(game.item_prototypes) do
+      if name:sub(1, 15) == "deadlock-crate-" then
+        global.freight_forwarding_container_items[name] = true
+      end
+    end
+  end
 end
 
 local function setup()
-  set_base_version()
+  process_active_mods()
   global.spidertron_waypoints = {}     -- Indexed by spidertron.unit_number
   global.path_renders = {}  -- Indexed by player.index
   global.chart_tags = {} -- Indexed by render id
@@ -148,7 +158,7 @@ local function setup()
   end
 
 local function config_changed_setup(changed_data)
-  set_base_version()
+  process_active_mods()
   -- Only run when this mod was present in the previous save as well. Otherwise, on_init will run.
   local mod_changes = changed_data.mod_changes
   local old_version

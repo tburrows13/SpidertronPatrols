@@ -209,6 +209,26 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
   local dock_contents = dock_inventory.get_contents()
   local dock_filters = get_filters(dock_inventory)
 
+  -- If Freight Forwarder is installed, we need to spill an container items on the ground because they aren't allowed inside Spidertrons
+  if global.freight_forwarding_enabled then
+    local is_container = global.freight_forwarding_container_items
+    for item_name, count in pairs(dock_contents) do
+      if is_container[item_name] then
+        local position = dock.position
+        local removed = dock_inventory.remove({name = item_name, count = count})
+        if removed > 0 then
+          game.print({"freight-forwarding.containers-in-spider-vehicles", "[gps=" .. position.x .. "," .. position.y .. "," .. dock.surface.name .. "]"})
+          local spilled = dock.surface.spill_item_stack(
+            {position.x + 0.25, position.y + 2},
+            {name = item_name, count = removed}, true, nil, false)
+          if not next(spilled) then
+            game.print("Error: could not spill container from spidertron dock")
+          end
+        end
+      end
+    end
+  end
+
   local spidertron_filter_diff = filter_table_diff(spidertron_filters, previous_filters)
   for index, filter in pairs(spidertron_filter_diff) do
     if filter == -1 then
