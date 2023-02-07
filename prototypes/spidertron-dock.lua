@@ -23,7 +23,7 @@ local dock_recipe = {
   name = "sp-spidertron-dock",
   ingredients = {
     {"steel-chest", 4},
-    {"rocket-control-unit", 4}
+    {"stack-inserter", 4},
   },
   energy_required = 4,
   result = "sp-spidertron-dock",

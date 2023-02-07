@@ -19,7 +19,6 @@ local spiderling_tech = {
     "exoskeleton-equipment",
     "effectivity-module-2",
     "rocketry",
-    "rocket-control-unit",
   },
   unit = {
     count = 250,
@@ -47,6 +46,7 @@ local patrol_tech = {
   prerequisites = {
     "sp-spiderling",
     "automated-rail-transportation",
+    "stack-inserter",
   },
   unit = {
     count = 500,
@@ -91,29 +91,8 @@ if dock_enabled then
 end
 
 
-if (spiderling_enabled or dock_enabled) and not (mods["space-exploration"] or mods["nullius"]) then
-  -- Why would the mod be installed if all 3 are disabled...? No idea...
-
-  -- Move rocket control unit unlock earlier in the tech tree, so that spidertron remotes can also be crafed earlier but leave recipe unchanged
-  local rcu_tech = data.raw.technology["rocket-control-unit"]
-  rcu_tech.prerequisites = {
-    --"utility-science-pack",
-    "advanced-electronics-2",  -- Added
-    "speed-module",
-  }
-  rcu_tech.unit.ingredients =
-  {
-    {"automation-science-pack", 1},
-    {"logistic-science-pack", 1},
-    {"chemical-science-pack", 1},
-    --{"utility-science-pack", 1}
-  }
-  rcu_tech.unit.time = 30  -- Was 45
-end
-
-
 if spiderling_enabled then
-  -- Add spiderling, remove exoskeleton, rocketry and rocket-control-unit from spidertron prereqs because they are covered in spiderling
+  -- Add spiderling, remove exoskeleton and rocketry from spidertron prereqs because they are covered in spiderling
   local spidertron_tech = data.raw.technology.spidertron
   spidertron_tech.prerequisites = {
     "sp-spiderling",  -- Added
@@ -121,8 +100,13 @@ if spiderling_enabled then
     --"exoskeleton-equipment",
     "fusion-reactor-equipment",
     --"rocketry",
-    --"rocket-control-unit",
+    "rocket-control-unit",
     "effectivity-module-3"
   }
-  table.remove(spidertron_tech.effects, 2)  -- Remove spidertron remote unlock
+  for i, effect in pairs(spidertron_tech.effects) do
+    if effect.type == "unlock-recipe" and effect.recipe == "spidertron-remote" then
+      table.remove(spidertron_tech.effects, i)  -- Remove spidertron remote unlock
+      break
+    end
+  end
 end

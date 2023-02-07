@@ -69,7 +69,6 @@ local spiderling_recipe = {
   {
     {"exoskeleton-equipment", 2},
     {"rocket-launcher", 1},
-    {"rocket-control-unit", 4},
     {"low-density-structure", 40},
     {"radar", 1},
     {"effectivity-module-2", 2},

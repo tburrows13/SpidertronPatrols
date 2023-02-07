@@ -25,3 +25,9 @@ patrol_remote.localised_description = {
 
 data:extend{patrol_remote}
 
+if not mods["space-exploration"] then  -- RCU is unlocked earlier in SE so we don't need to change it
+  data.raw.recipe["spidertron-remote"].ingredients = {
+    {"processing-unit", 1},  -- Remove RCU requirement since it needs to be crafted at chemical science
+    {"radar", 1}
+  }
+end
