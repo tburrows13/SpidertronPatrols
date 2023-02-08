@@ -14,10 +14,11 @@ local spiderling_tech = {
     }
   },
   prerequisites = {
-    "military-3",
     "power-armor",
     "exoskeleton-equipment",
     "effectivity-module-2",
+    "low-density-structure",
+    "military-3",
     "rocketry",
   },
   unit = {
@@ -60,19 +61,7 @@ local patrol_tech = {
   }
 }
 
-if settings.startup["sp-remove-military-requirement"].value then
-  for _, tech in pairs{spiderling_tech, patrol_tech, data.raw.technology["spidertron"]} do
-    for i, ingredient in pairs(tech.unit.ingredients) do
-      if ingredient[1] == "military-science-pack" then
-        table.remove(tech.unit.ingredients, i)
-        break
-      end
-    end
-  end
-end
-
-if mods["Krastorio2"] then  -- SE undoes these changes
-  table.insert(spiderling_tech.prerequisites, "low-density-structure")
+if mods["Krastorio2"] then  -- SE undoes this so don't need to worry about K2+SE
   table.insert(spiderling_tech.prerequisites, "kr-radar")
 end
 

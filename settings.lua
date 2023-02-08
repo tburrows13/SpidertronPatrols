@@ -46,6 +46,12 @@ data:extend({
   },
 })
 
+if mods["nullius"] then
+  data.raw["bool-setting"]["sp-remove-military-requirement"].hidden = true
+  data.raw["bool-setting"]["sp-remove-military-requirement"].forced_value = false
+  data.raw["bool-setting"]["sp-remove-military-requirement"].default_value = false
+end
+
 -- Remove workaround for https://forums.factorio.com/98151
 local util = require "util"
 base_version = tonumber(util.split(mods["base"], ".")[3])
