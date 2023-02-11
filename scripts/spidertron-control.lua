@@ -19,33 +19,16 @@ local function check_condition(condition, a, b)
   end
 end
 
-local function snap_waypoint_position(surface, position)
+local function snap_waypoint_position(selected, position)
   -- Snap position to center of dock, or center of tile
-  -- Check for real dock
-  local docks = surface.find_entities_filtered{position = position, type = {"container", "logistic-container"}}
-  local dock_found = false
-  for _, dock in pairs(docks) do
-    if dock.name:sub(0, 19) == "sp-spidertron-dock-" then
-      position = dock.position
-      dock_found = true
-      break
-    end
+  if selected and (
+    selected.name:sub(0, 19) == "sp-spidertron-dock-" or
+    (selected.name == "entity-ghost" and selected.ghost_name:sub(0, 19) == "sp-spidertron-dock-")
+  ) then
+    return selected.position
+  else
+    return {x = math.floor(position.x) + 0.5, y = math.floor(position.y) + 0.5}
   end
-  if not dock_found then
-    -- Check for ghost dock
-    docks = surface.find_entities_filtered{position = position, ghost_type = {"container", "logistic-container"}}
-    for _, dock in pairs(docks) do
-      if dock.ghost_name:sub(0, 19) == "sp-spidertron-dock-" then
-        position = dock.position
-        dock_found = true
-        break
-      end
-    end
-    if not dock_found then
-      position = {x = math.floor(position.x) + 0.5, y = math.floor(position.y) + 0.5}
-    end
-  end
-  return position
 end
 
 function SpidertronControl.on_patrol_command_issued(spidertron, position)
@@ -54,8 +37,6 @@ function SpidertronControl.on_patrol_command_issued(spidertron, position)
   -- We are in patrol mode
   --log("Player used patrol remote on position " .. util.positiontostr(position))
 
-  position = snap_waypoint_position(spidertron.surface, position)
-
   -- Add to patrol
   local waypoint = {position = position, type = "none"}
   table.insert(waypoint_info.waypoints, waypoint)
@@ -63,7 +44,7 @@ function SpidertronControl.on_patrol_command_issued(spidertron, position)
   if waypoint_info.on_patrol then
     -- Send the spidertron to current_index waypoint, and add all other waypoints to autopilot_destinations
     local waypoints = waypoint_info.waypoints
-    local number_of_waypoints = #waypoints
+    --local number_of_waypoints = #waypoints
     local current_index = waypoint_info.current_index
     spidertron.autopilot_destination = waypoints[current_index].position
   else
@@ -83,10 +64,10 @@ script.on_event(defines.events.on_player_used_spider_remote,
     -- Prevent remote working on docked spidertrons from Space Spidertron
     if spidertron.name:sub(1, 10) == "ss-docked-" then return end
 
-    local position = event.position
     local remote = player.cursor_stack
 
     if remote.name == "sp-spidertron-patrol-remote" then
+      local position = snap_waypoint_position(player.selected, event.position)
       SpidertronControl.on_patrol_command_issued(spidertron, position)
     else
       local waypoint_info = get_waypoint_info(spidertron)
