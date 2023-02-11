@@ -66,7 +66,7 @@ local spiderling_recipe = {
   energy_required = 5,
   ingredients =
   {
-    {"exoskeleton-equipment", 2},
+    {"exoskeleton-equipment", 4},
     {"rocket-launcher", 1},
     {"low-density-structure", 40},
     {"radar", 1},
