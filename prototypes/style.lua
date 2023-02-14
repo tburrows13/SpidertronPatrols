@@ -1,5 +1,5 @@
 local styles = data.raw["gui-style"]["default"]
-local frame_width = 440
+local frame_width = 440 + 28 + 8 -4
 
 styles.sp_relative_stretchable_frame = {
   type = "frame_style",

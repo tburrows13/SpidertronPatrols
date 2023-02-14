@@ -141,6 +141,15 @@ local function build_waypoint_frames(waypoint_info)
         },
         {type = "empty-widget", style = "sp_empty_filler"},
         {
+          type = "sprite-button",
+          style = "train_schedule_action_button",
+          style_mods = {right_margin = -4},
+          mouse_button_filter = {"left"},
+          sprite = "item/sp-spidertron-patrol-remote",
+          tooltip = game.item_prototypes["sp-spidertron-patrol-remote"].localised_description,
+          handler = {[defines.events.on_gui_click] = PatrolGuiGeneral.give_connected_remote},
+        },
+        {
           type = "sprite-button", name = "up", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-up-white", hovered_sprite = "sp-up-black", clicked_sprite = "sp-up-black",
           ref = {"waypoint_button", i, "up"},
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.move_waypoint_up}, tags = {index = i},
