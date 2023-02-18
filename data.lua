@@ -1,4 +1,5 @@
 require "prototypes.spiderling"
+require "prototypes.spidertron-dock"
 require "prototypes.equipment-grid"
 require "prototypes.custom-input"
 require "prototypes.spidertron-remote"

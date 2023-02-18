@@ -1,5 +1,4 @@
 util = require "util"
 require "scripts.utils"
-require "prototypes.spidertron-dock"
 sp_data_stage = "data-updates"
 require "prototypes.nullius"

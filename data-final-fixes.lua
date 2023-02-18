@@ -1,4 +1,4 @@
-require "prototypes.spidertron-dock"  -- In case inventory sizes have changed since data-updates
+require "prototypes.spidertron-dock-final-fixes"  -- In case inventory sizes have changed since data
 
 sp_data_stage = "data-final-fixes"
 require "prototypes.nullius"

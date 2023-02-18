@@ -14,7 +14,7 @@ local dock_item = {
   icon_size = 64,
   stack_size = 50,
   place_result = "sp-spidertron-dock-0",
-  order = "b[personal-transport]-c[spidertron]-c[[dock]",  -- [[ ensures that it is ordered before all spidertron-logistics items
+  order = "b[personal-transport]-c[spidertron]-c[[dock]",  -- '[[' ensures that it is ordered before all spidertron-logistics items
   subgroup = "transport",
 }
 
@@ -30,24 +30,25 @@ local dock_recipe = {
   enabled = false
 }
 
+local dock_type = "container"
+local logistic_mode
+if settings.startup["sp-dock-is-requester"].value then
+  dock_type = "logistic-container"
+  logistic_mode = "requester"
+end
 
--- "container" definition doesn't support filters, but does support circuit connections
 local function create_spidertron_dock(inventory_size, closing)
-  local type = "container"
-  local logistic_mode
-  if settings.startup["sp-dock-is-requester"].value then
-    type = "logistic-container"
-    logistic_mode = "requester"
-  end
   local name = "sp-spidertron-dock-" .. inventory_size
-  if closing then name = "sp-spidertron-dock-closing" end
-  if data.raw[type][name] then return end
+  if closing then
+    name = "sp-spidertron-dock-closing"
+  end
+
   local filename = "spidertron-dock-open.png"
   if inventory_size == 0 and not closing then
     filename = "spidertron-dock-closed.png"
   end
   local dock = {
-    type = type,
+    type = dock_type,
     logistic_mode = logistic_mode,
     name = name,
     localised_name = {"entity-name.sp-spidertron-dock"},
@@ -121,16 +122,12 @@ local function create_spidertron_dock(inventory_size, closing)
   data:extend{dock}
 end
 
-local sizes_created = {0}
 create_spidertron_dock(0)
 create_spidertron_dock(0, true)  -- "closing" dock, used while the closing animation is being played
-for _, spider_prototype in pairs(data.raw["spider-vehicle"]) do
-  local inventory_size = spider_prototype.inventory_size
-  if not contains(sizes_created, inventory_size) then
-    create_spidertron_dock(inventory_size)
-    table.insert(sizes_created, inventory_size)
-  end
-end
+
+-- Standard dock for deepcopying in data-final-fixes
+-- Doesn't actually matter if the spidertron ends up with a different inventory_size to 80
+create_spidertron_dock(80)
 
 local open_animation = {
   type = "animation",
