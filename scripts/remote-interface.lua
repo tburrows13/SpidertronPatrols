@@ -63,5 +63,19 @@ local function connect_to_remote_interfaces()
 end
 script.on_load(connect_to_remote_interfaces)
 
+-- Milestones will ignore it if spiderling is disabled
+remote.add_interface("SpidertronPatrolsMilestones", {
+  milestones_preset_addons = function()
+    return {
+      ["Spidertron Patrols"] = {
+        required_mods = {"SpidertronPatrols"},
+        milestones = {
+            {type="group", name="Progress"},
+            {type="item",  name="sp-spiderling", quantity=1},
+        }
+      }
+    }
+  end
+})
 
 return {on_spidertron_given_new_destination = on_spidertron_given_new_destination, connect_to_remote_interfaces = connect_to_remote_interfaces}
