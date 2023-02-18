@@ -140,27 +140,28 @@ function update_player_render_paths(player)
   end
 
   -- Create new path renders if necessary
-  local rendered_spidertrons = {}  -- Ensure that we don't render the same spidertron's path twice if it falls into multiple of the following categories
+  -- Early returns are to ensure that we don't render the same spidertron's path twice if it falls into multiple of the following categories
   local cursor_stack = player.cursor_stack
   if cursor_stack and cursor_stack.valid_for_read
       and (cursor_stack.name == "sp-spidertron-patrol-remote")
       and cursor_stack.connected_entity then
     create_render_paths(cursor_stack.connected_entity, player, true)
-    rendered_spidertrons[cursor_stack.connected_entity.unit_number] = true
+    return
   end
   local vehicle = player.vehicle
-  if vehicle and vehicle.type == "spider-vehicle" and not rendered_spidertrons[vehicle.unit_number] then
+  if vehicle and vehicle.type == "spider-vehicle" then
     create_render_paths(vehicle, player, false)
-    rendered_spidertrons[vehicle.unit_number] = true
+    return
   end
   local opened = player.opened
-  if opened and player.opened_gui_type == defines.gui_type.entity and opened.type == "spider-vehicle" and not rendered_spidertrons[opened.unit_number] then
+  if opened and player.opened_gui_type == defines.gui_type.entity and opened.type == "spider-vehicle" then
     create_render_paths(opened, player, false)
-    rendered_spidertrons[opened.unit_number] = true
+    return
   end
   local selected = player.selected
-  if selected and selected.type == "spider-vehicle" and not rendered_spidertrons[selected.unit_number] then
+  if selected and selected.type == "spider-vehicle" then
     create_render_paths(selected, player, false)
+    return
   end
 end
 
