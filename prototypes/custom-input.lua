@@ -1,19 +1,26 @@
 -- Misc inputs
-local delete_waypoints_key = {
-  type = "custom-input",
-  name = "sp-delete-all-waypoints",
-  key_sequence = "CONTROL + mouse-button-2",
-  consuming = "none",
-  order = "aa"
+data:extend{
+  {
+    type = "custom-input",
+    name = "sp-replace-previous-waypoint",
+    key_sequence = "SHIFT + mouse-button-1",
+    consuming = "none",
+    order = "a"
+  },
+  {
+    type = "custom-input",
+    name = "sp-delete-all-waypoints",
+    key_sequence = "CONTROL + mouse-button-2",
+    consuming = "none",
+    order = "b"
+  },
+  {
+    type = "custom-input",
+    name = "sp-confirm-gui",
+    key_sequence = "",
+    linked_game_control = "confirm-gui"
+  }
 }
-
-local confirm_gui_key = {
-  type = "custom-input",
-  name = "sp-confirm-gui",
-  key_sequence = "",
-  linked_game_control = "confirm-gui"
-}
-data:extend{delete_waypoints_key, confirm_gui_key}
 
 -- Allows getting movement control events to detect when to turn on 'manual' mode
 data:extend{

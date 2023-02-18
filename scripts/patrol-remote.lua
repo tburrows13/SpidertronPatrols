@@ -1,4 +1,5 @@
 local PatrolRemote = {}
+local replace_this_tick = {}  -- Shouldn't desync as long as comparison is only made to current tick
 
 local function snap_waypoint_position(selected, position)
   -- Snap position to center of dock, or center of tile
@@ -11,6 +12,12 @@ local function snap_waypoint_position(selected, position)
     return {x = math.floor(position.x) + 0.5, y = math.floor(position.y) + 0.5}
   end
 end
+
+script.on_event("sp-replace-previous-waypoint",
+  function(event)
+    replace_this_tick[event.player_index] = event.tick
+  end
+)
 
 script.on_event(defines.events.on_player_used_spider_remote,
   function(event)
@@ -26,8 +33,9 @@ script.on_event(defines.events.on_player_used_spider_remote,
     if remote.name == "sp-spidertron-patrol-remote" then
       local position = snap_waypoint_position(player.selected, event.position)
       local waypoint_index = global.remotes_in_cursor[player.index]
-      SpidertronControl.on_patrol_command_issued(spidertron, position, waypoint_index)
-      if waypoint_index then
+      local replace_waypoint = replace_this_tick[event.player_index] == event.tick
+      SpidertronControl.on_patrol_command_issued(spidertron, position, waypoint_index, replace_waypoint)
+      if waypoint_index and not replace_waypoint then
         global.remotes_in_cursor[player.index] = waypoint_index + 1
       end
     else

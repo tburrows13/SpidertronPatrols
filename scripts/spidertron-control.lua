@@ -19,7 +19,7 @@ local function check_condition(condition, a, b)
   end
 end
 
-function SpidertronControl.on_patrol_command_issued(spidertron, position, index)
+function SpidertronControl.on_patrol_command_issued(spidertron, position, index, replace)
   -- Called when remote used and on remote interface call
   local waypoint_info = get_waypoint_info(spidertron)
   -- We are in patrol mode
@@ -27,10 +27,11 @@ function SpidertronControl.on_patrol_command_issued(spidertron, position, index)
 
   -- Add to patrol
   local waypoint = {position = position, type = "none"}
-  if index then
-    table.insert(waypoint_info.waypoints, index + 1, waypoint)
+  if not index then index = #waypoint_info.waypoints end
+  if replace then
+    waypoint_info.waypoints[index] = waypoint
   else
-    table.insert(waypoint_info.waypoints, waypoint)
+    table.insert(waypoint_info.waypoints, index + 1, waypoint)
   end
 
   if waypoint_info.on_patrol then
