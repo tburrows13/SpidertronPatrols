@@ -146,7 +146,7 @@ local function build_waypoint_frames(waypoint_info)
           style_mods = {right_margin = -4},
           mouse_button_filter = {"left"},
           sprite = "item/sp-spidertron-patrol-remote",
-          tooltip = game.item_prototypes["sp-spidertron-patrol-remote"].localised_description,
+          tooltip = {"", {"gui-patrol.insert-after-waypoint"}, "\n", game.item_prototypes["sp-spidertron-patrol-remote"].localised_description},
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.give_connected_remote_for_waypoint}, tags = {index = i},
         },
         {
