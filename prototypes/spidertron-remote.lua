@@ -17,6 +17,8 @@ patrol_remote.localised_description = {
   line_start,
   {"item-description.sp-create-waypoint"},
   line_start,
+  {"item-description.sp-replace-waypoint"},
+  line_start,
   {"item-description.sp-delete-waypoints"},
   line_start,
   {"item-description.spe-open-inventory"},
