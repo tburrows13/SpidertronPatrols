@@ -4,6 +4,7 @@ RemoteInterface = require "scripts.remote-interface"
 local Dock = require "scripts.dock"
 local PatrolGui = require "scripts.patrol-gui"
 SpidertronControl = require "scripts.spidertron-control"
+PatrolRemote = require "scripts.patrol-remote"
 require "scripts.waypoint-rendering"
 
 --[[
@@ -144,6 +145,7 @@ local function setup()
   global.spidertron_waypoints = {}     -- Indexed by spidertron.unit_number
   global.path_renders = {}  -- Indexed by player.index
   global.chart_tags = {} -- Indexed by render id
+  global.remotes_in_cursor = {} -- Indexed by player.index
 
   global.spidertron_docks = {}
   global.spidertrons_docked = {}
@@ -199,6 +201,10 @@ local function config_changed_setup(changed_data)
     if old_version[2] < 3 or (old_version[2] == 3 and old_version[3] < 2) then
       -- Pre 2.3.2
       global.chart_tags = {}
+    end
+    if old_version[2] < 4 then
+      -- Pre 2.4
+      global.remotes_in_cursor = {}
     end
     if old_version[2] < 2 then
       -- Pre 2.2. Has to go at end so that globals can be initialized first.

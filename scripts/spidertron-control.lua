@@ -19,19 +19,7 @@ local function check_condition(condition, a, b)
   end
 end
 
-local function snap_waypoint_position(selected, position)
-  -- Snap position to center of dock, or center of tile
-  if selected and (
-    selected.name:sub(0, 19) == "sp-spidertron-dock-" or
-    (selected.name == "entity-ghost" and selected.ghost_name:sub(0, 19) == "sp-spidertron-dock-")
-  ) then
-    return selected.position
-  else
-    return {x = math.floor(position.x) + 0.5, y = math.floor(position.y) + 0.5}
-  end
-end
-
-function SpidertronControl.on_patrol_command_issued(spidertron, position)
+function SpidertronControl.on_patrol_command_issued(spidertron, position, index)
   -- Called when remote used and on remote interface call
   local waypoint_info = get_waypoint_info(spidertron)
   -- We are in patrol mode
@@ -39,7 +27,11 @@ function SpidertronControl.on_patrol_command_issued(spidertron, position)
 
   -- Add to patrol
   local waypoint = {position = position, type = "none"}
-  table.insert(waypoint_info.waypoints, waypoint)
+  if index then
+    table.insert(waypoint_info.waypoints, index + 1, waypoint)
+  else
+    table.insert(waypoint_info.waypoints, waypoint)
+  end
 
   if waypoint_info.on_patrol then
     -- Send the spidertron to current_index waypoint, and add all other waypoints to autopilot_destinations
@@ -54,28 +46,6 @@ function SpidertronControl.on_patrol_command_issued(spidertron, position)
   update_render_text(spidertron)  -- Inserts text at the position that we have just added
 end
 
-
-script.on_event(defines.events.on_player_used_spider_remote,
-  function(event)
-    if not event.success then return end
-
-    local player = game.get_player(event.player_index)
-    local spidertron = event.vehicle
-    -- Prevent remote working on docked spidertrons from Space Spidertron
-    if spidertron.name:sub(1, 10) == "ss-docked-" then return end
-
-    local remote = player.cursor_stack
-
-    if remote.name == "sp-spidertron-patrol-remote" then
-      local position = snap_waypoint_position(player.selected, event.position)
-      SpidertronControl.on_patrol_command_issued(spidertron, position)
-    else
-      local waypoint_info = get_waypoint_info(spidertron)
-      waypoint_info.on_patrol = false
-      PatrolGui.update_gui_switch(waypoint_info)
-    end
-  end
-)
 
 ---------------------------------------------------------------------------------------------------
 

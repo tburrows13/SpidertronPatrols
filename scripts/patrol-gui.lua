@@ -147,7 +147,7 @@ local function build_waypoint_frames(waypoint_info)
           mouse_button_filter = {"left"},
           sprite = "item/sp-spidertron-patrol-remote",
           tooltip = game.item_prototypes["sp-spidertron-patrol-remote"].localised_description,
-          handler = {[defines.events.on_gui_click] = PatrolGuiGeneral.give_connected_remote},
+          handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.give_connected_remote_for_waypoint}, tags = {index = i},
         },
         {
           type = "sprite-button", name = "up", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-up-white", hovered_sprite = "sp-up-black", clicked_sprite = "sp-up-black",
@@ -477,13 +477,11 @@ end
 
 function PatrolGuiGeneral.give_connected_remote(player, spidertron)
   -- Can be called from addon GUI
-  if not player.is_cursor_empty() then
-    local cleared = player.clear_cursor()
-    if not cleared then return end
-  end
-  local cursor = player.cursor_stack
-  cursor.set_stack("sp-spidertron-patrol-remote")
-  cursor.connected_entity = spidertron
+  PatrolRemote.give_remote(player, spidertron)
+end
+
+function PatrolGuiWaypoint.give_connected_remote_for_waypoint(player, spidertron, gui_elements, waypoint_info, index)
+  PatrolRemote.give_remote(player, spidertron, index)
 end
 
 function PatrolGuiWaypoint.go_to_waypoint(player, spidertron, gui_elements, waypoint_info, index)
