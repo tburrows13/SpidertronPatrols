@@ -5,7 +5,7 @@ local Dock = require "scripts.dock"
 local PatrolGui = require "scripts.patrol-gui"
 SpidertronControl = require "scripts.spidertron-control"
 PatrolRemote = require "scripts.patrol-remote"
-require "scripts.waypoint-rendering"
+local WaypointRendering = require "scripts.waypoint-rendering"
 
 --[[
 Globals:
@@ -105,6 +105,7 @@ script.on_event(defines.events.on_entity_destroyed,
 script.on_event(defines.events.on_tick,
   function(event)
     Dock.on_tick(event)
+    WaypointRendering.on_tick(event)
     PatrolGui.update_gui_highlights()
     SpidertronControl.handle_spider_stopping()
   end
@@ -146,6 +147,7 @@ local function setup()
   global.path_renders = {}  -- Indexed by player.index
   global.chart_tags = {} -- Indexed by render id
   global.remotes_in_cursor = {} -- Indexed by player.index
+  global.blinking_renders = {} -- Indexed by player.index
 
   global.spidertron_docks = {}
   global.spidertrons_docked = {}
@@ -205,6 +207,7 @@ local function config_changed_setup(changed_data)
     if old_version[2] < 4 then
       -- Pre 2.4
       global.remotes_in_cursor = {}
+      global.blinking_renders = {}
     end
     if old_version[2] < 2 then
       -- Pre 2.2. Has to go at end so that globals can be initialized first.

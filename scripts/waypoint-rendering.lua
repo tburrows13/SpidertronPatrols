@@ -12,6 +12,27 @@ local function colors_eq(color1, color2)
   return color1.r == color2.r and color1.g == color2.g and color1.b == color2.b and color1.a == color2.a
 end
 
+local WaypointRendering = {}
+
+local BLINK_LENGTH = 30
+
+function WaypointRendering.on_tick(event)
+  local tick = event.tick
+  for _, player_render_ids in pairs(global.blinking_renders) do
+    for render_id, toggle_tick in pairs(player_render_ids) do
+      if rendering.is_valid(render_id) then
+        if toggle_tick == tick then
+          rendering.set_visible(render_id, not rendering.get_visible(render_id))
+          player_render_ids[render_id] = tick + BLINK_LENGTH
+        end
+      else
+        player_render_ids[render_id] = nil
+      end
+    end
+  end
+end
+
+
 local function create_render_paths(spidertron, player, create_chart_tags)
   local waypoint_info = get_waypoint_info(spidertron)
 
@@ -19,10 +40,17 @@ local function create_render_paths(spidertron, player, create_chart_tags)
   local surface = spidertron.surface.name
   local force = player.force
 
-  local path_render_ids = {}
-
   local waypoints = waypoint_info.waypoints
   local number_of_waypoints = #waypoints
+
+  local path_render_ids = {}
+  local blinking_render_ids = global.blinking_renders[player.index] or {}
+  global.blinking_renders[player.index] = blinking_render_ids
+  local waypoint_index_to_blink = global.remotes_in_cursor[player.index]
+  if waypoint_index_to_blink == -1 then
+    waypoint_index_to_blink = number_of_waypoints
+  end
+
   for i, waypoint in pairs(waypoints) do
     -- First draw waypoint number like in update_render_text() in case alt-mode is not on
     local render_id = rendering.draw_text{
@@ -36,6 +64,9 @@ local function create_render_paths(spidertron, player, create_chart_tags)
       players = {player},
     }
     table.insert(path_render_ids, render_id)
+    if i == waypoint_index_to_blink then
+      blinking_render_ids[render_id] = game.tick + BLINK_LENGTH
+    end
 
     if create_chart_tags then
       local tag = force.add_chart_tag(surface, {
@@ -79,6 +110,9 @@ local function create_render_paths(spidertron, player, create_chart_tags)
       }
 
       table.insert(path_render_ids, render_id)
+      if i == waypoint_index_to_blink then
+        blinking_render_ids[render_id] = game.tick + BLINK_LENGTH
+      end  
 
       if create_chart_tags then
         -- Show patrol paths in map view using chart tags
@@ -171,6 +205,14 @@ script.on_event({defines.events.on_player_cursor_stack_changed,
                  defines.events.on_selected_entity_changed},
   function(event)
     local player = game.get_player(event.player_index)
+
+    if event.name == defines.events.on_player_cursor_stack_changed then
+      local remote = player.cursor_stack
+      if not remote.valid_for_read or remote.name ~= "sp-spidertron-patrol-remote" then
+        global.remotes_in_cursor[player.index] = nil
+      end
+    end
+
     update_player_render_paths(player)
   end
 )
@@ -202,6 +244,9 @@ function update_render_text(spidertron)
       end
       if not colors_eq(rendering.get_color(render_id), color) then
         rendering.set_color(render_id, color)
+      end
+      if not table_equals(rendering.get_target(render_id).position, waypoint.position) then
+        rendering.set_target(render_id, waypoint.position)
       end
     else
       -- We need to create the text
@@ -249,3 +294,5 @@ function update_render_players()
 
   global.render_players = render_players
 end
+
+return WaypointRendering
