@@ -26,11 +26,13 @@ function SpidertronControl.on_patrol_command_issued(spidertron, position, index,
   --log("Player used patrol remote on position " .. util.positiontostr(position))
 
   -- Add to patrol
-  local waypoint = {position = position, type = "none"}
   if not index then index = #waypoint_info.waypoints end
   if replace then
+    local waypoint = waypoint_info.waypoints[index]
+    waypoint.position = position
     waypoint_info.waypoints[index] = waypoint
   else
+    local waypoint = {position = position, type = "none"}
     table.insert(waypoint_info.waypoints, index + 1, waypoint)
   end
 
