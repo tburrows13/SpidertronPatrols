@@ -1,4 +1,24 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.4.0
+Date: 22 February 2023
+  Features:
+    - Changed remote interaction
+      - Patrol remote is no longer craftable, instead it is given for free
+      - Patrol remote can be accessed from the spidertron's GUI, or from patrol remote pipetting a spidertron (Control + Shift + Q)
+      - Each waypoint has a button for inserting waypoints immediately after it
+      - Shift click with patrol remote to move the previous waypoint instead
+    - Waypoint positions are snapped to the grid (and the center of spidertron docks)
+    - Compatibility with upcoming Freight Forwarding and Exotic Industries overhauls
+    - Added spiderling milestone when using Milestones mod
+  Changes:
+    - Spiderling, dock, and regular remote no longer require rocket control units to craft (unless playing with SE)
+    - Dock recipe now requires 4 stack inserters
+    - Spiderling recipe now requires 4 exoskeletons instead of 2
+    - Regular remote now requires processing units (unless playing with SE)
+    - As a result, fixed incompatibility with BZ Graphite & Diamonds
+  Bugfixes:
+    - "Remove military science requirement" now actually works
+---------------------------------------------------------------------------------------------------
 Version: 2.3.2
 Date: 28 January 2023
   Features:
