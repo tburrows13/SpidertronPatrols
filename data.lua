@@ -8,6 +8,7 @@ require "prototypes.style"
 require "prototypes.sprite"
 sp_data_stage = "data"
 require "prototypes.nullius"
+require "prototypes.industrial-revolution"
 require "prototypes.space-exploration"
 require "prototypes.signal"
 
