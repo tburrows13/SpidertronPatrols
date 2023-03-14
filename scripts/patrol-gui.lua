@@ -4,44 +4,74 @@ PatrolGui = {}
 local PatrolGuiWaypoint = {}
 local PatrolGuiGeneral = {}
 
-dropdown_contents = {
-  {"description.no-limit"},
-  {"gui-train.add-time-condition"},
-  {"gui-train.add-inactivity-condition"},
-  {"gui-patrol.full-inventory-condition"},
-  {"gui-patrol.empty-inventory-condition"},
-  {"gui-train.add-item-count-condition"},
-  {"gui-train.add-circuit-condition"},
-  {"gui-train.add-robots-inactive-condition"},
-  {"gui-patrol.driver-present"},
-  {"gui-patrol.driver-not-present"},
-}
+local function has_fuel_inventory(spidertron)
+  return not not spidertron.get_fuel_inventory()
+end
 
-dropdown_index = {
-  ["none"] = 1,
-  ["time-passed"] = 2,
-  ["inactivity"] = 3,
-  ["full-inventory"] = 4,
-  ["empty-inventory"] = 5,
-  ["item-count"] = 6,
-  ["circuit-condition"] = 7,
-  ["robots-inactive"] = 8,
-  ["passenger-present"] = 9,
-  ["passenger-not-present"] = 10,
-}
+local function dropdown_contents(spidertron)
+  local contents = {
+    {"description.no-limit"},
+    {"gui-train.add-time-condition"},
+    {"gui-train.add-inactivity-condition"},
+    {"gui-patrol.full-inventory-condition"},
+    {"gui-patrol.empty-inventory-condition"},
+    {"gui-train.add-item-count-condition"},
+    {"gui-patrol.fuel-full-condition"},
+    {"gui-train.add-circuit-condition"},
+    {"gui-train.add-robots-inactive-condition"},
+    {"gui-patrol.driver-present"},
+    {"gui-patrol.driver-not-present"},
+  }
+  if not has_fuel_inventory(spidertron) then
+    table.remove(contents, 7)
+  end
+  return contents
+end
 
-dropdown_index_lookup = {
-  "none",
-  "time-passed",
-  "inactivity",
-  "full-inventory",
-  "empty-inventory",
-  "item-count",
-  "circuit-condition",
-  "robots-inactive",
-  "passenger-present",
-  "passenger-not-present",
-}
+
+local function dropdown_index_lookup(index, spidertron)
+  local lookup = {
+    "none",
+    "time-passed",
+    "inactivity",
+    "full-inventory",
+    "empty-inventory",
+    "item-count",
+    "fuel-full",
+    "circuit-condition",
+    "robots-inactive",
+    "passenger-present",
+    "passenger-not-present",
+  }
+  if not has_fuel_inventory(spidertron) then
+    table.remove(lookup, 7)
+  end
+  return lookup[index]
+end
+
+local function dropdown_index(wait_condition, spidertron)
+  local lookup = {
+    "none",
+    "time-passed",
+    "inactivity",
+    "full-inventory",
+    "empty-inventory",
+    "item-count",
+    "fuel-full",
+    "circuit-condition",
+    "robots-inactive",
+    "passenger-present",
+    "passenger-not-present",
+  }
+  if not has_fuel_inventory(spidertron) then
+    table.remove(lookup, 7)
+  end
+  for i, condition in pairs(lookup) do
+    if condition == wait_condition then
+      return i
+    end
+  end
+end
 
 
 condition_dropdown_contents = {">", "<", "=", "≥", "≤", "≠"}
@@ -114,7 +144,7 @@ local function generate_button_status(waypoint_info, index)
   return {style = style, sprite = sprite}
 end
 
-local function build_waypoint_frames(waypoint_info)
+local function build_waypoint_frames(waypoint_info, spidertron)
   --waypoint_info.waypoints = {{type = "none"}, {type = "time-passed", wait_time = 5}, {type = "inactivity", wait_time = 10}}--{type = "full-inventory"}, {type = "empty-inventory"}, {type = "robots-inactive"}, {type = "passenger-present"}, {type = "passenger-not-present"}, {type = "none"}, {type = "time-passed", wait_time = 5}, {type = "inactivity", wait_time = 10}, {type = "full-inventory"}, {type = "empty-inventory"}, {type = "robots-inactive"}, {type = "passenger-present"}, {type = "passenger-not-present"}, {type = "none"}, {type = "time-passed", wait_time = 5}, {type = "inactivity", wait_time = 10}, {type = "full-inventory"}, {type = "empty-inventory"}, {type = "robots-inactive"}, {type = "passenger-present"}, {type = "passenger-not-present"}}
   local frames = {}
   for i, waypoint in pairs(waypoint_info.waypoints) do
@@ -130,7 +160,7 @@ local function build_waypoint_frames(waypoint_info)
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.move_camera_to_waypoint}, tags = {index = i},
         },
         {
-          type = "drop-down", items = dropdown_contents, selected_index = dropdown_index[waypoint.type],
+          type = "drop-down", items = dropdown_contents(spidertron), selected_index = dropdown_index(waypoint.type, spidertron),
           ref = {"waypoint_dropdown", i},
           tooltip = waypoint.type == "circuit-condition" and {"gui-patrol.circuit-condition-tooltip"} or nil,
           handler = {[defines.events.on_gui_selection_state_changed] = PatrolGuiWaypoint.waypoint_type_changed}, tags = {index = i},
@@ -278,7 +308,7 @@ local function build_gui(player, spidertron)
               }},
             }},
             {type = "scroll-pane", style = "sp_spidertron_schedule_scroll_pane", name = "schedule-scroll-pane", horizontal_scroll_policy = "never", vertical_scroll_policy = "auto-and-reserve-space", children =
-              build_waypoint_frames(waypoint_info)
+              build_waypoint_frames(waypoint_info, spidertron)
             }
           }},
         }},
@@ -318,7 +348,7 @@ function PatrolGui.update_gui_schedule(waypoint_info)
       if gui_elements then
         local scroll_pane = gui_elements["schedule-scroll-pane"]
         scroll_pane.clear()
-        local waypoint_frames = build_waypoint_frames(waypoint_info)
+        local waypoint_frames = build_waypoint_frames(waypoint_info, spidertron)
         local new_gui_elements = gui.add(scroll_pane, waypoint_frames)
         -- Copy across new gui elements to global storage
         gui_elements.waypoint_dropdown = new_gui_elements.waypoint_dropdown
@@ -505,7 +535,7 @@ end
 function PatrolGuiWaypoint.waypoint_type_changed(player, spidertron, gui_elements, waypoint_info, index, element)
   local dropdown = gui_elements.waypoint_dropdown[index]
   local waypoint = waypoint_info.waypoints[index]
-  local new_waypoint_type = dropdown_index_lookup[dropdown.selected_index]
+  local new_waypoint_type = dropdown_index_lookup(dropdown.selected_index, spidertron)
   if waypoint.type ~= new_waypoint_type then
     waypoint.type = new_waypoint_type
     element.tooltip = nil

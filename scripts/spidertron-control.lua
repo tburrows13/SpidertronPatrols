@@ -160,6 +160,17 @@ local function handle_wait_timers()
         if check_condition(item_count_info.condition, item_count, item_count_info.count) then
           SpidertronControl.go_to_next_waypoint(spidertron)
         end
+      elseif waypoint_type == "fuel-full" then
+        local fuel_inventory = spidertron.get_fuel_inventory()
+        if fuel_inventory then
+          if fuel_inventory.is_full() then
+            SpidertronControl.go_to_next_waypoint(spidertron)
+          end
+        else
+          -- Spidertron prototype no longer allows fuel, so reset its waypoint type
+          waypoint.type = "none"
+          SpidertronControl.go_to_next_waypoint(spidertron)
+        end
       elseif waypoint_type == "circuit-condition" then
         local item_count_info = waypoint.item_count_info
         local dock_unit_number = global.spidertrons_docked[spidertron.unit_number]
