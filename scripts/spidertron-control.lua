@@ -92,7 +92,7 @@ end
 
 function SpidertronControl.handle_spider_stopping()
   for _, waypoint_info in pairs(global.spidertron_waypoints) do
-    if waypoint_info.on_patrol and waypoint_info.tick_arrived and not waypoint_info.stopped then
+    if waypoint_info.on_patrol and waypoint_info.tick_arrived and not waypoint_info.stopped and waypoint_info.spidertron.valid then
       local spidertron = waypoint_info.spidertron
       local waypoint = waypoint_info.waypoints[waypoint_info.current_index]
       local waypoint_position = waypoint.position
@@ -123,7 +123,7 @@ end
 
 local function handle_wait_timers()
   for _, waypoint_info in pairs(global.spidertron_waypoints) do
-    if waypoint_info.on_patrol and waypoint_info.tick_arrived then
+    if waypoint_info.on_patrol and waypoint_info.tick_arrived and waypoint_info.spidertron.valid then
       -- Spidertron is waiting
       local spidertron = waypoint_info.spidertron
       local waypoint = waypoint_info.waypoints[waypoint_info.current_index]
