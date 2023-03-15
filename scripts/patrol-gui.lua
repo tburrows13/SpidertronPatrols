@@ -667,7 +667,12 @@ function PatrolGuiWaypoint.update_text_field(player, spidertron, gui_elements, w
 end
 
 function PatrolGuiWaypoint.update_slider(player, spidertron, gui_elements, waypoint_info, index)
-  local text = gui_elements.time_textfield[index].text
+  local text_field = gui_elements.time_textfield[index]
+
+   -- If the user tabbed into the textbox, then remove_s won't have been called, so need to filter out all non-digits
+  local text = text_field.text:gsub("%D", "")
+  text_field.text = text
+
   if text == "" then text = "0" end
   local wait_time = tonumber(text)
   gui_elements.time_slider[index].slider_value = slider_value_index(wait_time)
