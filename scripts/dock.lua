@@ -209,7 +209,7 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
   local dock_contents = dock_inventory.get_contents()
   local dock_filters = get_filters(dock_inventory)
 
-  -- If Freight Forwarder is installed, we need to spill an container items on the ground because they aren't allowed inside Spidertrons
+  -- If Freight Forwarding is installed, we need to spill an container items on the ground because they aren't allowed inside spidertrons
   if global.freight_forwarding_enabled then
     local is_container = global.freight_forwarding_container_items
     for item_name, count in pairs(dock_contents) do

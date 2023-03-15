@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.4.1
+Date: 15 March 2023
+  Features:
+    - Added 'Fuel full' wait condition (only visible when the spidertron requires fuel, e.g. with Krastorio 2 or Exotic Industries)
+    - Fully compatible with Industrial Revolution 3
+  Bugfixes:
+    - Fixed crash when tabbing into wait condition time textfields
+---------------------------------------------------------------------------------------------------
 Version: 2.4.0
 Date: 22 February 2023
   Features:
