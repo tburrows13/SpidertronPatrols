@@ -425,11 +425,8 @@ script.on_event(defines.events.on_gui_closed,
     local player = game.get_player(event.player_index)
     local entity = event.entity
     if entity and entity.type == "spider-vehicle" then
-      local relative_frame = player.gui.relative["sp-relative-frame"]
-      if relative_frame then
-        relative_frame.destroy()
-      end
-      global.open_gui_elements[player.index] = nil
+      -- Can't close relative GUI here because when SpidertronEnhancements/RemoteConfiguration re-opens
+      -- the GUI in on_gui_closed, we recieve on_gui_closed after on_gui_opened
 
       -- Spidertron's color could have changed
       update_render_text(entity)
