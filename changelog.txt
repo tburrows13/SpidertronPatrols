@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.4.2
+Date: 16 March 2023
+  Bugfixes:
+    - Fixed that schedule GUI wouldn't show when the spidertron inventory is opened remotely
+    - Fixed that only one spidertron's path would be drawn at a time
+---------------------------------------------------------------------------------------------------
 Version: 2.4.1
 Date: 15 March 2023
   Features:
