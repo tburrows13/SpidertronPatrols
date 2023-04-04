@@ -134,7 +134,8 @@ local function process_active_mods()
   global.freight_forwarding_container_items = {}
   if global.freight_forwarding_enabled then
     for name, _ in pairs(game.item_prototypes) do
-      if name:sub(1, 15) == "deadlock-crate-" then
+      if name:sub(1, 15) == "deadlock-crate-" or name:sub(1, 13) == "ic-container-" then
+        -- Old versions of FF use DCM, newer versions use IC
         global.freight_forwarding_container_items[name] = true
       end
     end
