@@ -27,7 +27,7 @@ function SpidertronControl.on_patrol_command_issued(spidertron, position, index,
 
   -- Add to patrol
   if not index then index = #waypoint_info.waypoints end
-  if replace then
+  if replace and #waypoint_info.waypoints > 0 then
     local waypoint = waypoint_info.waypoints[index]
     waypoint.position = position
     waypoint_info.waypoints[index] = waypoint
