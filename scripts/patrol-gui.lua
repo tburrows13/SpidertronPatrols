@@ -499,7 +499,7 @@ function PatrolGui.toggle_on_patrol(player, spidertron, gui_elements)
   local switch = gui_elements.on_patrol_switch
   local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
   local on_patrol = switch.switch_state == "left"
-  if not waypoint_info and on_patrol then
+  if not waypoint_info then
     waypoint_info = get_waypoint_info(spidertron)
   end
   set_on_patrol(on_patrol, spidertron, waypoint_info)
