@@ -497,7 +497,7 @@ end
 
 function PatrolGui.toggle_on_patrol(player, spidertron, gui_elements)
   local switch = gui_elements.on_patrol_switch
-  local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
+  local waypoint_info = get_waypoint_info(spidertron)
   local on_patrol = switch.switch_state == "left"
   set_on_patrol(on_patrol, spidertron, waypoint_info)
 end
@@ -639,6 +639,7 @@ function PatrolGuiWaypoint.delete_waypoint(player, spidertron, gui_elements, way
   if not next(waypoints) then
     -- All waypoints are gone, so cleanup
     clear_spidertron_waypoints(spidertron)
+    return
   end
   if not waypoints[index_to_delete] then
     waypoint_info.current_index = 1
