@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.4.4
+Date: 26 May 2023
+  Bugfixes:
+    - Fixed crash when shift-clicking with patrol remote when there are no waypoints
+    - Fixed crash when toggling automatic/manual after clearing all waypoints
+---------------------------------------------------------------------------------------------------
 Version: 2.4.3
 Date: 5 April 2023
   Compatibility:
