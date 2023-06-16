@@ -6,5 +6,5 @@
     "homepage": "https://discord.gg/pkJc4v9nfT",
     "description": "Send spidertrons on patrols and automatically load and unload them using docks. Adds mid-game spiderling to allow the new features to be used sooner.",
     "factorio_version": "1.1",
-    "dependencies": ["base >= 1.1.72", "SpidertronEnhancements >= 1.8.14", "(?) SpidertronWeaponSwitcher >= 1.2.0", "(?) nullius"]
+    "dependencies": ["base >= 1.1.83", "SpidertronEnhancements >= 1.8.14", "(?) SpidertronWeaponSwitcher >= 1.2.0", "(?) nullius"]
 }
