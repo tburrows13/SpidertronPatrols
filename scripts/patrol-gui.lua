@@ -156,7 +156,8 @@ local function build_waypoint_frames(waypoint_info, spidertron)
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.go_to_waypoint}, tags = {index = i},
         },
         {
-          type = "label", style = "sp_spidertron_waypoint_label", caption = "#" .. tostring(i), game_controller_interaction = defines.game_controller_interaction.always,
+          type = "label", style = "sp_spidertron_waypoint_label", caption = "#" .. tostring(i),
+          game_controller_interaction = defines.game_controller_interaction and defines.game_controller_interaction.always,  -- This code works even on pre-1.1.83 versions
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.move_camera_to_waypoint}, tags = {index = i},
         },
         {
