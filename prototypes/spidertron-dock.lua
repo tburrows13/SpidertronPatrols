@@ -112,11 +112,12 @@ local function create_spidertron_dock(inventory_size, closing)
       filename = "__base__/sound/metallic-chest-open.ogg",
       volume = 0.6
     },
-    collision_box = {{-1.0, -1.0}, {1.0, 1.0}},
+    collision_box = {{-1.1, -1.1}, {1.1, 1.1}},
     selection_box = {{-1.5, -1.5}, {1.5, 1.5}},
     tile_width = 3,
     tile_height = 3,
     flags = {"placeable-neutral", "placeable-player", "player-creation"},
+    squeak_behaviour = false,  -- Stops squeak through from further reducing the collision box
     se_allow_in_space = true,
   }
   data:extend{dock}
