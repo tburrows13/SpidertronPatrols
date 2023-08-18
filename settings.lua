@@ -34,6 +34,13 @@ data:extend({
     default_value = true,
     order = "a"
   },
+  {
+    type = "bool-setting",
+    name = "sp-prevent-docking-when-driving",
+    setting_type = "runtime-per-user",
+    default_value = false,
+    order = "b"
+  },
 })
 
 if mods["nullius"] then

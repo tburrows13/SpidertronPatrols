@@ -281,6 +281,50 @@ local function increase_bounding_box(bounding_box, increase)
   return {left_top = {x = left_top.x - increase, y = left_top.y - increase}, right_bottom = {x = right_bottom.x + increase, y = right_bottom.y + increase}}
 end
 
+local function connect_to_spidertron(dock_data, spidertron, surface)
+  if global.spidertrons_docked[spidertron.unit_number] or spidertron.speed >= 0.1 or spidertron.name == "companion" then return end
+
+  -- Check if driver has prevent-docking-when-driving enabled
+  local waypoint_info = get_waypoint_info(spidertron)
+  if not waypoint_info.on_patrol then  -- Only check for drivers if not in automatic mode
+    local driver = spidertron.get_driver()
+    if driver then
+      if driver.object_name == "LuaEntity" then
+        driver = driver.player
+      end
+      if driver then
+        local player_settings = driver.mod_settings
+        if player_settings["sp-prevent-docking-when-driving"] and player_settings["sp-prevent-docking-when-driving"].value then
+          return
+        end
+      end
+    end
+  end
+  local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
+  local inventory_size = #inventory
+  if inventory_size == 0 then return end
+  -- Switch dock entity out for one with the correct inventory size
+  local dock = replace_dock(dock_data.dock, "sp-spidertron-dock-" .. inventory_size)
+  dock_data.dock = dock
+  global.spidertron_docks[dock.unit_number] = dock_data
+
+  dock_data.connected_spidertron = spidertron
+  global.spidertrons_docked[spidertron.unit_number] = dock.unit_number
+  --game.print("Spidertron docked")
+  surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-docked"}}
+
+  local spidertron_contents = {items = inventory.get_contents(), filters = get_filters(inventory)}
+  local dock_inventory = dock.get_inventory(defines.inventory.chest)
+  for index, filter in pairs(spidertron_contents.filters) do
+    dock_inventory.set_filter(index, filter)
+  end
+  for item_name, count in pairs(spidertron_contents.items) do
+    dock_inventory.insert{name = item_name, count = count}
+  end
+  dock_data.previous_contents = spidertron_contents
+  return true
+end
+
 local function update_dock(dock_data)
   local dock = dock_data.dock
   local delete = false
@@ -310,34 +354,11 @@ local function update_dock(dock_data)
       -- Check if dock should initiate connection
       if not dock.to_be_deconstructed() then
         local nearby_spidertrons = surface.find_entities_filtered{type = "spider-vehicle", area = increase_bounding_box(dock.bounding_box, 0.4), force = dock.force}
-        local spidertrons_docked = global.spidertrons_docked
         for _, spidertron in pairs(nearby_spidertrons) do
-          if not spidertrons_docked[spidertron.unit_number] and spidertron.speed < 0.1 and spidertron.name ~= "companion" then
-            local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
-            local inventory_size = #inventory
-            if inventory_size > 0 then
-              -- Switch dock entity out for one with the correct inventory size
-              dock = replace_dock(dock, "sp-spidertron-dock-" .. inventory_size)
-              dock_data.dock = dock
-              global.spidertron_docks[dock.unit_number] = dock_data
-              delete = true
-
-              dock_data.connected_spidertron = spidertron
-              spidertrons_docked[spidertron.unit_number] = dock.unit_number
-              --game.print("Spidertron docked")
-              surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-docked"}}
-
-              local spidertron_contents = {items = inventory.get_contents(), filters = get_filters(inventory)}
-              local dock_inventory = dock.get_inventory(defines.inventory.chest)
-              for index, filter in pairs(spidertron_contents.filters) do
-                dock_inventory.set_filter(index, filter)
-              end
-              for item_name, count in pairs(spidertron_contents.items) do
-                dock_inventory.insert{name = item_name, count = count}
-              end
-              dock_data.previous_contents = spidertron_contents
-              break
-            end
+          local connected = connect_to_spidertron(dock_data, spidertron, surface)
+          if connected then
+            delete = true
+            break
           end
         end
       end
