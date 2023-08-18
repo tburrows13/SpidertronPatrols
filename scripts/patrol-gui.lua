@@ -1,5 +1,3 @@
-local gui = require "__SpidertronPatrols__.scripts.gui-lite"
-
 PatrolGui = {}
 local PatrolGuiWaypoint = {}
 local PatrolGuiGeneral = {}
@@ -370,8 +368,8 @@ function PatrolGui.update_gui_switch(waypoint_info)
   end
 end
 
-function PatrolGui.update_gui_highlights()
-  -- Called every tick
+local function on_tick()
+  -- Updates GUI highlights
   for player_index, button_info in pairs(global.player_highlights) do
     local button = button_info.button
     local tick_started = button_info.tick_started
@@ -400,35 +398,33 @@ function PatrolGui.clear_highlights_for_player(player)
   end
 end
 
-script.on_event(defines.events.on_gui_opened,
-  function(event)
-    local player = game.get_player(event.player_index)
-    local entity = event.entity
-    if entity and entity.type == "spider-vehicle" then
-      update_player_render_paths(player)
+local function on_gui_opened(event)
+  local player = game.get_player(event.player_index)
+  local entity = event.entity
+  if entity and entity.type == "spider-vehicle" then
+    update_player_render_paths(player)
 
-      local relative_frame = player.gui.relative["sp-relative-frame"]
-      if relative_frame then
-        relative_frame.destroy()
-      end
-      build_gui(player, entity)
+    local relative_frame = player.gui.relative["sp-relative-frame"]
+    if relative_frame then
+      relative_frame.destroy()
     end
+    build_gui(player, entity)
   end
-)
+end
 
-script.on_event(defines.events.on_gui_closed,
-  function(event)
-    local player = game.get_player(event.player_index)
-    local entity = event.entity
-    if entity and entity.type == "spider-vehicle" then
-      -- Can't close relative GUI here because when SpidertronEnhancements/RemoteConfiguration re-opens
-      -- the GUI in on_gui_closed, we recieve on_gui_closed after on_gui_opened
 
-      -- Spidertron's color could have changed
-      update_render_text(entity)
-    end
+local function on_gui_closed(event)
+  local player = game.get_player(event.player_index)
+  local entity = event.entity
+  if entity and entity.type == "spider-vehicle" then
+    -- Can't close relative GUI here because when SpidertronEnhancements/RemoteConfiguration re-opens
+    -- the GUI in on_gui_closed, we recieve on_gui_closed after on_gui_opened
+
+    -- Spidertron's color could have changed
+    update_render_text(entity)
   end
-)
+end
+
 
 function PatrolGui.toggle_camera(player, spidertron, gui_elements)
   local camera_button = gui_elements.toggle_camera_button
@@ -478,7 +474,7 @@ function PatrolGui.open_location_on_map(player, spidertron, gui_elements)
 end
 
 function PatrolGui.delete_all_waypoints(player, spidertron, gui_elements)
-  clear_spidertron_waypoints(spidertron)
+  Control.clear_spidertron_waypoints(spidertron)
 end
 
 function set_on_patrol(on_patrol, spidertron, waypoint_info)
@@ -634,7 +630,7 @@ function PatrolGuiWaypoint.delete_waypoint(player, spidertron, gui_elements, way
   table.remove(waypoints, index_to_delete)
   if not next(waypoints) then
     -- All waypoints are gone, so cleanup
-    clear_spidertron_waypoints(spidertron)
+    Control.clear_spidertron_waypoints(spidertron)
     return
   end
   if not waypoints[index_to_delete] then
@@ -742,6 +738,10 @@ gui.add_handlers(PatrolGuiWaypoint,
   end
 )
 
-gui.handle_events()
+PatrolGui.events = {
+  [defines.events.on_gui_opened] = on_gui_opened,
+  [defines.events.on_gui_closed] = on_gui_closed,
+  [defines.events.on_tick] = on_tick,
+}
 
 return PatrolGui

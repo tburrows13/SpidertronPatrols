@@ -1,8 +1,11 @@
 local math2d = require "math2d"
 
+local Dock = {}
+
 local function on_built(event)
   local entity = event.created_entity or event.entity or event.destination
   if entity then
+    if not (entity.type == "container" or entity.type == "logistic-container" or entity.type == "spider-vehicle") then return end
     if entity.type == "spider-vehicle" then
       script.register_on_entity_destroyed(entity)
     elseif entity.name == "sp-spidertron-dock-0" then
@@ -15,12 +18,8 @@ local function on_built(event)
     end
   end
 end
-local on_built_filter = {{filter = "type", type = "container"}, {filter = "type", type = "logistic-container"}, {filter = "type", type = "spider-vehicle"}}
-script.on_event(defines.events.on_built_entity, on_built, on_built_filter)
-script.on_event(defines.events.on_robot_built_entity, on_built, on_built_filter)
-script.on_event(defines.events.script_raised_revive, on_built, on_built_filter)
-script.on_event(defines.events.script_raised_built, on_built, on_built_filter)
-script.on_event(defines.events.on_entity_cloned, on_built, on_built_filter)
+-- TODO add filter back
+-- local on_built_filter = {{filter = "type", type = "container"}, {filter = "type", type = "logistic-container"}, {filter = "type", type = "spider-vehicle"}}
 
 function on_entity_destroyed(event)
   local unit_number = event.unit_number
@@ -55,17 +54,15 @@ function on_entity_destroyed(event)
 end
 
 
-script.on_event(defines.events.on_pre_player_mined_item,
-  function(event)
-    -- Dock inventories should never return their contents to the player
-    -- because all their items are duplicates from the spidertron's inventory
-    local dock = event.entity
-    if dock and dock.name:sub(0, 19) == "sp-spidertron-dock-" then
-      local dock_inventory = dock.get_inventory(defines.inventory.chest)
-      dock_inventory.clear()
-    end
+local function on_pre_player_mined_item(event)
+  -- Dock inventories should never return their contents to the player
+  -- because all their items are duplicates from the spidertron's inventory
+  local dock = event.entity
+  if dock and dock.name:sub(0, 19) == "sp-spidertron-dock-" then
+    local dock_inventory = dock.get_inventory(defines.inventory.chest)
+    dock_inventory.clear()
   end
-)
+end
 
 local function animate_dock(dock)
   local frames = 32
@@ -385,4 +382,15 @@ local function on_tick(event)
   end
 end
 
-return {on_entity_destroyed = on_entity_destroyed, on_tick = on_tick}
+Dock.events = {
+  [defines.events.on_pre_player_mined_item] = on_pre_player_mined_item,
+  [defines.events.on_built_entity] = on_built,
+  [defines.events.on_robot_built_entity] = on_built,
+  [defines.events.script_raised_revive] = on_built,
+  [defines.events.script_raised_built] = on_built,
+  [defines.events.on_entity_cloned] = on_built,
+  [defines.events.on_entity_destroyed] = on_entity_destroyed,
+  [defines.events.on_tick] = on_tick,
+}
+
+return Dock

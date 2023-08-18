@@ -16,7 +16,7 @@ local WaypointRendering = {}
 
 local BLINK_LENGTH = 30
 
-function WaypointRendering.on_tick(event)
+local function on_tick(event)
   local tick = event.tick
   for _, player_render_ids in pairs(global.blinking_renders) do
     for render_id, toggle_tick in pairs(player_render_ids) do
@@ -198,23 +198,18 @@ function update_player_render_paths(player)
   end
 end
 
-script.on_event({defines.events.on_player_cursor_stack_changed,
-                 defines.events.on_player_configured_spider_remote,
-                 defines.events.on_player_driving_changed_state,
-                 defines.events.on_selected_entity_changed},
-  function(event)
-    local player = game.get_player(event.player_index)
+local function need_to_update_player_render_paths(event)
+  local player = game.get_player(event.player_index)
 
-    if event.name == defines.events.on_player_cursor_stack_changed then
-      local remote = player.cursor_stack
-      if not remote.valid_for_read or remote.name ~= "sp-spidertron-patrol-remote" then
-        global.remotes_in_cursor[player.index] = nil
-      end
+  if event.name == defines.events.on_player_cursor_stack_changed then
+    local remote = player.cursor_stack
+    if not remote.valid_for_read or remote.name ~= "sp-spidertron-patrol-remote" then
+      global.remotes_in_cursor[player.index] = nil
     end
-
-    update_player_render_paths(player)
   end
-)
+
+  update_player_render_paths(player)
+end
 
 function update_spidertron_render_paths(unit_number)
   for player_index, player_render_ids in pairs(global.path_renders) do
@@ -269,7 +264,7 @@ function update_render_text(spidertron)
 end
 
 
-function update_render_players()
+function WaypointRendering.update_render_players()
   -- Called when a player joins or changes the associated setting
   local render_players = {}
   for _, player in pairs(game.players) do
@@ -293,5 +288,24 @@ function update_render_players()
 
   global.render_players = render_players
 end
+
+local function on_runtime_mod_setting_changed(event)
+  if event.setting_type == "runtime-per-user" then
+    if event.setting == "sp-show-waypoint-numbers-in-alt-mode" then
+      WaypointRendering.update_render_players()
+    end
+  end
+end
+
+
+WaypointRendering.events = {
+  [defines.events.on_tick] = on_tick,
+  [defines.events.on_player_cursor_stack_changed] = need_to_update_player_render_paths,
+  [defines.events.on_player_configured_spider_remote] = need_to_update_player_render_paths,
+  [defines.events.on_player_driving_changed_state] = need_to_update_player_render_paths,
+  [defines.events.on_selected_entity_changed] = need_to_update_player_render_paths,
+  [defines.events.on_player_joined_game] = WaypointRendering.update_render_players,
+  [defines.events.on_runtime_mod_setting_changed] = on_runtime_mod_setting_changed,
+}
 
 return WaypointRendering

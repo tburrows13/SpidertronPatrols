@@ -1,11 +1,17 @@
+local event_handler = require "__core__.lualib.event_handler"
 util = require "util"
 require "scripts.utils"
+gui = require "scripts.gui-lite"
+
 RemoteInterface = require "scripts.remote-interface"
 local Dock = require "scripts.dock"
 local PatrolGui = require "scripts.patrol-gui"
 SpidertronControl = require "scripts.spidertron-control"
 PatrolRemote = require "scripts.patrol-remote"
 local WaypointRendering = require "scripts.waypoint-rendering"
+
+
+Control = {}
 
 --[[
 Globals:
@@ -45,7 +51,7 @@ function get_waypoint_info(spidertron)
   return waypoint_info
 end
 
-function clear_spidertron_waypoints(spidertron, unit_number)
+function Control.clear_spidertron_waypoints(spidertron, unit_number)
   -- Called on custom-input or whenever the current autopilot_destination is removed or when the spidertron is removed.
   -- Pass in either `spidertron` or `unit_number`
   local waypoint_info
@@ -74,7 +80,7 @@ script.on_event("sp-delete-all-waypoints",
       local remote = player.cursor_stack
       local spidertron = remote.connected_entity
       if spidertron then
-        clear_spidertron_waypoints(spidertron)
+        Control.clear_spidertron_waypoints(spidertron)
         spidertron.autopilot_destination = nil
       end
     end
@@ -94,37 +100,15 @@ script.on_event({"move-right-custom", "move-left-custom", "move-up-custom", "mov
   end
 )
 
-script.on_event(defines.events.on_entity_destroyed,
-  function(event)
-    local unit_number = event.unit_number
-    clear_spidertron_waypoints(nil, unit_number)
-    Dock.on_entity_destroyed(event)
-  end
-)
+local function on_entity_destroyed(event)
+  local unit_number = event.unit_number
+  Control.clear_spidertron_waypoints(nil, unit_number)
+end
 
-script.on_event(defines.events.on_tick,
-  function(event)
-    Dock.on_tick(event)
-    WaypointRendering.on_tick(event)
-    PatrolGui.update_gui_highlights()
-    SpidertronControl.handle_spider_stopping()
-  end
-)
-
-script.on_event(defines.events.on_runtime_mod_setting_changed,
-  function(event)
-    if event.setting_type == "runtime-per-user" then
-      if event.setting == "sp-show-waypoint-numbers-in-alt-mode" then
-        update_render_players()
-      end
-    end
-  end
-)
-script.on_event(defines.events.on_player_joined_game, update_render_players)
 
 local function process_active_mods()
-  local version = game.active_mods["base"]
-  version = util.split(version, ".")
+  local version_string = game.active_mods["base"]
+  local version = util.split(version_string, ".")
   for i=1, #version do
     version[i] = tonumber(version[i])
   end
@@ -158,9 +142,9 @@ local function setup()
   global.player_highlights = {}  -- Indexed by player.index
 
   RemoteInterface.connect_to_remote_interfaces()
-  update_render_players()
+  WaypointRendering.update_render_players()
   --settings_changed()
-  end
+end
 
 local function config_changed_setup(changed_data)
   process_active_mods()
@@ -217,13 +201,16 @@ local function config_changed_setup(changed_data)
   end
 end
 
-script.on_init(setup)
-script.on_configuration_changed(config_changed_setup)
+Control.on_init = setup
+Control.on_configuration_changed = config_changed_setup
+Control.events = {
+  [defines.events.on_entity_destroyed] = on_entity_destroyed,
+}
 
 function reset_render_objects()
   rendering.clear("SpidertronPatrols")
   global.path_renders = {}
-  update_render_players()
+  WaypointRendering.update_render_players()
   for _, waypoint_info in pairs(global.spidertron_waypoints) do
     local spidertron = waypoint_info.spidertron
     if spidertron and spidertron.valid then
@@ -242,3 +229,13 @@ commands.add_command("reset-sp-render-objects",
     game.print("Render objects reset")
   end
 )
+
+event_handler.add_libraries{
+  gui,
+  Control,
+  Dock,
+  PatrolGui,
+  PatrolRemote,
+  SpidertronControl,
+  WaypointRendering
+}
