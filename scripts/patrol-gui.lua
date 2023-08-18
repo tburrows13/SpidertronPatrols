@@ -261,10 +261,6 @@ local function build_gui(player, spidertron)
     return
   end
 
-  -- Avoid by setting (configurable) max height https://forums.factorio.com/viewtopic.php?f=7&t=98151
-  local maximal_height = 930
-  if script.active_mods["AutoTrash"] then maximal_height = 650 end
-  maximal_height = maximal_height * player.mod_settings["sp-window-height-scale"].value
   global.open_gui_elements[player.index] = gui.add(player.gui.relative, {
     {
       type = "frame",
@@ -272,7 +268,6 @@ local function build_gui(player, spidertron)
       name = "sp-relative-frame",
       direction = "vertical",
       anchor = anchor,
-      style_mods = {maximal_height = maximal_height},
       children = {
         {type = "label", style = "frame_title", caption = {"gui-train.schedule"}, ignored_by_interaction = true},
         {type = "flow", direction = "vertical", style = "inset_frame_container_vertical_flow", children = {
