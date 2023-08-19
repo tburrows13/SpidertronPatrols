@@ -5,6 +5,7 @@ gui = require "scripts.gui-lite"
 
 RemoteInterface = require "scripts.remote-interface"
 local Dock = require "scripts.dock"
+local DockGui = require "scripts.dock-gui"
 local PatrolGui = require "scripts.patrol-gui"
 SpidertronControl = require "scripts.spidertron-control"
 PatrolRemote = require "scripts.patrol-remote"
@@ -234,6 +235,7 @@ event_handler.add_libraries{
   gui,
   Control,
   Dock,
+  DockGui,
   PatrolGui,
   PatrolRemote,
   SpidertronControl,

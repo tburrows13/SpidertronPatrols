@@ -9,12 +9,12 @@ local function on_built(event)
     if entity.type == "spider-vehicle" then
       script.register_on_entity_destroyed(entity)
     elseif entity.name == "sp-spidertron-dock-0" then
-      global.spidertron_docks[entity.unit_number] = {dock = entity}
+      global.spidertron_docks[entity.unit_number] = {dock = entity, mode = "trunk"}
       script.register_on_entity_destroyed(entity)
     elseif entity.name:sub(0, 19) == "sp-spidertron-dock-" then
       -- a non-zero-capacity dock has been created, from on_entity_cloned or built from blueprint
       entity = replace_dock(entity, "sp-spidertron-dock-0")
-      global.spidertron_docks[entity.unit_number] = {dock = entity}
+      global.spidertron_docks[entity.unit_number] = {dock = entity, mode = "trunk"}
     end
   end
 end
@@ -46,7 +46,7 @@ function on_entity_destroyed(event)
           dock.surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-removed"}}
 
           dock = replace_dock(dock, "sp-spidertron-dock-0")
-          global.spidertron_docks[dock.unit_number] = {dock = dock}
+          global.spidertron_docks[dock.unit_number] = {dock = dock, mode = dock_data.mode}
         end
       end
     end
@@ -339,13 +339,13 @@ local function update_dock(dock_data)
         surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-undocked"}}
 
         dock = replace_dock(dock, "sp-spidertron-dock-0")
-        global.spidertron_docks[dock.unit_number] = {dock = dock}
+        global.spidertron_docks[dock.unit_number] = {dock = dock, mode = dock_data.mode}
         delete = true
       end
     else
       if spidertron then
         -- `spidertron` is not valid
-        dock_data = {dock = dock_data.dock}
+        dock_data = {dock = dock_data.dock, mode = dock_data.mode}
       end
 
       -- Check if dock should initiate connection
@@ -371,8 +371,9 @@ local function on_tick(event)
   if schedule then
     for _, dock in pairs(schedule) do
       if dock.valid then
+        local dock_data = global.spidertron_docks[dock.unit_number]
         dock = replace_dock(dock, "sp-spidertron-dock-0")
-        global.spidertron_docks[dock.unit_number] = {dock = dock}
+        global.spidertron_docks[dock.unit_number] = {dock = dock, mode = dock_data.mode}
       end
     end
   end
