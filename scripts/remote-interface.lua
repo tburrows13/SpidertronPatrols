@@ -1,10 +1,12 @@
+local RemoteInterface = {}
+
 local function remote_interface_assign_waypoints(spidertron, waypoints)
   for _, waypoint in pairs(waypoints) do
     SpidertronControl.on_patrol_command_issued(spidertron, waypoint.position)
   end
 end
 
-local on_spidertron_given_new_destination = script.generate_event_name()
+RemoteInterface.on_spidertron_given_new_destination = script.generate_event_name()
 remote.add_interface("SpidertronPatrols", {
   get_events = function() return {on_spidertron_given_new_destination = on_spidertron_given_new_destination} end,
   clear_waypoints = function(unit_number) Control.clear_spidertron_waypoints(nil, unit_number) end,
@@ -48,7 +50,7 @@ local function spidertron_replaced(event)
   script.register_on_entity_destroyed(spidertron)
 end
 
-local function connect_to_remote_interfaces()
+function RemoteInterface.connect_to_remote_interfaces()
   if remote.interfaces["SpidertronWeaponSwitcher"] then
     local on_spidertron_switched = remote.call("SpidertronWeaponSwitcher", "get_events").on_spidertron_switched
     script.on_event(on_spidertron_switched, spidertron_replaced)
@@ -64,7 +66,7 @@ local function connect_to_remote_interfaces()
     end
   end
 end
-script.on_load(connect_to_remote_interfaces)
+RemoteInterface.on_load = RemoteInterface.connect_to_remote_interfaces
 
 -- Milestones will ignore it if spiderling is disabled
 remote.add_interface("SpidertronPatrolsMilestones", {
@@ -81,4 +83,4 @@ remote.add_interface("SpidertronPatrolsMilestones", {
   end
 })
 
-return {on_spidertron_given_new_destination = on_spidertron_given_new_destination, connect_to_remote_interfaces = connect_to_remote_interfaces}
+return RemoteInterface

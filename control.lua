@@ -233,6 +233,7 @@ commands.add_command("reset-sp-render-objects",
 event_handler.add_libraries{
   gui,
   Control,
+  RemoteInterface,
   Dock,
   PatrolGui,
   PatrolRemote,
