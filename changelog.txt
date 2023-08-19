@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.4.8
+Date: 19 August 2023
+  Features:
+    - Added "Prevent docking when driving" setting (default off)
+  Compatibility:
+    - Fixed dock only having 2x2 collision box when using Squeak Through
+    - Fixed dock dimensions being shown as 2x2 by Extended Descriptions
+---------------------------------------------------------------------------------------------------
 Version: 2.4.7
 Date: 20 June 2023
   Changes:
