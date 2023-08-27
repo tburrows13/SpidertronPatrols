@@ -32,7 +32,7 @@ local function spidertron_replaced(event)
       path_render_info[previous_unit_number] = nil
     end
   end
-  update_spidertron_render_paths(spidertron.unit_number)
+  WaypointRendering.update_spidertron_render_paths(spidertron.unit_number)
 
   if global.spidertrons_docked[previous_unit_number] then
     local dock_unit_number = global.spidertrons_docked[previous_unit_number]
@@ -62,7 +62,7 @@ function RemoteInterface.connect_to_remote_interfaces()
 
     local on_player_disconnected_spider_remote = events.on_player_disconnected_spider_remote
     if on_player_disconnected_spider_remote then
-      script.on_event(on_player_disconnected_spider_remote, function(event) update_player_render_paths(game.get_player(event.player_index)) end)
+      script.on_event(on_player_disconnected_spider_remote, function(event) WaypointRendering.update_player_render_paths(game.get_player(event.player_index)) end)
     end
   end
 end

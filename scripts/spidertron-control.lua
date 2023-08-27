@@ -46,7 +46,7 @@ function SpidertronControl.on_patrol_command_issued(spidertron, position, index,
     spidertron.autopilot_destination = nil
   end
   PatrolGui.update_gui_schedule(waypoint_info)
-  update_render_text(spidertron)  -- Inserts text at the position that we have just added
+  WaypointRendering.update_render_text(spidertron)  -- Inserts text at the position that we have just added
 end
 
 
@@ -247,14 +247,14 @@ local function on_entity_settings_pasted(event)
     waypoint_info.tick_inactive = nil
     waypoint_info.previous_inventories = nil
 
-    -- Erase all render ids so that new ones can be recreated by update_render_text
+    -- Erase all render ids so that new ones can be recreated by WaypointRendering.update_render_text
     for _, waypoint in pairs(waypoint_info.waypoints) do
       waypoint.render_id = nil
     end
 
     global.spidertron_waypoints[destination.unit_number] = waypoint_info
     PatrolGui.update_gui_schedule(waypoint_info)
-    update_render_text(destination)  -- Inserts text at the position that we have just added
+    WaypointRendering.update_render_text(destination)  -- Inserts text at the position that we have just added
   end
 end
 

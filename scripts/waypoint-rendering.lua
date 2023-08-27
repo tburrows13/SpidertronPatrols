@@ -52,7 +52,7 @@ local function create_render_paths(spidertron, player, create_chart_tags)
   end
 
   for i, waypoint in pairs(waypoints) do
-    -- First draw waypoint number like in update_render_text() in case alt-mode is not on
+    -- First draw waypoint number like in WaypointRendering.update_render_text() in case alt-mode is not on
     local render_id = rendering.draw_text{
       text = tostring(i),
       surface = spidertron.surface,
@@ -153,7 +153,7 @@ function create_chart_tag_path(surface, player, force, from, to, tag_spacing)
   return tags
 end
 
-function update_player_render_paths(player)
+function WaypointRendering.update_player_render_paths(player)
   -- Clear up any previous renders
   local player_render_ids = global.path_renders[player.index]
   if player_render_ids then
@@ -208,19 +208,19 @@ local function need_to_update_player_render_paths(event)
     end
   end
 
-  update_player_render_paths(player)
+  WaypointRendering.update_player_render_paths(player)
 end
 
-function update_spidertron_render_paths(unit_number)
+function WaypointRendering.update_spidertron_render_paths(unit_number)
   for player_index, player_render_ids in pairs(global.path_renders) do
     if player_render_ids[unit_number] then
-      update_player_render_paths(game.get_player(player_index))
+      WaypointRendering.update_player_render_paths(game.get_player(player_index))
     end
   end
 end
 
 
-function update_render_text(spidertron)
+function WaypointRendering.update_render_text(spidertron)
   -- Updates numbered text on ground for given spidertron
   local waypoint_info = get_waypoint_info(spidertron)
 
@@ -260,7 +260,7 @@ function update_render_text(spidertron)
       waypoint.render_id = render_id
     end
   end
-  update_spidertron_render_paths(spidertron.unit_number)
+  WaypointRendering.update_spidertron_render_paths(spidertron.unit_number)
 end
 
 

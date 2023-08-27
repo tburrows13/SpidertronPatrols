@@ -8,7 +8,7 @@ local Dock = require "scripts.dock"
 local PatrolGui = require "scripts.patrol-gui"
 SpidertronControl = require "scripts.spidertron-control"
 PatrolRemote = require "scripts.patrol-remote"
-local WaypointRendering = require "scripts.waypoint-rendering"
+WaypointRendering = require "scripts.waypoint-rendering"
 
 
 Control = {}
@@ -69,7 +69,7 @@ function Control.clear_spidertron_waypoints(spidertron, unit_number)
   end
   waypoint_info.waypoints = {}
   PatrolGui.update_gui_schedule(waypoint_info)
-  update_spidertron_render_paths(unit_number)
+  WaypointRendering.update_spidertron_render_paths(unit_number)
   global.spidertron_waypoints[unit_number] = nil
 end
 
@@ -214,11 +214,11 @@ function reset_render_objects()
   for _, waypoint_info in pairs(global.spidertron_waypoints) do
     local spidertron = waypoint_info.spidertron
     if spidertron and spidertron.valid then
-      update_render_text(waypoint_info.spidertron)
+      WaypointRendering.update_render_text(waypoint_info.spidertron)
     end
   end
   for _, player in pairs(game.players) do
-    update_player_render_paths(player)
+    WaypointRendering.update_player_render_paths(player)
   end
 end
 

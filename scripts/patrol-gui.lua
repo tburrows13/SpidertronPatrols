@@ -402,7 +402,7 @@ local function on_gui_opened(event)
   local player = game.get_player(event.player_index)
   local entity = event.entity
   if entity and entity.type == "spider-vehicle" then
-    update_player_render_paths(player)
+    WaypointRendering.update_player_render_paths(player)
 
     local relative_frame = player.gui.relative["sp-relative-frame"]
     if relative_frame then
@@ -421,7 +421,7 @@ local function on_gui_closed(event)
     -- the GUI in on_gui_closed, we recieve on_gui_closed after on_gui_opened
 
     -- Spidertron's color could have changed
-    update_render_text(entity)
+    WaypointRendering.update_render_text(entity)
   end
 end
 
@@ -573,7 +573,7 @@ function PatrolGuiWaypoint.move_waypoint_up(player, spidertron, gui_elements, wa
     end
 
     PatrolGui.update_gui_schedule(waypoint_info)
-    update_render_text(spidertron)
+    WaypointRendering.update_render_text(spidertron)
 
     local button = gui_elements.waypoint_button[index_above].up
     button.style = "sp_selected_schedule_move_button"
@@ -609,7 +609,7 @@ function PatrolGuiWaypoint.move_waypoint_down(player, spidertron, gui_elements, 
     end
 
     PatrolGui.update_gui_schedule(waypoint_info)
-    update_render_text(spidertron)
+    WaypointRendering.update_render_text(spidertron)
 
     local button = gui_elements.waypoint_button[index_below].down
     button.style = "sp_selected_schedule_move_button"
@@ -640,7 +640,7 @@ function PatrolGuiWaypoint.delete_waypoint(player, spidertron, gui_elements, way
     SpidertronControl.go_to_next_waypoint(spidertron, waypoint_info.current_index)
   end
   PatrolGui.update_gui_schedule(waypoint_info)
-  update_render_text(spidertron)
+  WaypointRendering.update_render_text(spidertron)
 end
 
 local function set_waypoint_time(wait_time, spidertron, waypoint_index)
