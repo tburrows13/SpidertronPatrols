@@ -76,7 +76,7 @@ end
 script.on_event("sp-delete-all-waypoints",
   function(event)
     local player = game.get_player(event.player_index)
-    if player.cursor_stack.valid_for_read and player.cursor_stack.type == "spidertron-remote" then
+    if player.cursor_stack and player.cursor_stack.valid_for_read and player.cursor_stack.type == "spidertron-remote" then
       local remote = player.cursor_stack
       local spidertron = remote.connected_entity
       if spidertron then
