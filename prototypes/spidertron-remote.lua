@@ -22,6 +22,8 @@ patrol_remote.localised_description = {
   {"item-description.sp-delete-waypoints"},
   line_start,
   {"item-description.spe-open-inventory"},
+  line_start,
+  {"item-description.spe-open-in-map"},
   font_end,
 }
 
