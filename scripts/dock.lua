@@ -279,7 +279,7 @@ local function increase_bounding_box(bounding_box, increase)
 end
 
 local function connect_to_spidertron(dock_data, spidertron, surface)
-  if global.spidertrons_docked[spidertron.unit_number] or spidertron.speed >= 0.1 or spidertron.name == "companion" then return end
+  if global.spidertrons_docked[spidertron.unit_number] or spidertron.speed >= 0.1 or spidertron.name == "companion" or spidertron.autopilot_destination then return end
 
   -- Check if driver has prevent-docking-when-driving enabled
   local waypoint_info = get_waypoint_info(spidertron)
@@ -333,7 +333,7 @@ local function update_dock(dock_data)
       dock_data.previous_contents = update_dock_inventory(dock, spidertron, dock_data.previous_contents)
 
       -- 0.1 * 216 ~ 20km/h
-      if dock.to_be_deconstructed() or spidertron.speed > 0.2 or not math2d.bounding_box.collides_with(increase_bounding_box(dock.bounding_box, 1.7), spidertron.bounding_box) then
+      if dock.to_be_deconstructed() or spidertron.speed > 0.2 or spidertron.autopilot_destination or not math2d.bounding_box.collides_with(increase_bounding_box(dock.bounding_box, 1.7), spidertron.bounding_box) then
         -- Spidertron needs to become undocked
         global.spidertrons_docked[spidertron.unit_number] = nil
         surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-undocked"}}
