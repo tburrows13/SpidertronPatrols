@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.4.10
+Date: 8 November 2023
+  Bugfixes:
+    - Fixed spidertrons connecting to docks whilst travelling on autopilot
+    - Fixed crash when pressing Control + Right-click when respawning or spectating
+    - Fixed crash on load with Industrial Revolution 3.1
+---------------------------------------------------------------------------------------------------
 Version: 2.4.9
 Date: 19 August 2023
   Bugfixes:
