@@ -11,8 +11,7 @@ if spiderling_enabled then
 
   data.raw.recipe["sp-spiderling"].ingredients = {
     {"computer-mk2", 4},
-    {"gold-radio", 1},
-    --{"gyroscope", 1},  -- Ideally would be steel-frame-turret, but this is only unlocked after chrome
+    {"gyroscope", 1},  -- Ideally would be steel-frame-turret, but this is only unlocked after chrome
     {"copper-coil", 4},
     {"low-density-structure", 60},
     {"steel-piston", 20},
