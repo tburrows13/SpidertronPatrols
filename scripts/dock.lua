@@ -120,11 +120,16 @@ function replace_dock(dock, new_dock_name)
 
   local request_from_buffers
   local requests
+  local circuit_mode_of_operation
   if dock.type == "logistic-container" then
     request_from_buffers = dock.request_from_buffers
     requests = {}
     for slot_index = 1, dock.request_slot_count do
       requests[slot_index] = dock.get_request_slot(slot_index)
+    end
+    local control_behavior = dock.get_control_behavior()
+    if control_behavior then
+      circuit_mode_of_operation = control_behavior.circuit_mode_of_operation
     end
   end
 
@@ -160,6 +165,10 @@ function replace_dock(dock, new_dock_name)
     for slot_index, request in pairs(requests) do
       dock.set_request_slot(request, slot_index)
     end
+  end
+  if circuit_mode_of_operation then
+    local control_behavior = dock.get_or_create_control_behavior()
+    control_behavior.circuit_mode_of_operation = circuit_mode_of_operation
   end
 
 
