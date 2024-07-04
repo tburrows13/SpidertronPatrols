@@ -23,7 +23,7 @@ local dock_recipe = {
   name = "sp-spidertron-dock",
   ingredients = {
     {"steel-chest", 4},
-    {"stack-inserter", 4},
+    {"bulk-inserter", 4},
   },
   energy_required = 4,
   results = {{type="item", name="sp-spidertron-dock", amount=1}},

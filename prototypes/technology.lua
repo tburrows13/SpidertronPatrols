@@ -43,7 +43,7 @@ local patrol_tech = {
   prerequisites = {
     "sp-spiderling",
     "automated-rail-transportation",
-    "stack-inserter",
+    "bulk-inserter",
   },
   unit = {
     count = 500,

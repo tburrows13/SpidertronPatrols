@@ -20,7 +20,7 @@ if spiderling_enabled then
 end
 
 if dock_enabled then
-  util.remove_prerequisite("sp-spidertron-automation", "stack-inserter")
+  util.remove_prerequisite("sp-spidertron-automation", "bulk-inserter")
   util.add_prerequisite("sp-spidertron-automation", "fast-inserter")
 
   data.raw.recipe["sp-spidertron-dock"].ingredients = {
