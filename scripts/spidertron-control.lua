@@ -236,7 +236,7 @@ local function on_entity_settings_pasted(event)
     -- Erase render ids from receiving spidertron
     local destination_waypoint_info = get_waypoint_info(destination)
     for _, waypoint in pairs(destination_waypoint_info.waypoints) do
-      rendering.destroy(waypoint.render_id)
+      waypoint.render.destroy()
     end
 
     local waypoint_info = util.table.deepcopy(get_waypoint_info(source))
@@ -248,7 +248,7 @@ local function on_entity_settings_pasted(event)
 
     -- Erase all render ids so that new ones can be recreated by WaypointRendering.update_render_text
     for _, waypoint in pairs(waypoint_info.waypoints) do
-      waypoint.render_id = nil
+      waypoint.render = nil
     end
 
     global.spidertron_waypoints[destination.unit_number] = waypoint_info

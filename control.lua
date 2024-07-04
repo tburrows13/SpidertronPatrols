@@ -26,7 +26,7 @@ global.spidertron_waypoints: indexed by spidertron.unit_number:
       item_name :: string or SignalID (depending on if type is "item-count" or "circuit-condition")
       condition :: int (index of condition_dropdown_contents)
       count :: int
-    render_id :: int
+    render :: LuaRenderObject
   current_index :: int (index of waypoints)
   tick_arrived? :: int (only set when at a waypoint)
   tick_inactive? :: int (only used whilst at an "inactivity" waypoint)
@@ -42,7 +42,7 @@ function get_waypoint_info(spidertron)
     global.spidertron_waypoints[spidertron.unit_number] = {
       spidertron = spidertron,
       waypoints = {},
-      render_ids = {},
+      renders = {},
       current_index = 1,
       on_patrol = false
     }
@@ -65,7 +65,7 @@ function Control.clear_spidertron_waypoints(spidertron, unit_number)
   if not unit_number then unit_number = spidertron.unit_number end
   log("Clearing spidertron waypoints for unit number " .. unit_number)
   for _, waypoint in pairs(waypoint_info.waypoints) do
-    rendering.destroy(waypoint.render_id)
+    waypoint.render.destroy()
   end
   waypoint_info.waypoints = {}
   PatrolGui.update_gui_schedule(waypoint_info)

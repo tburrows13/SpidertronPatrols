@@ -626,7 +626,7 @@ function PatrolGuiWaypoint.delete_waypoint(player, spidertron, gui_elements, way
   if waypoint_info.current_index > index_to_delete then
     waypoint_info.current_index = waypoint_info.current_index - 1
   end
-  rendering.destroy(waypoints[index_to_delete].render_id)
+  waypoints[index_to_delete].render.destroy()
   table.remove(waypoints, index_to_delete)
   if not next(waypoints) then
     -- All waypoints are gone, so cleanup
