@@ -3,10 +3,7 @@ if not mods["nullius"] then return end
 local spiderling_enabled = settings.startup["sp-enable-spiderling"].value
 local dock_enabled = settings.startup["sp-enable-dock"].value
 
-local patrol_remote = data.raw["spidertron-remote"]["sp-spidertron-patrol-remote"]
-patrol_remote.group = "equipment"
-patrol_remote.subgroup = "vehicle"
-patrol_remote.order = "nullius-dg"
+local patrol_remote = data.raw["rts-tool"]["sp-spidertron-patrol-remote"]
 patrol_remote.localised_name = {"item-name.nullius-sp-spidertron-patrol-remote"}
 
 if not (spiderling_enabled or dock_enabled) then return end

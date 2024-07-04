@@ -8,10 +8,6 @@ local spiderling_tech = {
       type = "unlock-recipe",
       recipe = "sp-spiderling"
     },
-    {
-      type = "unlock-recipe",
-      recipe = "spidertron-remote"
-    }
   },
   prerequisites = {
     "power-armor",
@@ -92,10 +88,4 @@ if spiderling_enabled then
     "rocket-control-unit",
     "effectivity-module-3"
   }
-  for i, effect in pairs(spidertron_tech.effects) do
-    if effect.type == "unlock-recipe" and effect.recipe == "spidertron-remote" then
-      table.remove(spidertron_tech.effects, i)  -- Remove spidertron remote unlock
-      break
-    end
-  end
 end

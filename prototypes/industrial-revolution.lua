@@ -17,11 +17,6 @@ if spiderling_enabled then
     {"steel-piston", 20},
     {"rocket-launcher", 1},
   }
-
-  data.raw.recipe["spidertron-remote"].ingredients = {
-    {"advanced-circuit", 1},
-    {"radar", 1}
-  }
 end
 
 if dock_enabled then
