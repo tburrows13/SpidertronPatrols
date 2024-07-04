@@ -301,7 +301,7 @@ end
 WaypointRendering.events = {
   [defines.events.on_tick] = on_tick,
   [defines.events.on_player_cursor_stack_changed] = need_to_update_player_render_paths,
-  [defines.events.on_player_configured_spider_remote] = need_to_update_player_render_paths,
+  --[defines.events.on_player_configured_spider_remote] = need_to_update_player_render_paths,  TODO replace?
   [defines.events.on_player_driving_changed_state] = need_to_update_player_render_paths,
   [defines.events.on_selected_entity_changed] = need_to_update_player_render_paths,
   [defines.events.on_player_joined_game] = WaypointRendering.update_render_players,
