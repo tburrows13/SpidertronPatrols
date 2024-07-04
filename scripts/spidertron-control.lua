@@ -155,9 +155,8 @@ local function handle_wait_timers()
         end
       elseif waypoint_type == "item-count" then
         local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
-        local inventory_contents = inventory.get_contents()
         local item_count_info = waypoint.item_count_info
-        local item_count = inventory_contents[item_count_info.item_name] or 0
+        local item_count = inventory.get_item_count(item_count_info.item_name) or 0
         if check_condition(item_count_info.condition, item_count, item_count_info.count) then
           SpidertronControl.go_to_next_waypoint(spidertron)
         end

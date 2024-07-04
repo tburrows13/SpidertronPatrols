@@ -43,7 +43,7 @@ function on_object_destroyed(event)
       if dock_data then
         local dock = dock_data.dock
         if dock.valid then
-          dock.surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-removed"}}
+          --dock.surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-removed"}}
 
           dock = replace_dock(dock, "sp-spidertron-dock-0")
           global.spidertron_docks[dock.unit_number] = {dock = dock}
@@ -114,20 +114,19 @@ function replace_dock(dock, new_dock_name)
 
   local health = dock.health
   local last_user = dock.last_user
-  --local circuit_connected_entities = dock.circuit_connected_entities
-  local circuit_connection_definitions = dock.circuit_connection_definitions
+  local wire_connectors = dock.get_wire_connectors(true)
   local to_be_deconstructed = dock.to_be_deconstructed()
 
   local request_from_buffers
   local requests
   local circuit_mode_of_operation
-  if dock.type == "logistic-container" then
+  if dock.type == "logistic-container" then  -- TODO test
     request_from_buffers = dock.request_from_buffers
     requests = {}
     for slot_index = 1, dock.request_slot_count do
       requests[slot_index] = dock.get_request_slot(slot_index)
     end
-    local control_behavior = dock.get_control_behavior()
+    local control_behavior = dock.get_control_behavior()  -- TODO move out of logistic-container check
     if control_behavior then
       circuit_mode_of_operation = control_behavior.circuit_mode_of_operation
     end
@@ -146,12 +145,13 @@ function replace_dock(dock, new_dock_name)
   dock.health = health
   dock.last_user = last_user
 
-  for _, definition in pairs(circuit_connection_definitions) do
-    dock.connect_neighbour{
-      wire = definition.wire,
-      target_entity = definition.target_entity,
-      target_circuit_id = definition.target_circuit_id
-    }
+  local new_wire_connectors = dock.get_wire_connectors(true)
+  for i, connector in pairs(wire_connectors) do
+    for _, connection in pairs(connector.connections) do
+      local target = connection.target
+      local origin = connection.origin
+      new_wire_connectors[i].connect_to(target, false, origin)
+    end
   end
 
   if to_be_deconstructed then
@@ -198,6 +198,16 @@ local function get_filters(inventory)
   return filters
 end
 
+local function get_contents_1_1(inventory)
+  -- Temporary abstraction for 2.0 version, ignoring quality
+  local contents_2_0 = inventory.get_contents()
+  local contents_1_1 = {}
+  for _, item in pairs(contents_2_0) do
+    contents_1_1[item.name] = item.count + (contents_1_1[item.name] or 0)
+  end
+  return contents_1_1
+end
+
 local function update_dock_inventory(dock, spidertron, previous_contents)
   local previous_items = previous_contents.items
   local previous_filters = previous_contents.filters
@@ -208,11 +218,11 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
   end
 
   local spidertron_inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
-  local spidertron_contents = spidertron_inventory.get_contents()
+  local spidertron_contents = get_contents_1_1(spidertron_inventory)
   local spidertron_filters = get_filters(spidertron_inventory)
 
   local dock_inventory = dock.get_inventory(defines.inventory.chest)
-  local dock_contents = dock_inventory.get_contents()
+  local dock_contents = get_contents_1_1(dock_inventory)
   local dock_filters = get_filters(dock_inventory)
 
   -- If Freight Forwarding is installed, we need to spill an container items on the ground because they aren't allowed inside spidertrons
@@ -274,7 +284,7 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
   spidertron_inventory.sort_and_merge()
   dock_inventory.sort_and_merge()
 
-  local new_spidertron_contents = {items = spidertron_inventory.get_contents(), filters = get_filters(spidertron_inventory)}
+  local new_spidertron_contents = {items = get_contents_1_1(spidertron_inventory), filters = get_filters(spidertron_inventory)}
   --local new_dock_contents = dock_inventory.get_contents()
   --assert(table_equals(new_spidertron_contents, new_dock_contents))  -- TODO Remove for release
   return new_spidertron_contents
@@ -317,9 +327,9 @@ local function connect_to_spidertron(dock_data, spidertron, surface)
   dock_data.connected_spidertron = spidertron
   global.spidertrons_docked[spidertron.unit_number] = dock.unit_number
   --game.print("Spidertron docked")
-  surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-docked"}}
+  --surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-docked"}}
 
-  local spidertron_contents = {items = inventory.get_contents(), filters = get_filters(inventory)}
+  local spidertron_contents = {items = get_contents_1_1(inventory), filters = get_filters(inventory)}
   local dock_inventory = dock.get_inventory(defines.inventory.chest)
   for index, filter in pairs(spidertron_contents.filters) do
     dock_inventory.set_filter(index, filter)
@@ -345,7 +355,7 @@ local function update_dock(dock_data)
       if dock.to_be_deconstructed() or spidertron.speed > 0.2 or spidertron.autopilot_destination or not math2d.bounding_box.collides_with(increase_bounding_box(dock.bounding_box, 1.7), spidertron.bounding_box) then
         -- Spidertron needs to become undocked
         global.spidertrons_docked[spidertron.unit_number] = nil
-        surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-undocked"}}
+       -- surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-undocked"}}
 
         dock = replace_dock(dock, "sp-spidertron-dock-0")
         global.spidertron_docks[dock.unit_number] = {dock = dock}
