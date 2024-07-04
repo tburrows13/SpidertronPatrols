@@ -176,11 +176,12 @@ function WaypointRendering.update_player_render_paths(player)
   -- Create new path renders if necessary
   local rendered_spidertrons = {}  -- Ensure that we don't render the same spidertron's path twice if it falls into multiple of the following categories
   local cursor_stack = player.cursor_stack
+  local rts_selection = player.rts_selection
   if cursor_stack and cursor_stack.valid_for_read
       and (cursor_stack.name == "sp-spidertron-patrol-remote")
-      and cursor_stack.connected_entity then
-    create_render_paths(cursor_stack.connected_entity, player, true)
-    rendered_spidertrons[cursor_stack.connected_entity.unit_number] = true
+      and rts_selection then
+    create_render_paths(rts_selection[1], player, true)
+    rendered_spidertrons[rts_selection[1].unit_number] = true
   end
   local vehicle = player.vehicle
   if vehicle and vehicle.type == "spider-vehicle" and not rendered_spidertrons[vehicle.unit_number] then

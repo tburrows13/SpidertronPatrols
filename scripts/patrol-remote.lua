@@ -62,7 +62,7 @@ function PatrolRemote.give_remote(player, spidertron, waypoint_index)
   end
   local cursor = player.cursor_stack
   cursor.set_stack("sp-spidertron-patrol-remote")
-  cursor.connected_entity = spidertron
+  player.rts_selection = {spidertron}
 
   if waypoint_index then
     global.remotes_in_cursor[player.index] = waypoint_index
