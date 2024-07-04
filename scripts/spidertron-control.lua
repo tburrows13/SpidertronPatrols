@@ -1,4 +1,4 @@
--- Handles on_player_used_spider_remote, on_spider_command_completed, and wait conditions
+-- Handles on_player_used_rts_tool, on_spider_command_completed, and wait conditions
 
 local SpidertronControl = {}
 

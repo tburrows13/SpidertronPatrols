@@ -19,7 +19,7 @@ script.on_event("sp-replace-previous-waypoint",
   end
 )
 
-local function on_player_used_spider_remote(event)
+local function on_player_used_rts_tool(event)
   if not event.success then return end
 
   local player = game.get_player(event.player_index)
@@ -72,7 +72,7 @@ function PatrolRemote.give_remote(player, spidertron, waypoint_index)
 end
 
 PatrolRemote.events = {
-  [defines.events.on_player_used_spider_remote] = on_player_used_spider_remote,
+  [defines.events.on_player_used_rts_tool] = on_player_used_rts_tool,
 }
 
 return PatrolRemote
