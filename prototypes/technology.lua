@@ -83,9 +83,8 @@ if spiderling_enabled then
     "sp-spiderling",  -- Added
     "military-4",
     --"exoskeleton-equipment",
-    "fusion-reactor-equipment",
+    "fission-reactor-equipment",
     --"rocketry",
-    "rocket-control-unit",
     "effectivity-module-3"
   }
 end
