@@ -26,7 +26,7 @@ local dock_recipe = {
     {"stack-inserter", 4},
   },
   energy_required = 4,
-  result = "sp-spidertron-dock",
+  results = {{type="item", name="sp-spidertron-dock", amount=1}},
   enabled = false
 }
 

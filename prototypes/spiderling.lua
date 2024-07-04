@@ -73,7 +73,7 @@ local spiderling_recipe = {
     {"effectivity-module-2", 2},
     {"raw-fish", 1}
   },
-  result = "sp-spiderling"
+  results = {{type="item", name="sp-spiderling", amount=1}},
 }
 
 data:extend{spiderling_item, spiderling_recipe}
