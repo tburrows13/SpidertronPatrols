@@ -100,7 +100,7 @@ script.on_event({"move-right-custom", "move-left-custom", "move-up-custom", "mov
   end
 )
 
-local function on_entity_destroyed(event)
+local function on_object_destroyed(event)
   local unit_number = event.unit_number
   Control.clear_spidertron_waypoints(nil, unit_number)
 end
@@ -204,7 +204,7 @@ end
 Control.on_init = setup
 Control.on_configuration_changed = config_changed_setup
 Control.events = {
-  [defines.events.on_entity_destroyed] = on_entity_destroyed,
+  [defines.events.on_object_destroyed] = on_object_destroyed,
 }
 
 function reset_render_objects()

@@ -7,10 +7,10 @@ local function on_built(event)
   if entity then
     if not (entity.type == "container" or entity.type == "logistic-container" or entity.type == "spider-vehicle") then return end
     if entity.type == "spider-vehicle" then
-      script.register_on_entity_destroyed(entity)
+      script.register_on_object_destroyed(entity)
     elseif entity.name == "sp-spidertron-dock-0" then
       global.spidertron_docks[entity.unit_number] = {dock = entity}
-      script.register_on_entity_destroyed(entity)
+      script.register_on_object_destroyed(entity)
     elseif entity.name:sub(0, 19) == "sp-spidertron-dock-" then
       -- a non-zero-capacity dock has been created, from on_entity_cloned or built from blueprint
       entity = replace_dock(entity, "sp-spidertron-dock-0")
@@ -21,7 +21,7 @@ end
 -- TODO add filter back
 -- local on_built_filter = {{filter = "type", type = "container"}, {filter = "type", type = "logistic-container"}, {filter = "type", type = "spider-vehicle"}}
 
-function on_entity_destroyed(event)
+function on_object_destroyed(event)
   local unit_number = event.unit_number
   if unit_number then
     -- Entity is a dock
@@ -178,7 +178,7 @@ function replace_dock(dock, new_dock_name)
     end
   end
 
-  script.register_on_entity_destroyed(dock)
+  script.register_on_object_destroyed(dock)
   old_dock.destroy()
 
   animate_dock(dock)
@@ -398,7 +398,7 @@ Dock.events = {
   [defines.events.script_raised_revive] = on_built,
   [defines.events.script_raised_built] = on_built,
   [defines.events.on_entity_cloned] = on_built,
-  [defines.events.on_entity_destroyed] = on_entity_destroyed,
+  [defines.events.on_object_destroyed] = on_object_destroyed,
   [defines.events.on_tick] = on_tick,
 }
 

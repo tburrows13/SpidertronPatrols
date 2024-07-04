@@ -47,7 +47,7 @@ local function spidertron_replaced(event)
     end
   end
 
-  script.register_on_entity_destroyed(spidertron)
+  script.register_on_object_destroyed(spidertron)
 end
 
 function RemoteInterface.connect_to_remote_interfaces()
