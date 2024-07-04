@@ -20,10 +20,8 @@ script.on_event("sp-replace-previous-waypoint",
 )
 
 local function on_player_used_rts_tool(event)
-  if not event.success then return end
-
   local player = game.get_player(event.player_index)
-  local spidertron = event.vehicle
+  local spidertron = player.rts_selection[1]
   -- Prevent remote working on docked spidertrons from Space Spidertron
   if spidertron.name:sub(1, 10) == "ss-docked-" then return end
 
