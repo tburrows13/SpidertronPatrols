@@ -119,7 +119,7 @@ local function build_waypoint_player_input(i, waypoint)
         handler = {[defines.events.on_gui_elem_changed] = PatrolGuiWaypoint.item_selected}, tags = {index = i},
       },
       {
-        type = "drop-down", style = "circuit_condition_comparator_dropdown", items = condition_dropdown_contents, selected_index = info.condition,
+        type = "drop-down", style = "train_schedule_circuit_condition_comparator_dropdown", items = condition_dropdown_contents, selected_index = info.condition,
         handler = {[defines.events.on_gui_selection_state_changed] = PatrolGuiWaypoint.item_condition_changed}, tags = {index = i},
       },
       {
