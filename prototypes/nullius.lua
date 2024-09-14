@@ -25,8 +25,8 @@ if sp_data_stage == "data" then
   local remote_recipe = data.raw.recipe["nullius-mecha-remote"]
 
   remote_recipe.ingredients = {
-    {"nullius-processor-1", 2},
-    {"nullius-scout-remote", 1}
+    {type="item", name="nullius-processor-1", amount=2},
+    {type="item", name="nullius-scout-remote", amount=1}
   }
 end
 
@@ -83,8 +83,8 @@ if dock_enabled and sp_data_stage ~= "data" then
   recipe.category = "medium-crafting"
   recipe.energy_required = 60
   recipe.ingredients = {
-    {"nullius-large-chest-2", 2},
-    {"nullius-sensor-2", 1}
+    {type="item", name="nullius-large-chest-2", amount=2},
+    {type="item", name="nullius-sensor-2", amount=1}
   }
 
   local type = "container"

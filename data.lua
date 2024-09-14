@@ -18,7 +18,7 @@ if settings.startup["sp-remove-military-requirement"].value then
   if settings.startup["sp-enable-spiderling"].value then
     data.raw["spider-vehicle"]["sp-spiderling"].guns = nil
     for i, ingredient in pairs(data.raw.recipe["sp-spiderling"].ingredients) do
-      if ingredient[1] == "rocket-launcher" then
+      if ingredient.name == "rocket-launcher" then
         table.remove(data.raw.recipe["sp-spiderling"].ingredients, i)
         break
       end
