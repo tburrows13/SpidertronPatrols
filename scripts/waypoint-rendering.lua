@@ -18,7 +18,7 @@ local BLINK_LENGTH = 30
 
 local function on_tick(event)
   local tick = event.tick
-  for _, player_renders in pairs(global.blinking_renders) do
+  for _, player_renders in pairs(storage.blinking_renders) do
     for render_id, render_data in pairs(player_renders) do
       local render = render_data.render
       if render.valid then
@@ -45,9 +45,9 @@ local function create_render_paths(spidertron, player, create_chart_tags)
   local number_of_waypoints = #waypoints
 
   local path_renders = {}
-  local blinking_renders = global.blinking_renders[player.index] or {}
-  global.blinking_renders[player.index] = blinking_renders
-  local waypoint_index_to_blink = global.remotes_in_cursor[player.index]
+  local blinking_renders = storage.blinking_renders[player.index] or {}
+  storage.blinking_renders[player.index] = blinking_renders
+  local waypoint_index_to_blink = storage.remotes_in_cursor[player.index]
   if waypoint_index_to_blink == -1 then
     waypoint_index_to_blink = number_of_waypoints
   end
@@ -75,7 +75,7 @@ local function create_render_paths(spidertron, player, create_chart_tags)
         text = tostring(i),
         icon = {type = "virtual", name = "signal-waypoint"}
       })
-      if tag then global.chart_tags[render.id] = {tag} end
+      if tag then storage.chart_tags[render.id] = {tag} end
     end
 
     local next_waypoint = waypoints[i + 1]
@@ -122,15 +122,15 @@ local function create_render_paths(spidertron, player, create_chart_tags)
           a2 = math2d.position.add(a, math2d.position.multiply_scalar(vec, tag_spacing))
           b2 = math2d.position.subtract(b, math2d.position.multiply_scalar(vec, tag_spacing))
 
-          global.chart_tags[render.id] = create_chart_tag_path(surface, force, a2, b2, tag_spacing)
+          storage.chart_tags[render.id] = create_chart_tag_path(surface, force, a2, b2, tag_spacing)
         end
       end
     end
   end
 
-  local player_renders = global.path_renders[player.index] or {}
+  local player_renders = storage.path_renders[player.index] or {}
   player_renders[spidertron.unit_number] = path_renders
-  global.path_renders[player.index] = player_renders
+  storage.path_renders[player.index] = player_renders
 end
 
 function create_chart_tag_path(surface, force, from, to, tag_spacing)
@@ -156,22 +156,22 @@ end
 
 function WaypointRendering.update_player_render_paths(player)
   -- Clear up any previous renders
-  local player_renders = global.path_renders[player.index]
+  local player_renders = storage.path_renders[player.index]
   if player_renders then
     -- There are render ids to cleanup
     for _, path_renders in pairs(player_renders) do
       for _, render in pairs(path_renders) do
         local render_id = render.id
         render.destroy()
-        if global.chart_tags[render_id] then
-          for _, tag in pairs(global.chart_tags[render_id]) do
+        if storage.chart_tags[render_id] then
+          for _, tag in pairs(storage.chart_tags[render_id]) do
             if tag and tag.valid then tag.destroy() end
           end
-          global.chart_tags[render_id] = nil
+          storage.chart_tags[render_id] = nil
         end
       end
     end
-    global.path_renders[player.index] = nil
+    storage.path_renders[player.index] = nil
   end
 
   -- Create new path renders if necessary
@@ -206,7 +206,7 @@ local function need_to_update_player_render_paths(event)
   if event.name == defines.events.on_player_cursor_stack_changed then
     local remote = player.cursor_stack
     if not remote.valid_for_read or remote.name ~= "sp-spidertron-patrol-remote" then
-      global.remotes_in_cursor[player.index] = nil
+      storage.remotes_in_cursor[player.index] = nil
     end
   end
 
@@ -214,7 +214,7 @@ local function need_to_update_player_render_paths(event)
 end
 
 function WaypointRendering.update_spidertron_render_paths(unit_number)
-  for player_index, player_renders in pairs(global.path_renders) do
+  for player_index, player_renders in pairs(storage.path_renders) do
     if player_renders[unit_number] then
       WaypointRendering.update_player_render_paths(game.get_player(player_index))
     end
@@ -226,7 +226,7 @@ function WaypointRendering.update_render_text(spidertron)
   -- Updates numbered text on ground for given spidertron
   local waypoint_info = get_waypoint_info(spidertron)
 
-  local viewing_players = global.render_players
+  local viewing_players = storage.render_players
   local is_at_least_one_player = not not next(viewing_players)
 
   local color = add_alpha(spidertron.color)
@@ -270,7 +270,7 @@ function WaypointRendering.update_render_players()
   end
   local is_at_least_one_player = not not next(render_players)
 
-  for _, waypoint_info in pairs(global.spidertron_waypoints) do
+  for _, waypoint_info in pairs(storage.spidertron_waypoints) do
     for _, waypoint in pairs(waypoint_info.waypoints) do
       local render = waypoint.render
       if render and render.valid then
@@ -281,7 +281,7 @@ function WaypointRendering.update_render_players()
     end
   end
 
-  global.render_players = render_players
+  storage.render_players = render_players
 end
 
 local function on_runtime_mod_setting_changed(event)

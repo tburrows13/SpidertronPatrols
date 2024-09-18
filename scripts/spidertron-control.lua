@@ -92,7 +92,7 @@ end
 
 function on_tick()
   -- Handles spider stopping
-  for _, waypoint_info in pairs(global.spidertron_waypoints) do
+  for _, waypoint_info in pairs(storage.spidertron_waypoints) do
     if waypoint_info.on_patrol and waypoint_info.tick_arrived and not waypoint_info.stopped and waypoint_info.spidertron.valid then
       local spidertron = waypoint_info.spidertron
       local waypoint = waypoint_info.waypoints[waypoint_info.current_index]
@@ -123,7 +123,7 @@ function on_tick()
 end
 
 local function handle_wait_timers()
-  for _, waypoint_info in pairs(global.spidertron_waypoints) do
+  for _, waypoint_info in pairs(storage.spidertron_waypoints) do
     if waypoint_info.on_patrol and waypoint_info.tick_arrived and waypoint_info.spidertron.valid then
       -- Spidertron is waiting
       local spidertron = waypoint_info.spidertron
@@ -173,9 +173,9 @@ local function handle_wait_timers()
         end
       elseif waypoint_type == "circuit-condition" then
         local item_count_info = waypoint.item_count_info
-        local dock_unit_number = global.spidertrons_docked[spidertron.unit_number]
+        local dock_unit_number = storage.spidertrons_docked[spidertron.unit_number]
         if dock_unit_number then
-          local dock = global.spidertron_docks[dock_unit_number].dock
+          local dock = storage.spidertron_docks[dock_unit_number].dock
           if dock and dock.valid and item_count_info.item_name and item_count_info.item_name.name then
             local signal_count = dock.get_merged_signal(item_count_info.item_name)
             if check_condition(item_count_info.condition, signal_count, item_count_info.count) then
@@ -251,7 +251,7 @@ local function on_entity_settings_pasted(event)
       waypoint.render = nil
     end
 
-    global.spidertron_waypoints[destination.unit_number] = waypoint_info
+    storage.spidertron_waypoints[destination.unit_number] = waypoint_info
     PatrolGui.update_gui_schedule(waypoint_info)
     WaypointRendering.update_render_text(destination)  -- Inserts text at the position that we have just added
   end

@@ -31,15 +31,15 @@ local function on_player_used_rts_tool(event)
     local position = snap_waypoint_position(player.selected, event.position)
     local replace_waypoint = replace_this_tick[event.player_index] == event.tick
 
-    local waypoint_index = global.remotes_in_cursor[player.index]
+    local waypoint_index = storage.remotes_in_cursor[player.index]
     local waypoint_info = get_waypoint_info(spidertron)
     local number_of_waypoints = #waypoint_info.waypoints
     if waypoint_index and waypoint_index ~= -1 then
       waypoint_index = math.min(number_of_waypoints + 1, waypoint_index)
       if replace_waypoint then
-        global.remotes_in_cursor[player.index] = waypoint_index
+        storage.remotes_in_cursor[player.index] = waypoint_index
       else
-        global.remotes_in_cursor[player.index] = waypoint_index + 1
+        storage.remotes_in_cursor[player.index] = waypoint_index + 1
       end
     else
       waypoint_index = number_of_waypoints
@@ -63,9 +63,9 @@ function PatrolRemote.give_remote(player, spidertron, waypoint_index)
   player.rts_selection = {spidertron}
 
   if waypoint_index then
-    global.remotes_in_cursor[player.index] = waypoint_index
+    storage.remotes_in_cursor[player.index] = waypoint_index
   else
-    global.remotes_in_cursor[player.index] = -1  -- Represents last waypoint
+    storage.remotes_in_cursor[player.index] = -1  -- Represents last waypoint
   end
 end
 
