@@ -116,7 +116,7 @@ local function process_active_mods()
   storage.freight_forwarding_enabled = game.active_mods["FreightForwarding"] ~= nil
   storage.freight_forwarding_container_items = {}
   if storage.freight_forwarding_enabled then
-    for name, _ in pairs(game.item_prototypes) do
+    for name, _ in pairs(prototypes.item) do
       if name:sub(1, 15) == "deadlock-crate-" or name:sub(1, 13) == "ic-container-" then
         -- Old versions of FF use DCM, newer versions use IC
         storage.freight_forwarding_container_items[name] = true

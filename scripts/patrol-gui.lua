@@ -201,7 +201,7 @@ local function build_waypoint_frames(waypoint_info, spidertron)
       style = "sp_spidertron_schedule_add_station_button",
       mouse_button_filter = {"left"},
       caption = {"gui-patrol.add-waypoint"},
-      tooltip = game.item_prototypes["sp-spidertron-patrol-remote"].localised_description,
+      tooltip = prototypes.item["sp-spidertron-patrol-remote"].localised_description,
       handler = {[defines.events.on_gui_click] = PatrolGuiGeneral.give_connected_remote},
     })
   return frames
@@ -248,7 +248,7 @@ local function build_gui(player, spidertron)
                 style = "slot_sized_button",
                 mouse_button_filter = {"left"},
                 sprite = "item/sp-spidertron-patrol-remote",
-                tooltip = game.item_prototypes["sp-spidertron-patrol-remote"].localised_description,
+                tooltip = prototypes.item["sp-spidertron-patrol-remote"].localised_description,
                 handler = {[defines.events.on_gui_click] = PatrolGuiGeneral.give_connected_remote},
               },
             }
