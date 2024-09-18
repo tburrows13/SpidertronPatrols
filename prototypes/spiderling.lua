@@ -70,7 +70,7 @@ local spiderling_recipe = {
     {type="item", name="rocket-launcher", amount=1},
     {type="item", name="low-density-structure", amount=40},
     {type="item", name="radar", amount=1},
-    {type="item", name="effectivity-module-2", amount=2},
+    {type="item", name="efficiency-module-2", amount=2},
     {type="item", name="raw-fish", amount=1}
   },
   results = {{type="item", name="sp-spiderling", amount=1}},

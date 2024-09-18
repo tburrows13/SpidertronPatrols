@@ -12,7 +12,7 @@ local spiderling_tech = {
   prerequisites = {
     "power-armor",
     "exoskeleton-equipment",
-    "effectivity-module-2",
+    "efficiency-module-2",
     "low-density-structure",
     "military-3",
     "rocketry",
@@ -85,6 +85,6 @@ if spiderling_enabled then
     --"exoskeleton-equipment",
     "fission-reactor-equipment",
     --"rocketry",
-    "effectivity-module-3"
+    "efficiency-module-3"
   }
 end
