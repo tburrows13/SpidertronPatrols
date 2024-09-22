@@ -131,15 +131,15 @@ local function build_waypoint_player_input(i, waypoint)
 end
 
 local function generate_button_status(waypoint_info, index)
-  local style = "train_schedule_action_button"
+  local toggled = false
   local sprite = "utility/play"
   if waypoint_info.on_patrol and waypoint_info.current_index == index then
-    style = "sp_clicked_train_schedule_action_button"
+    toggled = true
     if waypoint_info.tick_arrived then
       sprite = "utility/stop"
     end
   end
-  return {style = style, sprite = sprite}
+  return {toggled = toggled, sprite = sprite}
 end
 
 local function build_waypoint_frames(waypoint_info, spidertron)
@@ -150,7 +150,7 @@ local function build_waypoint_frames(waypoint_info, spidertron)
     table.insert(frames,
       {type = "frame", --[[name = "schedule-waypoint-" .. i,]] style = "sp_spidertron_schedule_station_frame", children = {
         {
-          type = "sprite-button", name = "status_button", style = button_status.style, mouse_button_filter = {"left"}, sprite = button_status.sprite,
+          type = "sprite-button", name = "status_button", style = "train_schedule_action_button", toggled = button_status.toggled, mouse_button_filter = {"left"}, sprite = button_status.sprite,
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.go_to_waypoint}, tags = {index = i},
         },
         {
@@ -284,15 +284,13 @@ local function build_gui(player, spidertron)
                 {
                   type = "sprite-button", style = "tool_button", mouse_button_filter = {"left"}, sprite = "sp-camera", tooltip = {"gui-patrol.toggle-camera"},
                   name = "toggle_camera_button",
-                  auto_toggle = true,
-                  elem_mods = {toggled = true},
+                  auto_toggle = true, toggled = true,
                   handler = {[defines.events.on_gui_click] = PatrolGui.toggle_camera},
                 },
                 {
                   type = "sprite-button", style = "tool_button", mouse_button_filter = {"left"}, sprite = "utility/center", tooltip = {"gui-patrol.toggle-center-on-spidertron"},
                   name = "toggle_center_button",
-                  auto_toggle = true,
-                  elem_mods = {toggled = true},
+                  auto_toggle = true, toggled = true,
                   handler = {[defines.events.on_gui_click] = PatrolGui.toggle_camera_center_on_spidertron},
                 },
                 {
@@ -328,7 +326,7 @@ function PatrolGui.update_gui_button_states(waypoint_info)
           if status_button then
             -- Filters out "Add waypoints" button
             local button_status = generate_button_status(waypoint_info, i)
-            status_button.style = button_status.style
+            status_button.toggled = button_status.toggled
             status_button.sprite = button_status.sprite
           end
         end
