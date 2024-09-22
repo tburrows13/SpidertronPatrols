@@ -179,17 +179,17 @@ local function build_waypoint_frames(waypoint_info, spidertron)
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.give_connected_remote_for_waypoint}, tags = {index = i},
         },
         {
-          type = "sprite-button", name = "up", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-up-white", hovered_sprite = "sp-up-black", clicked_sprite = "sp-up-black",
+          type = "sprite-button", name = "up", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-up-white",
           ref = {"waypoint_button", i, "up"},
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.move_waypoint_up}, tags = {index = i},
         },
         {
-          type = "sprite-button", name = "down", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-down-white", hovered_sprite = "sp-down-black", clicked_sprite = "sp-down-black",
+          type = "sprite-button", name = "down", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-down-white",
           ref = {"waypoint_button", i, "down"},
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.move_waypoint_down}, tags = {index = i},
         },
         {
-          type = "sprite-button", style = "train_schedule_delete_button", mouse_button_filter = {"left"}, sprite = "utility/close_white", hovered_sprite = "utility/close_black", clicked_sprite = "utility/close_black",
+          type = "sprite-button", style = "train_schedule_delete_button", mouse_button_filter = {"left"}, sprite = "utility/close",
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.delete_waypoint}, tags = {index = i},
         },
       }}
@@ -282,13 +282,17 @@ local function build_gui(player, spidertron)
                 build_on_patrol_switch(waypoint_info),
                 {type = "empty-widget", style = "sp_stretchable_empty_widget"},
                 {
-                  type = "sprite-button", style = "sp_clicked_tool_button", mouse_button_filter = {"left"}, sprite = "sp-camera", tooltip = {"gui-patrol.toggle-camera"},
+                  type = "sprite-button", style = "tool_button", mouse_button_filter = {"left"}, sprite = "sp-camera", tooltip = {"gui-patrol.toggle-camera"},
                   name = "toggle_camera_button",
+                  auto_toggle = true,
+                  elem_mods = {toggled = true},
                   handler = {[defines.events.on_gui_click] = PatrolGui.toggle_camera},
                 },
                 {
-                  type = "sprite-button", style = "sp_clicked_tool_button", mouse_button_filter = {"left"}, sprite = "utility/center", tooltip = {"gui-patrol.toggle-center-on-spidertron"},
+                  type = "sprite-button", style = "tool_button", mouse_button_filter = {"left"}, sprite = "utility/center", tooltip = {"gui-patrol.toggle-center-on-spidertron"},
                   name = "toggle_center_button",
+                  auto_toggle = true,
+                  elem_mods = {toggled = true},
                   handler = {[defines.events.on_gui_click] = PatrolGui.toggle_camera_center_on_spidertron},
                 },
                 {
@@ -429,13 +433,11 @@ end
 function PatrolGui.toggle_camera(player, spidertron, gui_elements)
   local camera_button = gui_elements.toggle_camera_button
   local camera = gui_elements.camera
-  if camera_button.style.name == "tool_button" then
+  if camera_button.toggled then
     -- Button was clicked
-    camera_button.style = "sp_clicked_tool_button"
     camera.parent.visible = true
   else
     -- Button was unclicked
-    camera_button.style = "tool_button"
     camera.parent.visible = false
   end
 end
@@ -443,13 +445,11 @@ end
 function PatrolGui.toggle_camera_center_on_spidertron(player, spidertron, gui_elements)
   local center_button = gui_elements.toggle_center_button
   local camera = gui_elements.camera
-  if center_button.style.name == "tool_button" then
+  if center_button.toggled then
     -- Button was clicked
-    center_button.style = "sp_clicked_tool_button"
     camera.entity = spidertron
   else
     -- Button was unclicked
-    center_button.style = "tool_button"
     camera.entity = nil
     camera.position = spidertron.position
   end
