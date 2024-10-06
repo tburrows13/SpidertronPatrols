@@ -1,8 +1,10 @@
 local styles = data.raw["gui-style"]["default"]
-local frame_width = 440 + 28 + 8 -4
+local frame_width = 440 + 28 + 8 - 4
+local scroll_pane_width = frame_width + 8 + 8
 
 styles.sp_relative_stretchable_frame = {
   type = "frame_style",
+  horizontally_stretchable = "on",
   --vertically_stretchable = "off",
   --vertically_squashable = "on",
   -- maximal_height = 930,
@@ -23,6 +25,9 @@ styles.sp_titlebar_drag_handle = {
 styles.sp_spidertron_schedule_scroll_pane = {
   type = "scroll_pane_style",
   parent = "train_schedule_scroll_pane",
+  width = scroll_pane_width,
+  margin = 0,
+  scrollbars_go_outside = false,
   vertically_stretchable = "stretch_and_expand",
   background_graphical_set = {
     position = {282, 17},
@@ -45,6 +50,7 @@ styles.sp_stretchable_subheader_frame = {
   parent = "subheader_frame",
   horizontally_stretchable = "on",
   horizontally_squashable = "on",
+  --margin = 0,
 }
 
 styles.sp_patrol_schedule_mode_switch_horizontal_flow = {
