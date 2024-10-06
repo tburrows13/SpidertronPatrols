@@ -19,9 +19,9 @@ script.on_event("sp-replace-previous-waypoint",
   end
 )
 
-local function on_player_used_rts_tool(event)
+local function on_player_used_spidertron_remote(event)
   local player = game.get_player(event.player_index)
-  local spidertron = player.rts_selection[1]
+  local spidertron = player.spidertron_remote_selection[1]
   -- Prevent remote working on docked spidertrons from Space Spidertron
   if spidertron.name:sub(1, 10) == "ss-docked-" then return end
 
@@ -60,7 +60,7 @@ function PatrolRemote.give_remote(player, spidertron, waypoint_index)
   end
   local cursor = player.cursor_stack
   cursor.set_stack("sp-spidertron-patrol-remote")
-  player.rts_selection = {spidertron}
+  player.spidertron_remote_selection = {spidertron}
 
   if waypoint_index then
     storage.remotes_in_cursor[player.index] = waypoint_index
@@ -70,7 +70,7 @@ function PatrolRemote.give_remote(player, spidertron, waypoint_index)
 end
 
 PatrolRemote.events = {
-  [defines.events.on_player_used_rts_tool] = on_player_used_rts_tool,
+  [defines.events.on_player_used_spidertron_remote] = on_player_used_spidertron_remote,
 }
 
 return PatrolRemote
