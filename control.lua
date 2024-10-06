@@ -106,14 +106,14 @@ end
 
 
 local function process_active_mods()
-  local version_string = game.active_mods["base"]
+  local version_string = script.active_mods["base"]
   local version = util.split(version_string, ".")
   for i=1, #version do
     version[i] = tonumber(version[i])
   end
   storage.base_version = version
 
-  storage.freight_forwarding_enabled = game.active_mods["FreightForwarding"] ~= nil
+  storage.freight_forwarding_enabled = script.active_mods["FreightForwarding"] ~= nil
   storage.freight_forwarding_container_items = {}
   if storage.freight_forwarding_enabled then
     for name, _ in pairs(prototypes.item) do
