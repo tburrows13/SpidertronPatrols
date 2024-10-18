@@ -32,6 +32,7 @@ storage.spidertron_waypoints: indexed by spidertron.unit_number:
   tick_inactive? :: int (only used whilst at an "inactivity" waypoint)
   previous_inventories? :: table (only used whilst at an "inactivity" waypoint)
   on_patrol :: bool
+  renders :: array of LuaRenderObject
 ]]
 
 
@@ -193,8 +194,8 @@ local function config_changed_setup(changed_data)
       storage.remotes_in_cursor = {}
       storage.blinking_renders = {}
     end
-    if old_version[2] < 2 then
-      -- Pre 2.2. Has to go at end so that globals can be initialized first.
+    if old_version[2] < 5 then
+      -- Pre 2.5. Has to go at end so that globals can be initialized first.
       reset_render_objects()
     end
   end
@@ -209,6 +210,7 @@ Control.events = {
 function reset_render_objects()
   rendering.clear("SpidertronPatrols")
   storage.path_renders = {}
+  storage.blinking_renders = {}
   WaypointRendering.update_render_players()
   for _, waypoint_info in pairs(storage.spidertron_waypoints) do
     local spidertron = waypoint_info.spidertron
