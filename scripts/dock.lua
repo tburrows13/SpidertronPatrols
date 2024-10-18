@@ -199,14 +199,16 @@ local function get_filters(inventory)
   return filters
 end
 
-local function get_contents_1_1(inventory)
+local function get_contents_dict(inventory)
   -- Temporary abstraction for 2.0 version, ignoring quality
-  local contents_2_0 = inventory.get_contents()
-  local contents_1_1 = {}
-  for _, item in pairs(contents_2_0) do
-    contents_1_1[item.name] = item.count + (contents_1_1[item.name] or 0)
+  local contents_list = inventory.get_contents()
+  local contents_dict = {}
+  for _, item in pairs(contents_list) do
+    local contents_by_quality = contents_dict[item.name] or {}
+    contents_by_quality[item.quality] = item.count + (contents_by_quality[item.quality] or 0)
+    contents_dict[item.name] = contents_by_quality
   end
-  return contents_1_1
+  return contents_dict
 end
 
 local function update_dock_inventory(dock, spidertron, previous_contents)
@@ -219,11 +221,11 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
   end
 
   local spidertron_inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
-  local spidertron_contents = get_contents_1_1(spidertron_inventory)
+  local spidertron_contents = get_contents_dict(spidertron_inventory)
   local spidertron_filters = get_filters(spidertron_inventory)
 
   local dock_inventory = dock.get_inventory(defines.inventory.chest)
-  local dock_contents = get_contents_1_1(dock_inventory)
+  local dock_contents = get_contents_dict(dock_inventory)
   local dock_filters = get_filters(dock_inventory)
 
   -- If Freight Forwarding is installed, we need to spill an container items on the ground because they aren't allowed inside spidertrons
@@ -265,27 +267,33 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
   end
 
   local spidertron_diff = table_diff(spidertron_contents, previous_items)
-  for item_name, count in pairs(spidertron_diff) do
-    if count > 0 then
-      dock_inventory.insert{name = item_name, count = count}
-    else
-      dock_inventory.remove{name = item_name, count = -count}
+  for item_name, quality_table in pairs(spidertron_diff) do
+    for quality_name, count in pairs(quality_table) do
+
+      if count > 0 then
+        dock_inventory.insert{name = item_name, count = count, quality = quality_name}
+      else
+        dock_inventory.remove{name = item_name, count = -count, quality = quality_name}
+      end
     end
   end
 
   local dock_diff = table_diff(dock_contents, previous_items)
   for item_name, count in pairs(dock_diff) do
-    if count > 0 then
-      spidertron_inventory.insert{name = item_name, count = count}
-    else
-      spidertron_inventory.remove{name = item_name, count = -count}
+    for quality_name, count in pairs(count) do
+
+      if count > 0 then
+        spidertron_inventory.insert{name = item_name, count = count, quality = quality_name}
+      else
+        spidertron_inventory.remove{name = item_name, count = -count, quality = quality_name}
+      end
     end
   end
 
   spidertron_inventory.sort_and_merge()
   dock_inventory.sort_and_merge()
 
-  local new_spidertron_contents = {items = get_contents_1_1(spidertron_inventory), filters = get_filters(spidertron_inventory)}
+  local new_spidertron_contents = {items = get_contents_dict(spidertron_inventory), filters = get_filters(spidertron_inventory)}
   --local new_dock_contents = dock_inventory.get_contents()
   --assert(table_equals(new_spidertron_contents, new_dock_contents))  -- TODO Remove for release
   return new_spidertron_contents
@@ -330,13 +338,15 @@ local function connect_to_spidertron(dock_data, spidertron, surface)
   --game.print("Spidertron docked")
   --surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-docked"}}
 
-  local spidertron_contents = {items = get_contents_1_1(inventory), filters = get_filters(inventory)}
+  local spidertron_contents = {items = get_contents_dict(inventory), filters = get_filters(inventory)}
   local dock_inventory = dock.get_inventory(defines.inventory.chest)
   for index, filter in pairs(spidertron_contents.filters) do
     dock_inventory.set_filter(index, filter)
   end
-  for item_name, count in pairs(spidertron_contents.items) do
-    dock_inventory.insert{name = item_name, count = count}
+  for item_name, quality_dict in pairs(spidertron_contents.items) do
+    for quality_name, count in pairs(quality_dict) do
+      dock_inventory.insert{name = item_name, count = count, quality = quality_name}
+    end
   end
   dock_data.previous_contents = spidertron_contents
   return true

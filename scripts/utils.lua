@@ -33,20 +33,26 @@ end
 
 
 function table_diff(table1, table2)
-  -- Returns a table `diff` indexed by item_name where positive values are the amount in table1 not in table2, negative values are the amount in table2
+  -- Returns a table `diff` indexed by item_name, then by quality_name where positive values are the amount in table1 not in table2, negative values are the amount in table2
   diff = {}
   table2 = table.deepcopy(table2)
-  for item_name, count1 in pairs(table1) do
-    local count2 = table2[item_name] or 0
-    if count1 ~= count2 then
-      diff[item_name] = count1 - count2
+  for item_name, quality_dict in pairs(table1) do
+    for quality_name, count1 in pairs(quality_dict) do
+      local count2 = table2[item_name] and table2[item_name][quality_name] or 0
+      if count1 ~= count2 then
+        if not diff[item_name] then diff[item_name] = {} end
+        diff[item_name][quality_name] = count1 - count2
+      end
+      if table2[item_name] then table2[item_name][quality_name] = nil end
     end
-    table2[item_name] = nil
   end
 
   -- Only iterates through what is left of table2, so all items are not in table1
   for item_name, count2 in pairs(table2) do
-    diff[item_name] = -count2
+    for quality_name, count in pairs(count2) do
+      if not diff[item_name] then diff[item_name] = {} end
+      diff[item_name][quality_name] = -count
+    end
   end
   return diff
 end
