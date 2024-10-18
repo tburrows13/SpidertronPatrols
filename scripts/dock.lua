@@ -22,7 +22,7 @@ end
 -- local on_built_filter = {{filter = "type", type = "container"}, {filter = "type", type = "logistic-container"}, {filter = "type", type = "spider-vehicle"}}
 
 function on_object_destroyed(event)
-  local unit_number = event.unit_number
+  local unit_number = event.useful_id
   if unit_number then
     -- Entity is a dock
     local dock_data = storage.spidertron_docks[unit_number]
@@ -92,16 +92,17 @@ local function animate_dock(dock)
 
   rendering.draw_animation{
     animation = "sp-spidertron-dock-door",
-    target = dock,
+    target = {
+      entity = dock,
+      offset = util.by_pixel_hr(-9, -46),
+    },
     surface = dock.surface,
     time_to_live = frames,
     animation_offset = animation_offset,
     --animation_offset = (tick * (speed - speed') + offset) % #frames`
-
     --animation_offset = new_dock_name == "sp-spidertron-dock-0" and (game.tick % 8) or (8 - (game.tick % 8)),
     animation_speed = animation_speed,
     render_layer = "higher-object-under",
-    target_offset = util.by_pixel_hr(-9, -46),
   }
 end
   
