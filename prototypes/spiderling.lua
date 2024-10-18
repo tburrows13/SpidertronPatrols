@@ -66,14 +66,14 @@ local spiderling_recipe = {
   energy_required = 5,
   ingredients =
   {
-    {"exoskeleton-equipment", 4},
-    {"rocket-launcher", 1},
-    {"low-density-structure", 40},
-    {"radar", 1},
-    {"effectivity-module-2", 2},
-    {"raw-fish", 1}
+    {type="item", name="exoskeleton-equipment", amount=4},
+    {type="item", name="rocket-launcher", amount=1},
+    {type="item", name="low-density-structure", amount=40},
+    {type="item", name="radar", amount=1},
+    {type="item", name="efficiency-module-2", amount=2},
+    {type="item", name="raw-fish", amount=1}
   },
-  result = "sp-spiderling"
+  results = {{type="item", name="sp-spiderling", amount=1}},
 }
 
 data:extend{spiderling_item, spiderling_recipe}

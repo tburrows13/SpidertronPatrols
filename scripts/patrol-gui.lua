@@ -119,7 +119,7 @@ local function build_waypoint_player_input(i, waypoint)
         handler = {[defines.events.on_gui_elem_changed] = PatrolGuiWaypoint.item_selected}, tags = {index = i},
       },
       {
-        type = "drop-down", style = "circuit_condition_comparator_dropdown", items = condition_dropdown_contents, selected_index = info.condition,
+        type = "drop-down", style = "train_schedule_circuit_condition_comparator_dropdown", items = condition_dropdown_contents, selected_index = info.condition,
         handler = {[defines.events.on_gui_selection_state_changed] = PatrolGuiWaypoint.item_condition_changed}, tags = {index = i},
       },
       {
@@ -131,15 +131,15 @@ local function build_waypoint_player_input(i, waypoint)
 end
 
 local function generate_button_status(waypoint_info, index)
-  local style = "train_schedule_action_button"
+  local toggled = false
   local sprite = "utility/play"
   if waypoint_info.on_patrol and waypoint_info.current_index == index then
-    style = "sp_clicked_train_schedule_action_button"
+    toggled = true
     if waypoint_info.tick_arrived then
       sprite = "utility/stop"
     end
   end
-  return {style = style, sprite = sprite}
+  return {toggled = toggled, sprite = sprite}
 end
 
 local function build_waypoint_frames(waypoint_info, spidertron)
@@ -150,7 +150,7 @@ local function build_waypoint_frames(waypoint_info, spidertron)
     table.insert(frames,
       {type = "frame", --[[name = "schedule-waypoint-" .. i,]] style = "sp_spidertron_schedule_station_frame", children = {
         {
-          type = "sprite-button", name = "status_button", style = button_status.style, mouse_button_filter = {"left"}, sprite = button_status.sprite,
+          type = "sprite-button", name = "status_button", style = "train_schedule_action_button", toggled = button_status.toggled, mouse_button_filter = {"left"}, sprite = button_status.sprite,
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.go_to_waypoint}, tags = {index = i},
         },
         {
@@ -175,21 +175,21 @@ local function build_waypoint_frames(waypoint_info, spidertron)
           style_mods = {right_margin = -4},
           mouse_button_filter = {"left"},
           sprite = "item/sp-spidertron-patrol-remote",
-          tooltip = {"", {"gui-patrol.insert-after-waypoint"}, "\n", game.item_prototypes["sp-spidertron-patrol-remote"].localised_description},
+          tooltip = {"", {"gui-patrol.insert-after-waypoint"}, "\n", prototypes.item["sp-spidertron-patrol-remote"].localised_description},
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.give_connected_remote_for_waypoint}, tags = {index = i},
         },
         {
-          type = "sprite-button", name = "up", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-up-white", hovered_sprite = "sp-up-black", clicked_sprite = "sp-up-black",
+          type = "sprite-button", name = "up", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-up-white",
           ref = {"waypoint_button", i, "up"},
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.move_waypoint_up}, tags = {index = i},
         },
         {
-          type = "sprite-button", name = "down", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-down-white", hovered_sprite = "sp-down-black", clicked_sprite = "sp-down-black",
+          type = "sprite-button", name = "down", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-down-white",
           ref = {"waypoint_button", i, "down"},
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.move_waypoint_down}, tags = {index = i},
         },
         {
-          type = "sprite-button", style = "train_schedule_delete_button", mouse_button_filter = {"left"}, sprite = "utility/close_white", hovered_sprite = "utility/close_black", clicked_sprite = "utility/close_black",
+          type = "sprite-button", style = "train_schedule_delete_button", mouse_button_filter = {"left"}, sprite = "utility/close",
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.delete_waypoint}, tags = {index = i},
         },
       }}
@@ -201,7 +201,7 @@ local function build_waypoint_frames(waypoint_info, spidertron)
       style = "sp_spidertron_schedule_add_station_button",
       mouse_button_filter = {"left"},
       caption = {"gui-patrol.add-waypoint"},
-      tooltip = game.item_prototypes["sp-spidertron-patrol-remote"].localised_description,
+      tooltip = prototypes.item["sp-spidertron-patrol-remote"].localised_description,
       handler = {[defines.events.on_gui_click] = PatrolGuiGeneral.give_connected_remote},
     })
   return frames
@@ -225,7 +225,7 @@ local function build_gui(player, spidertron)
   if relative_frame then
     relative_frame.destroy()
   end
-  global.open_gui_elements[player.index] = nil
+  storage.open_gui_elements[player.index] = nil
 
   local waypoint_info = get_waypoint_info(spidertron)
   local anchor = {gui = defines.relative_gui_type.spider_vehicle_gui, position = defines.relative_gui_position.right}
@@ -248,7 +248,7 @@ local function build_gui(player, spidertron)
                 style = "slot_sized_button",
                 mouse_button_filter = {"left"},
                 sprite = "item/sp-spidertron-patrol-remote",
-                tooltip = game.item_prototypes["sp-spidertron-patrol-remote"].localised_description,
+                tooltip = prototypes.item["sp-spidertron-patrol-remote"].localised_description,
                 handler = {[defines.events.on_gui_click] = PatrolGuiGeneral.give_connected_remote},
               },
             }
@@ -259,7 +259,7 @@ local function build_gui(player, spidertron)
     return
   end
 
-  global.open_gui_elements[player.index] = gui.add(player.gui.relative, {
+  storage.open_gui_elements[player.index] = gui.add(player.gui.relative, {
     {
       type = "frame",
       style = "sp_relative_stretchable_frame",
@@ -282,13 +282,15 @@ local function build_gui(player, spidertron)
                 build_on_patrol_switch(waypoint_info),
                 {type = "empty-widget", style = "sp_stretchable_empty_widget"},
                 {
-                  type = "sprite-button", style = "sp_clicked_tool_button", mouse_button_filter = {"left"}, sprite = "sp-camera", tooltip = {"gui-patrol.toggle-camera"},
+                  type = "sprite-button", style = "tool_button", mouse_button_filter = {"left"}, sprite = "sp-camera", tooltip = {"gui-patrol.toggle-camera"},
                   name = "toggle_camera_button",
+                  auto_toggle = true, toggled = true,
                   handler = {[defines.events.on_gui_click] = PatrolGui.toggle_camera},
                 },
                 {
-                  type = "sprite-button", style = "sp_clicked_tool_button", mouse_button_filter = {"left"}, sprite = "utility/center", tooltip = {"gui-patrol.toggle-center-on-spidertron"},
+                  type = "sprite-button", style = "tool_button", mouse_button_filter = {"left"}, sprite = "utility/center", tooltip = {"gui-patrol.toggle-center-on-spidertron"},
                   name = "toggle_center_button",
+                  auto_toggle = true, toggled = true,
                   handler = {[defines.events.on_gui_click] = PatrolGui.toggle_camera_center_on_spidertron},
                 },
                 {
@@ -316,7 +318,7 @@ function PatrolGui.update_gui_button_states(waypoint_info)
   -- Use when not the result of a GUI interaction
   for _, player in pairs(game.players) do
     if player.opened_gui_type == defines.gui_type.entity and player.opened == waypoint_info.spidertron then
-      local gui_elements = global.open_gui_elements[player.index]
+      local gui_elements = storage.open_gui_elements[player.index]
       if gui_elements then
         local scroll_pane = gui_elements["schedule-scroll-pane"]
         for i, frame in pairs(scroll_pane.children) do
@@ -324,7 +326,7 @@ function PatrolGui.update_gui_button_states(waypoint_info)
           if status_button then
             -- Filters out "Add waypoints" button
             local button_status = generate_button_status(waypoint_info, i)
-            status_button.style = button_status.style
+            status_button.toggled = button_status.toggled
             status_button.sprite = button_status.sprite
           end
         end
@@ -338,7 +340,7 @@ function PatrolGui.update_gui_schedule(waypoint_info)
 
   for _, player in pairs(game.players) do
     if player.opened_gui_type == defines.gui_type.entity and player.opened == waypoint_info.spidertron then
-      local gui_elements = global.open_gui_elements[player.index]
+      local gui_elements = storage.open_gui_elements[player.index]
       if gui_elements then
         local scroll_pane = gui_elements["schedule-scroll-pane"]
         scroll_pane.clear()
@@ -359,7 +361,7 @@ end
 function PatrolGui.update_gui_switch(waypoint_info)
   for _, player in pairs(game.players) do
     if player.opened_gui_type == defines.gui_type.entity and player.opened == waypoint_info.spidertron then
-      local gui_elements = global.open_gui_elements[player.index]
+      local gui_elements = storage.open_gui_elements[player.index]
       if gui_elements then
         gui_elements.on_patrol_switch.switch_state = build_on_patrol_switch(waypoint_info).switch_state
         PatrolGui.update_gui_button_states(waypoint_info)
@@ -370,31 +372,31 @@ end
 
 local function on_tick()
   -- Updates GUI highlights
-  for player_index, button_info in pairs(global.player_highlights) do
+  for player_index, button_info in pairs(storage.player_highlights) do
     local button = button_info.button
     local tick_started = button_info.tick_started
     if button and button.valid then
       if (game.tick - tick_started) > 20 then
         button.style = "sp_schedule_move_button"
         button.sprite = "sp-" .. button.name .. "-white"
-        global.player_highlights[player_index] = nil
+        storage.player_highlights[player_index] = nil
       end
     else
-      global.player_highlights[player_index] = nil
+      storage.player_highlights[player_index] = nil
     end
   end
 end
 
 
 function PatrolGui.clear_highlights_for_player(player)
-  local button_info = global.player_highlights[player.index]
+  local button_info = storage.player_highlights[player.index]
   if button_info then
     local button = button_info.button
     if button and button.valid then
       button.style = "sp_schedule_move_button"
       button.sprite = "sp-" .. button.name .. "-white"
     end
-    global.player_highlights[player.index] = nil
+    storage.player_highlights[player.index] = nil
   end
 end
 
@@ -429,13 +431,11 @@ end
 function PatrolGui.toggle_camera(player, spidertron, gui_elements)
   local camera_button = gui_elements.toggle_camera_button
   local camera = gui_elements.camera
-  if camera_button.style.name == "tool_button" then
+  if camera_button.toggled then
     -- Button was clicked
-    camera_button.style = "sp_clicked_tool_button"
     camera.parent.visible = true
   else
     -- Button was unclicked
-    camera_button.style = "tool_button"
     camera.parent.visible = false
   end
 end
@@ -443,13 +443,11 @@ end
 function PatrolGui.toggle_camera_center_on_spidertron(player, spidertron, gui_elements)
   local center_button = gui_elements.toggle_center_button
   local camera = gui_elements.camera
-  if center_button.style.name == "tool_button" then
+  if center_button.toggled then
     -- Button was clicked
-    center_button.style = "sp_clicked_tool_button"
     camera.entity = spidertron
   else
     -- Button was unclicked
-    center_button.style = "tool_button"
     camera.entity = nil
     camera.position = spidertron.position
   end
@@ -461,7 +459,7 @@ function PatrolGui.open_location_on_map(player, spidertron, gui_elements)
   if entity then
     -- At 100% interface scale (display_scale=1), 1/16 is identical to vanilla 'open in map' scale
     -- At 200% interface scale (display_scale=2), 1/8
-    if global.base_version[2] > 1 or global.base_version[3] >= 75 then
+    if storage.base_version[2] > 1 or storage.base_version[3] >= 75 then
       -- base >= 1.1.75
       player.open_map(entity.position, (1/16) * player.display_scale, entity)  
     else
@@ -580,7 +578,7 @@ function PatrolGuiWaypoint.move_waypoint_up(player, spidertron, gui_elements, wa
     button.sprite = "sp-up-black"
 
     PatrolGui.clear_highlights_for_player(player)
-    global.player_highlights[player.index] = {button = button, tick_started = game.tick}
+    storage.player_highlights[player.index] = {button = button, tick_started = game.tick}
   end
 end
 
@@ -616,7 +614,7 @@ function PatrolGuiWaypoint.move_waypoint_down(player, spidertron, gui_elements, 
     button.sprite = "sp-down-black"
 
     PatrolGui.clear_highlights_for_player(player)
-    global.player_highlights[player.index] = {button = button, tick_started = game.tick}
+    storage.player_highlights[player.index] = {button = button, tick_started = game.tick}
   end
 end
 
@@ -626,7 +624,7 @@ function PatrolGuiWaypoint.delete_waypoint(player, spidertron, gui_elements, way
   if waypoint_info.current_index > index_to_delete then
     waypoint_info.current_index = waypoint_info.current_index - 1
   end
-  rendering.destroy(waypoints[index_to_delete].render_id)
+  waypoints[index_to_delete].render.destroy()
   table.remove(waypoints, index_to_delete)
   if not next(waypoints) then
     -- All waypoints are gone, so cleanup
@@ -717,7 +715,7 @@ gui.add_handlers(PatrolGui,
   function(event, handler)
     local player = game.get_player(event.player_index)
     local spidertron = player.opened
-    local gui_elements = global.open_gui_elements[player.index]
+    local gui_elements = storage.open_gui_elements[player.index]
     if gui_elements then
       handler(player, spidertron, gui_elements)
     end
@@ -728,9 +726,9 @@ gui.add_handlers(PatrolGuiWaypoint,
   function(event, handler)
     local player = game.get_player(event.player_index)
     local spidertron = player.opened
-    local gui_elements = global.open_gui_elements[player.index]
+    local gui_elements = storage.open_gui_elements[player.index]
     if gui_elements then
-      local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
+      local waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
       local index = event.element.tags.index
       -- TODO look at using event.element in all events or none
       handler(player, spidertron, gui_elements, waypoint_info, index, event.element)

@@ -8,15 +8,11 @@ local spiderling_tech = {
       type = "unlock-recipe",
       recipe = "sp-spiderling"
     },
-    {
-      type = "unlock-recipe",
-      recipe = "spidertron-remote"
-    }
   },
   prerequisites = {
     "power-armor",
     "exoskeleton-equipment",
-    "effectivity-module-2",
+    "efficiency-module-2",
     "low-density-structure",
     "military-3",
     "rocketry",
@@ -47,7 +43,7 @@ local patrol_tech = {
   prerequisites = {
     "sp-spiderling",
     "automated-rail-transportation",
-    "stack-inserter",
+    "bulk-inserter",
   },
   unit = {
     count = 500,
@@ -87,15 +83,8 @@ if spiderling_enabled then
     "sp-spiderling",  -- Added
     "military-4",
     --"exoskeleton-equipment",
-    "fusion-reactor-equipment",
+    "fission-reactor-equipment",
     --"rocketry",
-    "rocket-control-unit",
-    "effectivity-module-3"
+    "efficiency-module-3"
   }
-  for i, effect in pairs(spidertron_tech.effects) do
-    if effect.type == "unlock-recipe" and effect.recipe == "spidertron-remote" then
-      table.remove(spidertron_tech.effects, i)  -- Remove spidertron remote unlock
-      break
-    end
-  end
 end

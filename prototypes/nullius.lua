@@ -4,9 +4,6 @@ local spiderling_enabled = settings.startup["sp-enable-spiderling"].value
 local dock_enabled = settings.startup["sp-enable-dock"].value
 
 local patrol_remote = data.raw["spidertron-remote"]["sp-spidertron-patrol-remote"]
-patrol_remote.group = "equipment"
-patrol_remote.subgroup = "vehicle"
-patrol_remote.order = "nullius-dg"
 patrol_remote.localised_name = {"item-name.nullius-sp-spidertron-patrol-remote"}
 
 if not (spiderling_enabled or dock_enabled) then return end
@@ -28,8 +25,8 @@ if sp_data_stage == "data" then
   local remote_recipe = data.raw.recipe["nullius-mecha-remote"]
 
   remote_recipe.ingredients = {
-    {"nullius-processor-1", 2},
-    {"nullius-scout-remote", 1}
+    {type="item", name="nullius-processor-1", amount=2},
+    {type="item", name="nullius-scout-remote", amount=1}
   }
 end
 
@@ -86,8 +83,8 @@ if dock_enabled and sp_data_stage ~= "data" then
   recipe.category = "medium-crafting"
   recipe.energy_required = 60
   recipe.ingredients = {
-    {"nullius-large-chest-2", 2},
-    {"nullius-sensor-2", 1}
+    {type="item", name="nullius-large-chest-2", amount=2},
+    {type="item", name="nullius-sensor-2", amount=1}
   }
 
   local type = "container"

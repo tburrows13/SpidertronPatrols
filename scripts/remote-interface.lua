@@ -20,13 +20,13 @@ local function spidertron_replaced(event)
   -- Called in response to Spidertron Weapon Switcher or Spidertron Enhancements event
   local previous_unit_number = event.old_spidertron.unit_number
   local spidertron = event.new_spidertron
-  if global.spidertron_waypoints[previous_unit_number] then
-    global.spidertron_waypoints[spidertron.unit_number] = global.spidertron_waypoints[previous_unit_number]
-    global.spidertron_waypoints[spidertron.unit_number].spidertron = spidertron
-    global.spidertron_waypoints[previous_unit_number] = nil
+  if storage.spidertron_waypoints[previous_unit_number] then
+    storage.spidertron_waypoints[spidertron.unit_number] = storage.spidertron_waypoints[previous_unit_number]
+    storage.spidertron_waypoints[spidertron.unit_number].spidertron = spidertron
+    storage.spidertron_waypoints[previous_unit_number] = nil
   end
 
-  for player_index, path_render_info in pairs(global.path_renders) do
+  for player_index, path_render_info in pairs(storage.path_renders) do
     if path_render_info[previous_unit_number] then
       path_render_info[spidertron.unit_number] = path_render_info[previous_unit_number]
       path_render_info[previous_unit_number] = nil
@@ -34,20 +34,20 @@ local function spidertron_replaced(event)
   end
   WaypointRendering.update_spidertron_render_paths(spidertron.unit_number)
 
-  if global.spidertrons_docked[previous_unit_number] then
-    local dock_unit_number = global.spidertrons_docked[previous_unit_number]
-    global.spidertrons_docked[spidertron.unit_number] = dock_unit_number
-    global.spidertrons_docked[previous_unit_number] = nil
-    dock_data = global.spidertron_docks[dock_unit_number]
+  if storage.spidertrons_docked[previous_unit_number] then
+    local dock_unit_number = storage.spidertrons_docked[previous_unit_number]
+    storage.spidertrons_docked[spidertron.unit_number] = dock_unit_number
+    storage.spidertrons_docked[previous_unit_number] = nil
+    dock_data = storage.spidertron_docks[dock_unit_number]
     if dock_data then
       local connected_spidertron = dock_data.connected_spidertron
       if connected_spidertron then
-        global.spidertron_docks[dock_unit_number].connected_spidertron = spidertron
+        storage.spidertron_docks[dock_unit_number].connected_spidertron = spidertron
       end
     end
   end
 
-  script.register_on_entity_destroyed(spidertron)
+  script.register_on_object_destroyed(spidertron)
 end
 
 function RemoteInterface.connect_to_remote_interfaces()

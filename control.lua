@@ -15,7 +15,7 @@ Control = {}
 
 --[[
 Globals:
-global.spidertron_waypoints: indexed by spidertron.unit_number:
+storage.spidertron_waypoints: indexed by spidertron.unit_number:
   spidertron :: LuaEntity
   waypoints :: array of Waypoint
   Waypoint contains
@@ -26,27 +26,28 @@ global.spidertron_waypoints: indexed by spidertron.unit_number:
       item_name :: string or SignalID (depending on if type is "item-count" or "circuit-condition")
       condition :: int (index of condition_dropdown_contents)
       count :: int
-    render_id :: int
+    render :: LuaRenderObject
   current_index :: int (index of waypoints)
   tick_arrived? :: int (only set when at a waypoint)
   tick_inactive? :: int (only used whilst at an "inactivity" waypoint)
   previous_inventories? :: table (only used whilst at an "inactivity" waypoint)
   on_patrol :: bool
+  renders :: array of LuaRenderObject
 ]]
 
 
 function get_waypoint_info(spidertron)
-  local waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
+  local waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
   if not waypoint_info then
     log("No waypoint info found. Creating blank table")
-    global.spidertron_waypoints[spidertron.unit_number] = {
+    storage.spidertron_waypoints[spidertron.unit_number] = {
       spidertron = spidertron,
       waypoints = {},
-      render_ids = {},
+      renders = {},
       current_index = 1,
       on_patrol = false
     }
-    waypoint_info = global.spidertron_waypoints[spidertron.unit_number]
+    waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
   end
   return waypoint_info
 end
@@ -59,27 +60,28 @@ function Control.clear_spidertron_waypoints(spidertron, unit_number)
     waypoint_info = get_waypoint_info(spidertron)
     spidertron.autopilot_destination = nil
   else
-    waypoint_info = global.spidertron_waypoints[unit_number]
+    waypoint_info = storage.spidertron_waypoints[unit_number]
     if not waypoint_info then return end
   end
   if not unit_number then unit_number = spidertron.unit_number end
   log("Clearing spidertron waypoints for unit number " .. unit_number)
   for _, waypoint in pairs(waypoint_info.waypoints) do
-    rendering.destroy(waypoint.render_id)
+    if waypoint.render then
+      waypoint.render.destroy()
+    end
   end
   waypoint_info.waypoints = {}
   PatrolGui.update_gui_schedule(waypoint_info)
   WaypointRendering.update_spidertron_render_paths(unit_number)
-  global.spidertron_waypoints[unit_number] = nil
+  storage.spidertron_waypoints[unit_number] = nil
 end
 
 script.on_event("sp-delete-all-waypoints",
   function(event)
     local player = game.get_player(event.player_index)
-    if player.cursor_stack and player.cursor_stack.valid_for_read and player.cursor_stack.type == "spidertron-remote" then
-      local remote = player.cursor_stack
-      local spidertron = remote.connected_entity
-      if spidertron then
+    local spidertron_remote_selection = player.spidertron_remote_selection
+    if spidertron_remote_selection then
+      for _, spidertron in pairs(spidertron_remote_selection) do  -- TODO remove loop if enforcing only one connection to patrol remote?
         Control.clear_spidertron_waypoints(spidertron)
         spidertron.autopilot_destination = nil
       end
@@ -100,27 +102,27 @@ script.on_event({"move-right-custom", "move-left-custom", "move-up-custom", "mov
   end
 )
 
-local function on_entity_destroyed(event)
-  local unit_number = event.unit_number
+local function on_object_destroyed(event)
+  local unit_number = event.useful_id
   Control.clear_spidertron_waypoints(nil, unit_number)
 end
 
 
 local function process_active_mods()
-  local version_string = game.active_mods["base"]
+  local version_string = script.active_mods["base"]
   local version = util.split(version_string, ".")
   for i=1, #version do
     version[i] = tonumber(version[i])
   end
-  global.base_version = version
+  storage.base_version = version
 
-  global.freight_forwarding_enabled = game.active_mods["FreightForwarding"] ~= nil
-  global.freight_forwarding_container_items = {}
-  if global.freight_forwarding_enabled then
-    for name, _ in pairs(game.item_prototypes) do
+  storage.freight_forwarding_enabled = script.active_mods["FreightForwarding"] ~= nil
+  storage.freight_forwarding_container_items = {}
+  if storage.freight_forwarding_enabled then
+    for name, _ in pairs(prototypes.item) do
       if name:sub(1, 15) == "deadlock-crate-" or name:sub(1, 13) == "ic-container-" then
         -- Old versions of FF use DCM, newer versions use IC
-        global.freight_forwarding_container_items[name] = true
+        storage.freight_forwarding_container_items[name] = true
       end
     end
   end
@@ -128,18 +130,18 @@ end
 
 local function setup()
   process_active_mods()
-  global.spidertron_waypoints = {}     -- Indexed by spidertron.unit_number
-  global.path_renders = {}  -- Indexed by player.index
-  global.chart_tags = {} -- Indexed by render id
-  global.remotes_in_cursor = {} -- Indexed by player.index
-  global.blinking_renders = {} -- Indexed by player.index
+  storage.spidertron_waypoints = {}     -- Indexed by spidertron.unit_number
+  storage.path_renders = {}  -- Indexed by player.index
+  storage.chart_tags = {} -- Indexed by render id
+  storage.remotes_in_cursor = {} -- Indexed by player.index
+  storage.blinking_renders = {} -- Indexed by player.index
 
-  global.spidertron_docks = {}
-  global.spidertrons_docked = {}
-  global.scheduled_dock_replacements = {}
+  storage.spidertron_docks = {}
+  storage.spidertrons_docked = {}
+  storage.scheduled_dock_replacements = {}
 
-  global.open_gui_elements = {}
-  global.player_highlights = {}  -- Indexed by player.index
+  storage.open_gui_elements = {}
+  storage.player_highlights = {}  -- Indexed by player.index
 
   RemoteInterface.connect_to_remote_interfaces()
   WaypointRendering.update_render_players()
@@ -167,7 +169,7 @@ local function config_changed_setup(changed_data)
     end
   end
 
-  global.wait_time_defaults = nil
+  storage.wait_time_defaults = nil
 
   log("Coming from old version: " .. old_version)
   old_version = util.split(old_version, ".")
@@ -178,25 +180,36 @@ local function config_changed_setup(changed_data)
   if old_version[1] == 2 then
     if old_version[2] < 1 then
       -- Pre 2.1
-      global.path_renders = {}
-      global.player_highlights = {}
+      storage.path_renders = {}
+      storage.player_highlights = {}
     end
     if old_version[2] < 3 then
       -- Pre 2.3
-      global.scheduled_dock_replacements = {}
+      storage.scheduled_dock_replacements = {}
     end
     if old_version[2] < 3 or (old_version[2] == 3 and old_version[3] < 2) then
       -- Pre 2.3.2
-      global.chart_tags = {}
+      storage.chart_tags = {}
     end
     if old_version[2] < 4 then
       -- Pre 2.4
-      global.remotes_in_cursor = {}
-      global.blinking_renders = {}
+      storage.remotes_in_cursor = {}
+      storage.blinking_renders = {}
     end
-    if old_version[2] < 2 then
-      -- Pre 2.2. Has to go at end so that globals can be initialized first.
+    if old_version[2] < 5 then
+      -- Pre 2.5. Has to go at end so that globals can be initialized first.
       reset_render_objects()
+      -- Disconnect all spidertrons from docks, since previous_items format has changed
+      for _, dock_data in pairs(storage.spidertron_docks) do
+        local spidertron = dock_data.connected_spidertron
+        local dock = dock_data.dock
+      
+        if dock and dock.valid and dock.name ~= "sp-spidertron-dock-closing" and spidertron and spidertron.valid then
+          storage.spidertrons_docked[spidertron.unit_number] = nil
+          dock = replace_dock(dock, "sp-spidertron-dock-0")
+          storage.spidertron_docks[dock.unit_number] = {dock = dock}
+        end
+      end
     end
   end
 end
@@ -204,14 +217,15 @@ end
 Control.on_init = setup
 Control.on_configuration_changed = config_changed_setup
 Control.events = {
-  [defines.events.on_entity_destroyed] = on_entity_destroyed,
+  [defines.events.on_object_destroyed] = on_object_destroyed,
 }
 
 function reset_render_objects()
   rendering.clear("SpidertronPatrols")
-  global.path_renders = {}
+  storage.path_renders = {}
+  storage.blinking_renders = {}
   WaypointRendering.update_render_players()
-  for _, waypoint_info in pairs(global.spidertron_waypoints) do
+  for _, waypoint_info in pairs(storage.spidertron_waypoints) do
     local spidertron = waypoint_info.spidertron
     if spidertron and spidertron.valid then
       WaypointRendering.update_render_text(waypoint_info.spidertron)
