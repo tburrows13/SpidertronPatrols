@@ -66,7 +66,9 @@ function Control.clear_spidertron_waypoints(spidertron, unit_number)
   if not unit_number then unit_number = spidertron.unit_number end
   log("Clearing spidertron waypoints for unit number " .. unit_number)
   for _, waypoint in pairs(waypoint_info.waypoints) do
-    waypoint.render.destroy()
+    if waypoint.render then
+      waypoint.render.destroy()
+    end
   end
   waypoint_info.waypoints = {}
   PatrolGui.update_gui_schedule(waypoint_info)
@@ -197,6 +199,17 @@ local function config_changed_setup(changed_data)
     if old_version[2] < 5 then
       -- Pre 2.5. Has to go at end so that globals can be initialized first.
       reset_render_objects()
+      -- Disconnect all spidertrons from docks, since previous_items format has changed
+      for _, dock_data in pairs(storage.spidertron_docks) do
+        local spidertron = dock_data.connected_spidertron
+        local dock = dock_data.dock
+      
+        if dock and dock.valid and dock.name ~= "sp-spidertron-dock-closing" and spidertron and spidertron.valid then
+          storage.spidertrons_docked[spidertron.unit_number] = nil
+          dock = replace_dock(dock, "sp-spidertron-dock-0")
+          storage.spidertron_docks[dock.unit_number] = {dock = dock}
+        end
+      end
     end
   end
 end
