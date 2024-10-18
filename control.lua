@@ -101,7 +101,7 @@ script.on_event({"move-right-custom", "move-left-custom", "move-up-custom", "mov
 )
 
 local function on_object_destroyed(event)
-  local unit_number = event.unit_number
+  local unit_number = event.useful_id
   Control.clear_spidertron_waypoints(nil, unit_number)
 end
 
