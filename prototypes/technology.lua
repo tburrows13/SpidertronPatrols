@@ -2,7 +2,7 @@ local spiderling_tech = {
   type = "technology",
   name = "sp-spiderling",
   icon = "__SpidertronPatrols__/graphics/technology/spiderling.png",  -- 55% scaled tech icon
-  icon_size = 256, icon_mipmaps = 4,
+  icon_size = 256,
   effects = {
     {
       type = "unlock-recipe",
@@ -33,7 +33,7 @@ local patrol_tech = {
   type = "technology",
   name = "sp-spidertron-automation",
   icon = "__SpidertronPatrols__/graphics/technology/spidertron-automation.png",
-  icon_size = 256, icon_mipmaps = 1,
+  icon_size = 256,
   effects = {
     {
       type = "unlock-recipe",

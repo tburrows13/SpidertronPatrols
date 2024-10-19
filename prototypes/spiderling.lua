@@ -15,7 +15,7 @@ spiderling = util.merge{
   spiderling,
   {
     icon = "__SpidertronPatrols__/graphics/icons/spiderling.png",
-    icon_size = 64, icon_mipmaps = 1,
+    icon_size = 64,
     inventory_size = 30,  -- default = 80
     torso_rotation_speed = 0.007,  -- default = 0.005
     torso_bob_speed = 1.2,  -- default = 1
@@ -52,7 +52,7 @@ local spiderling_item = {
   icon = "__SpidertronPatrols__/graphics/icons/spiderling.png",
   icon_tintable = "__SpidertronPatrols__/graphics/icons/spiderling-tintable.png",
   icon_tintable_mask = "__SpidertronPatrols__/graphics/icons/spiderling-tintable-mask.png",
-  icon_size = 64, icon_mipmaps = 1,
+  icon_size = 64,
   subgroup = "transport",
   order = "b[personal-transport]-c[spidertron]-a[[spiderling]",
   place_result = "sp-spiderling",

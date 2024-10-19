@@ -13,7 +13,6 @@ if sp_data_stage == "data" then
   tech.name = "nullius-sp-spidertron-automation"
   tech.icon = "__SpidertronPatrols__/graphics/technology/spiderling.png"
   tech.icon_size = 256
-  tech.icon_mipmaps = 1
 
   tech.prerequisites = {"nullius-cybernetics-4"}
   tech.effects = {{
