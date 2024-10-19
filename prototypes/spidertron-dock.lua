@@ -67,30 +67,15 @@ local function create_spidertron_dock(inventory_size, closing)
           width = 207,
           priority = "high",
           scale = 0.5,
-          hr_version = {
-            filename = "__SpidertronPatrols__/graphics/entity/hr-" .. filename,
-            height = 199,
-            width = 207,
-            priority = "high",
-            scale = 0.5,
-          },
         },
         {
           draw_as_shadow = true,
-          filename = "__base__/graphics/entity/artillery-turret/artillery-turret-base-shadow.png",
-          height = 75,
-          width = 138,
+          filename = "__base__/graphics/entity/artillery-turret/hr-artillery-turret-base-shadow.png",
+          height = 149,
+          width = 277,
           shift = {0.5625, 0.5},
           priority = "high",
-          hr_version = {
-            draw_as_shadow = true,
-            filename = "__base__/graphics/entity/artillery-turret/hr-artillery-turret-base-shadow.png",
-            height = 149,
-            width = 277,
-            shift = {0.5625, 0.5},
-            priority = "high",
-            scale = 0.5,
-          },
+          scale = 0.5,
         },
       }
     },
@@ -135,25 +120,12 @@ local open_animation = {
   name = "sp-spidertron-dock-door",
   filename = "__SpidertronPatrols__/graphics/entity/hr-spidertron-dock-animation.png",
   priority = "medium",
-  --width = 52,
-  --height = 20,
   width = 97,
   height = 79,
   frame_count = 16,
   animation_speed = 0.5,
   --shift = {0.015625, -0.890625},
   scale = 0.5,
-  hr_version =
-  {
-    filename = "__SpidertronPatrols__/graphics/entity/hr-spidertron-dock-animation.png",
-    priority = "medium",
-    width = 97,
-    height = 79,
-    frame_count = 16,
-    animation_speed = 0.5,
-    --shift = util.by_pixel(-0.25, -29.5),
-    scale = 0.5,
-  }
 }
 
 -- TODO sounds
