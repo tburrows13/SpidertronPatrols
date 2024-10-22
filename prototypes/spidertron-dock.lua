@@ -70,7 +70,7 @@ local function create_spidertron_dock(inventory_size, closing)
         },
         {
           draw_as_shadow = true,
-          filename = "__base__/graphics/entity/artillery-turret/hr-artillery-turret-base-shadow.png",
+          filename = "__base__/graphics/entity/artillery-turret/artillery-turret-base-shadow.png",
           height = 149,
           width = 277,
           shift = {0.5625, 0.5},
