@@ -16,6 +16,9 @@ local dock_item = {
   place_result = "sp-spidertron-dock",
   order = "b[personal-transport]-c[spidertron]-c[[dock]",  -- '[[' ensures that it is ordered before all spidertron-logistics items
   subgroup = "transport",
+  inventory_move_sound = item_sounds.metal_chest_inventory_move,
+  pick_sound = item_sounds.metal_chest_inventory_pickup,
+  drop_sound = item_sounds.metal_chest_inventory_move,
 }
 
 local dock_recipe = {

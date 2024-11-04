@@ -55,7 +55,11 @@ local spiderling_item = {
   icon_size = 64,
   subgroup = "transport",
   order = "b[personal-transport]-c[spidertron]-a[[spiderling]",
+  inventory_move_sound = item_sounds.spidertron_inventory_move,
+  pick_sound = item_sounds.spidertron_inventory_pickup,
+  drop_sound = item_sounds.spidertron_inventory_move,
   place_result = "sp-spiderling",
+  weight = 0.5 * tons,
   stack_size = 1
 }
 
