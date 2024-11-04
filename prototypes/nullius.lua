@@ -87,7 +87,7 @@ if dock_enabled and sp_data_stage ~= "data" then
   }
 
   for name, entity in pairs(data.raw["container"]) do
-    if name:sub(1, 19) == "sp-spidertron-dock-" then
+    if name:sub(1, 18) == "sp-spidertron-dock" then
       entity.localised_name = {"entity-name.nullius-sp-spidertron-dock"}
       entity.order = "nullius-dh"
     end

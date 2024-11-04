@@ -13,7 +13,7 @@ local dock_item = {
   icon = "__SpidertronPatrols__/graphics/icons/spidertron-dock.png",
   icon_size = 64,
   stack_size = 50,
-  place_result = "sp-spidertron-dock-0",
+  place_result = "sp-spidertron-dock",
   order = "b[personal-transport]-c[spidertron]-c[[dock]",  -- '[[' ensures that it is ordered before all spidertron-logistics items
   subgroup = "transport",
 }
@@ -32,14 +32,15 @@ local dock_recipe = {
 
 local function create_spidertron_dock(inventory_size, closing)
   local name = "sp-spidertron-dock-" .. inventory_size
+  local filename = "spidertron-dock-open.png"
   if closing then
     name = "sp-spidertron-dock-closing"
   end
-
-  local filename = "spidertron-dock-open.png"
   if inventory_size == 0 and not closing then
+    name = "sp-spidertron-dock"
     filename = "spidertron-dock-closed.png"
   end
+
   local dock = {
     type = "container",
     name = name,
@@ -49,7 +50,7 @@ local function create_spidertron_dock(inventory_size, closing)
     icon_size = 64,
     inventory_size = inventory_size,
     inventory_type = "with_filters_and_bar",
-    enable_inventory_bar = false,
+    hidden = true,
     scale_info_icons = false,
     picture = {
       layers = {
@@ -101,6 +102,7 @@ local function create_spidertron_dock(inventory_size, closing)
 end
 
 create_spidertron_dock(0)
+data.raw["container"]["sp-spidertron-dock"].hidden = false
 create_spidertron_dock(0, true)  -- "closing" dock, used while the closing animation is being played
 
 -- Standard dock for deepcopying in data-final-fixes

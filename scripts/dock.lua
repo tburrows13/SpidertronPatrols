@@ -8,12 +8,12 @@ local function on_built(event)
     if not (entity.type == "container" or entity.type == "logistic-container" or entity.type == "spider-vehicle") then return end
     if entity.type == "spider-vehicle" then
       script.register_on_object_destroyed(entity)
-    elseif entity.name == "sp-spidertron-dock-0" then
+    elseif entity.name == "sp-spidertron-dock" then
       storage.spidertron_docks[entity.unit_number] = {dock = entity}
       script.register_on_object_destroyed(entity)
     elseif entity.name:sub(0, 19) == "sp-spidertron-dock-" then
       -- a non-zero-capacity dock has been created, from on_entity_cloned or built from blueprint
-      entity = replace_dock(entity, "sp-spidertron-dock-0")
+      entity = replace_dock(entity, "sp-spidertron-dock")
       storage.spidertron_docks[entity.unit_number] = {dock = entity}
     end
   end
@@ -45,7 +45,7 @@ function on_object_destroyed(event)
         if dock.valid then
           --dock.surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-removed"}}
 
-          dock = replace_dock(dock, "sp-spidertron-dock-0")
+          dock = replace_dock(dock, "sp-spidertron-dock")
           storage.spidertron_docks[dock.unit_number] = {dock = dock}
         end
       end
@@ -79,7 +79,7 @@ local function animate_dock(dock)
   end
 
   -- Don't draw animation for already-closed dock
-  if dock_name == "sp-spidertron-dock-0" then return end
+  if dock_name == "sp-spidertron-dock" then return end
 
   -- Draw animation
   -- frame = ((tick * speed) + offset) % frames
@@ -100,7 +100,7 @@ local function animate_dock(dock)
     time_to_live = frames,
     animation_offset = animation_offset,
     --animation_offset = (tick * (speed - speed') + offset) % #frames`
-    --animation_offset = new_dock_name == "sp-spidertron-dock-0" and (game.tick % 8) or (8 - (game.tick % 8)),
+    --animation_offset = new_dock_name == "sp-spidertron-dock" and (game.tick % 8) or (8 - (game.tick % 8)),
     animation_speed = animation_speed,
     render_layer = "higher-object-under",
   }
@@ -108,7 +108,7 @@ end
   
 
 function replace_dock(dock, new_dock_name)
-  if new_dock_name == "sp-spidertron-dock-0" and dock.name ~= "sp-spidertron-dock-closing" then
+  if new_dock_name == "sp-spidertron-dock" and dock.name ~= "sp-spidertron-dock-closing" then
     -- Need to use temporary dock entity whilst closing animation is playing
     new_dock_name = "sp-spidertron-dock-closing"
   end
@@ -391,7 +391,7 @@ local function update_dock(dock_data)
         storage.spidertrons_docked[spidertron.unit_number] = nil
        -- surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-undocked"}}
 
-        dock = replace_dock(dock, "sp-spidertron-dock-0")
+        dock = replace_dock(dock, "sp-spidertron-dock")
         storage.spidertron_docks[dock.unit_number] = {dock = dock}
         delete = true
       end
@@ -424,7 +424,7 @@ local function on_tick(event)
   if schedule then
     for _, dock in pairs(schedule) do
       if dock.valid then
-        dock = replace_dock(dock, "sp-spidertron-dock-0")
+        dock = replace_dock(dock, "sp-spidertron-dock")
         storage.spidertron_docks[dock.unit_number] = {dock = dock}
       end
     end

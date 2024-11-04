@@ -206,7 +206,7 @@ local function config_changed_setup(changed_data)
       
         if dock and dock.valid and dock.name ~= "sp-spidertron-dock-closing" and spidertron and spidertron.valid then
           storage.spidertrons_docked[spidertron.unit_number] = nil
-          dock = replace_dock(dock, "sp-spidertron-dock-0")
+          dock = replace_dock(dock, "sp-spidertron-dock")
           storage.spidertron_docks[dock.unit_number] = {dock = dock}
         end
       end
