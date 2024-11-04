@@ -3,7 +3,7 @@ local math2d = require "math2d"
 local Dock = {}
 
 local function on_built(event)
-  local entity = event.created_entity or event.entity or event.destination
+  local entity = event.entity or event.destination
   if entity then
     if not (entity.type == "container" or entity.type == "logistic-container" or entity.type == "spider-vehicle") then return end
     if entity.type == "spider-vehicle" then
@@ -439,6 +439,7 @@ Dock.events = {
   [defines.events.on_pre_player_mined_item] = on_pre_player_mined_item,
   [defines.events.on_built_entity] = on_built,
   [defines.events.on_robot_built_entity] = on_built,
+  [defines.events.on_space_platform_built_entity] = on_built,
   [defines.events.script_raised_revive] = on_built,
   [defines.events.script_raised_built] = on_built,
   [defines.events.on_entity_cloned] = on_built,
