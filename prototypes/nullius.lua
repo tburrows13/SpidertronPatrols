@@ -86,12 +86,7 @@ if dock_enabled and sp_data_stage ~= "data" then
     {type="item", name="nullius-sensor-2", amount=1}
   }
 
-  local type = "container"
-  if settings.startup["sp-dock-is-requester"].value then
-    type = "logistic-container"
-  end
-
-  for name, entity in pairs(data.raw[type]) do
+  for name, entity in pairs(data.raw["container"]) do
     if name:sub(1, 19) == "sp-spidertron-dock-" then
       entity.localised_name = {"entity-name.nullius-sp-spidertron-dock"}
       entity.order = "nullius-dh"

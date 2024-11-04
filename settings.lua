@@ -15,13 +15,6 @@ data:extend({
   },
   {
     type = "bool-setting",
-    name = "sp-dock-is-requester",
-    setting_type = "startup",
-    default_value = false,
-    order = "b"
-  },
-  {
-    type = "bool-setting",
     name = "sp-remove-military-requirement",
     setting_type = "startup",
     default_value = false,

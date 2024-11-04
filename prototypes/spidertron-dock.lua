@@ -30,13 +30,6 @@ local dock_recipe = {
   enabled = false
 }
 
-local dock_type = "container"
-local logistic_mode
-if settings.startup["sp-dock-is-requester"].value then
-  dock_type = "logistic-container"
-  logistic_mode = "requester"
-end
-
 local function create_spidertron_dock(inventory_size, closing)
   local name = "sp-spidertron-dock-" .. inventory_size
   if closing then
@@ -48,8 +41,7 @@ local function create_spidertron_dock(inventory_size, closing)
     filename = "spidertron-dock-closed.png"
   end
   local dock = {
-    type = dock_type,
-    logistic_mode = logistic_mode,
+    type = "container",
     name = name,
     localised_name = {"entity-name.sp-spidertron-dock"},
     localised_description = {"entity-description.sp-spidertron-dock"},
