@@ -22,6 +22,10 @@ local function create_spidertron_dock(inventory_size)
 end
 
 for _, spider_prototype in pairs(data.raw["spider-vehicle"]) do
-  local inventory_size = spider_prototype.inventory_size
-  create_spidertron_dock(inventory_size)
+  local normal_inventory_size = spider_prototype.inventory_size
+  for _, quality in pairs(data.raw["quality"]) do
+    local level = quality.level
+    local quality_inventory_size = math.floor(normal_inventory_size * (1 + (level * 0.3)))
+    create_spidertron_dock(quality_inventory_size)
+  end
 end
