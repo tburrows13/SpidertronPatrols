@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.1
+Date: 4 November 2024
+  Changes:
+    - Spidertrons with toolbelt equipment are prohibited from docking
+    - Removed "Add logistic requests to spidertron docks" mod setting
+  Bugfixes:
+    - Fixed crash when docking spidertrons with quality or toolbelt equipment
+    - Fixed crash when opening camera location in map
+    - Fixed docks on space platforms not working
+---------------------------------------------------------------------------------------------------
 Version: 2.5.0
 Date: 18 October 2024
   Features:
