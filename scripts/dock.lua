@@ -309,6 +309,30 @@ end
 local function connect_to_spidertron(dock_data, spidertron, surface)
   if storage.spidertrons_docked[spidertron.unit_number] or spidertron.speed >= 0.1 or spidertron.name == "companion" or spidertron.autopilot_destination then return end
 
+  local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
+  local inventory_size = #inventory
+  if inventory_size == 0 then return end
+
+  -- Don't connect to spidertrons containing toolbelt equipment, because we will not have a dock with the correct inventory size defined
+  local grid = spidertron.grid
+  if grid then
+    -- Inventory size bonus remains the tick that the toolbelt is removed. This works, and maybe a future `grid.inventory_bonus` would work too
+    if inventory_size ~= math.floor(spidertron.prototype.get_inventory_size(defines.inventory.spider_trunk) * (1 + (spidertron.quality.level * 0.3))) then
+      for _, player in pairs(spidertron.force.players) do
+        -- Only print warning every 2 seconds. This may fail when more than 20 docks are placed...
+        if game.tick % 120 == 0 then
+          if player.surface == spidertron.surface then
+            player.create_local_flying_text{
+              text = {"flying-text.spidertron-toolbelts-cannot-be-docked"},
+              position = dock_data.dock.position,
+            }
+          end
+        end
+      end
+    return
+    end
+  end
+
   -- Check if driver has prevent-docking-when-driving enabled
   local waypoint_info = get_waypoint_info(spidertron)
   if not waypoint_info.on_patrol then  -- Only check for drivers if not in automatic mode
@@ -325,11 +349,10 @@ local function connect_to_spidertron(dock_data, spidertron, surface)
       end
     end
   end
-  local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
-  local inventory_size = #inventory
-  if inventory_size == 0 then return end
+
+  local new_dock_name = "sp-spidertron-dock-" .. inventory_size
   -- Switch dock entity out for one with the correct inventory size
-  local dock = replace_dock(dock_data.dock, "sp-spidertron-dock-" .. inventory_size)
+  local dock = replace_dock(dock_data.dock, new_dock_name)
   dock_data.dock = dock
   storage.spidertron_docks[dock.unit_number] = dock_data
 
