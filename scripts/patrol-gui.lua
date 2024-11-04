@@ -456,17 +456,14 @@ end
 function PatrolGui.open_location_on_map(player, spidertron, gui_elements)
   local camera = gui_elements.camera
   local entity = camera.entity
+  local position = entity and entity.position or camera.position
+  player.set_controller{
+    type = defines.controllers.remote,
+    position = position,
+    surface = player.surface,
+  }
   if entity then
-    -- At 100% interface scale (display_scale=1), 1/16 is identical to vanilla 'open in map' scale
-    -- At 200% interface scale (display_scale=2), 1/8
-    if storage.base_version[2] > 1 or storage.base_version[3] >= 75 then
-      -- base >= 1.1.75
-      player.open_map(entity.position, (1/16) * player.display_scale, entity)  
-    else
-      player.open_map(entity.position, (1/16) * player.display_scale)
-    end
-  else
-    player.open_map(camera.position, (1/16) * player.display_scale)
+    player.centered_on = entity
   end
   player.opened = nil
 end
