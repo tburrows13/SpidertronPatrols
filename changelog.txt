@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.2
+Date: 8 November 2024
+  Bugfixes:
+    - Fixed crash on load in 2.0.16
+    - Fixed crash when using the "Circuit condition" wait condition
+    - Fixed dock circuit connections not having correct graphics
+---------------------------------------------------------------------------------------------------
 Version: 2.5.1
 Date: 4 November 2024
   Changes:
