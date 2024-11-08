@@ -75,9 +75,8 @@ local function create_spidertron_dock(inventory_size, closing)
         },
       }
     },
-    circuit_connector_sprites = circuit_connections.circuit_connector_sprites,
-    circuit_wire_connection_point = circuit_connections.circuit_wire_connection_point,
-    circuit_wire_max_distance = circuit_connections.circuit_wire_max_distance,
+    circuit_connector = circuit_connector_definitions["artillery-turret"],
+    circuit_wire_max_distance = default_circuit_wire_max_distance,
     max_health = 600,
     minable = {mining_time = 1, result = "sp-spidertron-dock"},
     placeable_by = {item = "sp-spidertron-dock", count = 1},
