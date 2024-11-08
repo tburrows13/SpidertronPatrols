@@ -2,6 +2,8 @@ if not settings.startup["sp-enable-spiderling"].value then
   return
 end
 
+local item_sounds = require("__base__.prototypes.item_sounds")
+
 create_spidertron{
   name = "sp-spiderling",
   scale = 0.7,

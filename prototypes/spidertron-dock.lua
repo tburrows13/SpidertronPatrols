@@ -1,7 +1,7 @@
 if not settings.startup["sp-enable-dock"].value then
   return
 end
-
+local item_sounds = require("__base__.prototypes.item_sounds")
 local sounds = require("__base__.prototypes.entity.sounds")
 local hit_effects = require ("__base__.prototypes.entity.hit-effects")
 
