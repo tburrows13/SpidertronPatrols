@@ -18,7 +18,7 @@ function contains_key(array, element, remove)
   return false
 end
 
-function table_equals(table1, table2)
+function content_equals(table1, table2)
   table2 = table.deepcopy(table2)
   for item_name, count1 in pairs(table1) do
     local count2 = table2[item_name] or 0
@@ -31,6 +31,17 @@ function table_equals(table1, table2)
   return next(table2) == nil
 end
 
+function table_equals(table1, table2)
+  table2 = table.deepcopy(table2)
+  for index, contents1 in pairs(table1) do
+    local contents2 = table2[index] or {}
+    if not content_equals(contents1, contents2) then
+      return false
+    end
+    table2[index] = nil
+  end
+  return next(table2) == nil
+end
 
 function table_diff(table1, table2)
   -- Returns a table `diff` indexed by item_name, then by quality_name where positive values are the amount in table1 not in table2, negative values are the amount in table2
