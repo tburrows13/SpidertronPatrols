@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.3
+Date: 13 November 2024
+  Bugfixes:
+    - Fixed 'Inactivity' wait condition not working
+    - Fixed 'Read contents' checkbox in dock's circuit controls being reset when a spidertron docks there
+    - Added warning to help catch rare bug when creating waypoints - please report if you see it
+---------------------------------------------------------------------------------------------------
 Version: 2.5.2
 Date: 8 November 2024
   Bugfixes:
