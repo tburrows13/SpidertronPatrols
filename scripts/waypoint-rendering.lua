@@ -87,6 +87,16 @@ local function create_render_paths(spidertron, player, create_chart_tags)
       next_waypoint = waypoints[1]
     end
 
+    if not next_waypoint then
+      -- Log warning for very hard to repro bug: https://mods.factorio.com/mod/SpidertronPatrols/discussion/6732897d92c0d6bd25b3aad5
+      waypoints[1] = nil
+      game.print(serpent.block(waypoints))
+      game.print("[SpidertronPatrols] Error: inconsistent waypoint array detected. Please report this on the mod portal discussion page.")
+      log(serpent.block(waypoints))
+      log("[SpidertronPatrols] Error: inconsistent waypoint array detected. Please report this on the mod portal discussion page.")
+      break
+    end
+
     local a = waypoint.position
     local b = next_waypoint.position
     local D = util.distance(a, b)
