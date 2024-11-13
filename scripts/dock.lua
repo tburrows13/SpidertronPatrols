@@ -118,6 +118,12 @@ function replace_dock(dock, new_dock_name)
   local wire_connectors = dock.get_wire_connectors(true)
   local to_be_deconstructed = dock.to_be_deconstructed()
 
+  local circuit_read_contents
+  local control_behavior = dock.get_control_behavior()
+  if control_behavior then
+    circuit_read_contents = control_behavior.read_contents
+  end
+
   local players_with_gui_open = {}
   for _, player in pairs(game.connected_players) do
     if player.opened == dock then
@@ -142,6 +148,11 @@ function replace_dock(dock, new_dock_name)
 
   if to_be_deconstructed then
     dock.order_deconstruction(dock.force)
+  end
+
+  if circuit_read_contents ~= nil then
+    local new_control_behavior = dock.get_or_create_control_behavior()
+    new_control_behavior.read_contents = circuit_read_contents
   end
 
   for _, player in pairs(players_with_gui_open) do
