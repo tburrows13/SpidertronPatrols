@@ -5,7 +5,7 @@ local Dock = {}
 local function on_built(event)
   local entity = event.entity or event.destination
   if entity then
-    if not (entity.type == "container" or entity.type == "logistic-container" or entity.type == "spider-vehicle") then return end
+    if not (entity.type == "container" or entity.type == "spider-vehicle") then return end
     if entity.type == "spider-vehicle" then
       script.register_on_object_destroyed(entity)
     elseif entity.name == "sp-spidertron-dock" then
@@ -19,7 +19,7 @@ local function on_built(event)
   end
 end
 -- TODO add filter back
--- local on_built_filter = {{filter = "type", type = "container"}, {filter = "type", type = "logistic-container"}, {filter = "type", type = "spider-vehicle"}}
+-- local on_built_filter = {{filter = "type", type = "container"}, {filter = "type", type = "spider-vehicle"}}
 
 function on_object_destroyed(event)
   local unit_number = event.useful_id
@@ -118,21 +118,6 @@ function replace_dock(dock, new_dock_name)
   local wire_connectors = dock.get_wire_connectors(true)
   local to_be_deconstructed = dock.to_be_deconstructed()
 
-  local request_from_buffers
-  local requests
-  local circuit_mode_of_operation
-  if dock.type == "logistic-container" then  -- TODO test
-    request_from_buffers = dock.request_from_buffers
-    requests = {}
-    for slot_index = 1, dock.request_slot_count do
-      requests[slot_index] = dock.get_request_slot(slot_index)
-    end
-    local control_behavior = dock.get_control_behavior()  -- TODO move out of logistic-container check
-    if control_behavior then
-      circuit_mode_of_operation = control_behavior.circuit_mode_of_operation
-    end
-  end
-
   local players_with_gui_open = {}
   for _, player in pairs(game.connected_players) do
     if player.opened == dock then
@@ -158,20 +143,6 @@ function replace_dock(dock, new_dock_name)
   if to_be_deconstructed then
     dock.order_deconstruction(dock.force)
   end
-
-  if request_from_buffers then
-    dock.request_from_buffers = request_from_buffers
-  end
-  if requests then
-    for slot_index, request in pairs(requests) do
-      dock.set_request_slot(request, slot_index)
-    end
-  end
-  if circuit_mode_of_operation then
-    local control_behavior = dock.get_or_create_control_behavior()
-    control_behavior.circuit_mode_of_operation = circuit_mode_of_operation
-  end
-
 
   for _, player in pairs(players_with_gui_open) do
     if player.valid then
