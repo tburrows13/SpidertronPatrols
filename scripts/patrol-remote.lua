@@ -59,6 +59,7 @@ function PatrolRemote.give_remote(player, spidertron, waypoint_index)
     if not cleared then return end
   end
   local cursor = player.cursor_stack
+  if not cursor then return end
   cursor.set_stack("sp-spidertron-patrol-remote")
   player.spidertron_remote_selection = {spidertron}
 
