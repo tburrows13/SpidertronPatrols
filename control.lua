@@ -35,23 +35,6 @@ storage.spidertron_waypoints: indexed by spidertron.unit_number:
   renders :: array of LuaRenderObject
 ]]
 
-
-function get_waypoint_info(spidertron)
-  local waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
-  if not waypoint_info then
-    log("No waypoint info found. Creating blank table")
-    storage.spidertron_waypoints[spidertron.unit_number] = {
-      spidertron = spidertron,
-      waypoints = {},
-      renders = {},
-      current_index = 1,
-      on_patrol = false
-    }
-    waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
-  end
-  return waypoint_info
-end
-
 function Control.clear_spidertron_waypoints(spidertron, unit_number)
   -- Called on custom-input or whenever the current autopilot_destination is removed or when the spidertron is removed.
   -- Pass in either `spidertron` or `unit_number`
