@@ -11,6 +11,7 @@ remote.add_interface("SpidertronPatrols", {
   get_events = function() return {on_spidertron_given_new_destination = on_spidertron_given_new_destination} end,
   clear_waypoints = function(unit_number) Control.clear_spidertron_waypoints(nil, unit_number) end,
   add_waypoints = function(spidertron, waypoints) remote_interface_assign_waypoints(spidertron, waypoints) end,
+  get_waypoints = get_waypoint_info,
   give_patrol_remote = function(player, spidertron, waypoint_index)  -- waypoint_index is optional
     PatrolRemote.give_remote(player, spidertron, waypoint_index)
   end,

@@ -3,7 +3,6 @@ util = require "util"
 require "scripts.utils"
 gui = require "scripts.gui-lite"
 
-RemoteInterface = require "scripts.remote-interface"
 local Dock = require "scripts.dock"
 local PatrolGui = require "scripts.patrol-gui"
 SpidertronControl = require "scripts.spidertron-control"
@@ -51,6 +50,8 @@ function get_waypoint_info(spidertron)
   end
   return waypoint_info
 end
+
+RemoteInterface = require "scripts.remote-interface"
 
 function Control.clear_spidertron_waypoints(spidertron, unit_number)
   -- Called on custom-input or whenever the current autopilot_destination is removed or when the spidertron is removed.
