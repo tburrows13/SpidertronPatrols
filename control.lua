@@ -3,7 +3,6 @@ util = require "util"
 require "scripts.utils"
 gui = require "scripts.gui-lite"
 
-RemoteInterface = require "scripts.remote-interface"
 local Dock = require "scripts.dock"
 local PatrolGui = require "scripts.patrol-gui"
 SpidertronControl = require "scripts.spidertron-control"
@@ -34,6 +33,25 @@ storage.spidertron_waypoints: indexed by spidertron.unit_number:
   on_patrol :: bool
   renders :: array of LuaRenderObject
 ]]
+
+
+function get_waypoint_info(spidertron)
+  local waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
+  if not waypoint_info then
+    log("No waypoint info found. Creating blank table")
+    storage.spidertron_waypoints[spidertron.unit_number] = {
+      spidertron = spidertron,
+      waypoints = {},
+      renders = {},
+      current_index = 1,
+      on_patrol = false
+    }
+    waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
+  end
+  return waypoint_info
+end
+
+RemoteInterface = require "scripts.remote-interface"
 
 function Control.clear_spidertron_waypoints(spidertron, unit_number)
   -- Called on custom-input or whenever the current autopilot_destination is removed or when the spidertron is removed.

@@ -1,21 +1,5 @@
 local RemoteInterface = {}
 
-function get_waypoint_info(spidertron)
-  local waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
-  if not waypoint_info then
-    log("No waypoint info found. Creating blank table")
-    storage.spidertron_waypoints[spidertron.unit_number] = {
-      spidertron = spidertron,
-      waypoints = {},
-      renders = {},
-      current_index = 1,
-      on_patrol = false
-    }
-    waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
-  end
-  return waypoint_info
-end
-
 local function remote_interface_assign_waypoints(spidertron, waypoints)
   for _, waypoint in pairs(waypoints) do
     SpidertronControl.on_patrol_command_issued(spidertron, waypoint.position)
