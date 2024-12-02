@@ -9,7 +9,7 @@
     "dependencies": [
         "base",
         "? space-age",
-        "SpidertronEnhancements",
+        "SpidertronEnhancements >= 1.10.6",
         "(?) SpidertronWeaponSwitcher",
         "(?) nullius"
     ]

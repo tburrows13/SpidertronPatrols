@@ -56,18 +56,22 @@ function RemoteInterface.connect_to_remote_interfaces()
     local on_spidertron_switched = remote.call("SpidertronWeaponSwitcher", "get_events").on_spidertron_switched
     script.on_event(on_spidertron_switched, spidertron_replaced)
   end
-  if remote.interfaces["SpidertronEnhancements"] then
-    local events = remote.call("SpidertronEnhancements", "get_events")
-    local on_spidertron_replaced = events.on_spidertron_replaced
-    script.on_event(on_spidertron_replaced, spidertron_replaced)
-
-    local on_player_disconnected_spider_remote = events.on_player_disconnected_spider_remote
-    if on_player_disconnected_spider_remote then
-      script.on_event(on_player_disconnected_spider_remote, function(event) WaypointRendering.update_player_render_paths(game.get_player(event.player_index)) end)
-    end
-  end
 end
 RemoteInterface.on_load = RemoteInterface.connect_to_remote_interfaces
+
+if prototypes.custom_event["on_spidertron_replaced"] then
+  script.on_event("on_spidertron_replaced", spidertron_replaced)
+end
+
+-- Used to be raised by SpidertronEnhancements
+if prototypes.custom_event["on_player_disconnected_spider_remote"] then
+  script.on_event("on_player_disconnected_spider_remote", function(event)
+    local player = game.get_player(event.player_index)
+    if player then
+      WaypointRendering.update_player_render_paths(player)
+    end
+  end)
+end
 
 -- Milestones will ignore it if spiderling is disabled
 remote.add_interface("SpidertronPatrolsMilestones", {
