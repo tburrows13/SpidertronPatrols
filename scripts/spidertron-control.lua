@@ -98,7 +98,7 @@ function SpidertronControl.go_to_next_waypoint(spidertron, next_index)
 
     PatrolGui.update_gui_button_states(waypoint_info)
     -- The spidertron is now walking towards a new waypoint
-    script.raise_event(RemoteInterface.on_spidertron_given_new_destination, {player_index = nil, vehicle = spidertron, position = next_position, success = true})
+    script.raise_event("on_spidertron_given_new_destination", {vehicle = spidertron, position = next_position, success = true})
   end
 end
 
