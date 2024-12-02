@@ -91,7 +91,7 @@ script.on_event("sp-delete-all-waypoints",
 )
 
 -- Detect when the player cancels a spidertron's autopilot_destination
-script.on_event({"move-right-custom", "move-left-custom", "move-up-custom", "move-down-custom"},
+script.on_event({"move-right-custom", --[["move-left-custom",]] "move-up-custom", "move-down-custom"},
   function(event)
     local player = game.get_player(event.player_index)
     local vehicle = player.vehicle
