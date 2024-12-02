@@ -1,5 +1,8 @@
 local math2d = require "math2d"
 
+---@param color Color
+---@param active boolean?
+---@return Color
 local function add_alpha(color, active)
   if active then
     return {r = color.r, g = color.g, b = color.b, a = 0.85}
@@ -16,6 +19,7 @@ local WaypointRendering = {}
 
 local BLINK_LENGTH = 30
 
+---@param event EventData.on_tick
 local function on_tick(event)
   local tick = event.tick
   for _, player_renders in pairs(storage.blinking_renders) do
@@ -33,7 +37,9 @@ local function on_tick(event)
   end
 end
 
-
+---@param spidertron LuaEntity
+---@param player LuaPlayer
+---@param create_chart_tags boolean?
 local function create_render_paths(spidertron, player, create_chart_tags)
   local waypoint_info = get_waypoint_info(spidertron)
 
@@ -143,6 +149,12 @@ local function create_render_paths(spidertron, player, create_chart_tags)
   storage.path_renders[player.index] = player_renders
 end
 
+---@param surface SurfaceIdentification
+---@param force LuaForce
+---@param from MapPosition
+---@param to MapPosition
+---@param tag_spacing number
+---@return LuaCustomChartTag[]
 function create_chart_tag_path(surface, force, from, to, tag_spacing)
   local vec = math2d.position.subtract(to, from)
   local dist = math2d.position.vector_length(vec)
@@ -164,6 +176,7 @@ function create_chart_tag_path(surface, force, from, to, tag_spacing)
   return tags
 end
 
+---@param player LuaPlayer
 function WaypointRendering.update_player_render_paths(player)
   -- Clear up any previous renders
   local player_renders = storage.path_renders[player.index]
@@ -210,19 +223,20 @@ function WaypointRendering.update_player_render_paths(player)
   end
 end
 
+---@param event EventData.on_player_cursor_stack_changed | EventData.on_player_driving_changed_state | EventData.on_selected_entity_changed
 local function need_to_update_player_render_paths(event)
-  local player = game.get_player(event.player_index)
+  local player = game.get_player(event.player_index)  ---@cast player -?
 
   if event.name == defines.events.on_player_cursor_stack_changed then
     local remote = player.cursor_stack
-    if not remote.valid_for_read or remote.name ~= "sp-spidertron-patrol-remote" then
+    if not remote or not remote.valid_for_read or remote.name ~= "sp-spidertron-patrol-remote" then
       storage.remotes_in_cursor[player.index] = nil
     end
   end
-
   WaypointRendering.update_player_render_paths(player)
 end
 
+---@param unit_number UnitNumber
 function WaypointRendering.update_spidertron_render_paths(unit_number)
   for player_index, player_renders in pairs(storage.path_renders) do
     if player_renders[unit_number] then
@@ -231,7 +245,7 @@ function WaypointRendering.update_spidertron_render_paths(unit_number)
   end
 end
 
-
+---@param spidertron LuaEntity
 function WaypointRendering.update_render_text(spidertron)
   -- Updates numbered text on ground for given spidertron
   local waypoint_info = get_waypoint_info(spidertron)

@@ -2,6 +2,10 @@
 
 local SpidertronControl = {}
 
+---@param condition uint
+---@param a integer
+---@param b integer
+---@return boolean
 local function check_condition(condition, a, b)
   -- Using list order: {">", "<", "=", "≥", "≤", "≠"}
   if condition == 1 then
@@ -19,6 +23,10 @@ local function check_condition(condition, a, b)
   end
 end
 
+---@param spidertron LuaEntity
+---@param position MapPosition
+---@param index WaypointIndex?
+---@param replace boolean?
 function SpidertronControl.on_patrol_command_issued(spidertron, position, index, replace)
   -- Called when remote used and on remote interface call
   local waypoint_info = get_waypoint_info(spidertron)
@@ -52,6 +60,9 @@ end
 
 ---------------------------------------------------------------------------------------------------
 
+---@param spidertron LuaEntity
+---@param old_inventories unknown
+---@return boolean
 local function was_spidertron_inactive(spidertron, old_inventories)
   local old_trunk = old_inventories.trunk
   local old_ammo = old_inventories.ammo
@@ -66,7 +77,8 @@ local function was_spidertron_inactive(spidertron, old_inventories)
   return true
 end
 
-
+---@param spidertron LuaEntity
+---@param next_index WaypointIndex?
 function SpidertronControl.go_to_next_waypoint(spidertron, next_index)
   local waypoint_info = get_waypoint_info(spidertron)
 
@@ -154,7 +166,7 @@ local function handle_wait_timers()
           SpidertronControl.go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "item-count" then
-        local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
+        local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)  ---@cast inventory -?
         local item_count_info = waypoint.item_count_info
         local item_count = inventory.get_item_count(item_count_info.item_name) or 0
         if check_condition(item_count_info.condition, item_count, item_count_info.count) then
@@ -208,7 +220,7 @@ local function handle_wait_timers()
 end
 script.on_nth_tick(5, handle_wait_timers)
 
-
+---@param event EventData.on_spider_command_completed
 local function on_spider_command_completed(event)
   local spidertron = event.vehicle
   local waypoint_info = get_waypoint_info(spidertron)
@@ -227,7 +239,7 @@ local function on_spider_command_completed(event)
   end
 end
 
-
+---@param event EventData.on_entity_settings_pasted
 local function on_entity_settings_pasted(event)
   local source = event.source
   local destination = event.destination
@@ -246,7 +258,7 @@ local function on_entity_settings_pasted(event)
     waypoint_info.tick_inactive = nil
     waypoint_info.previous_inventories = nil
 
-    -- Erase all render ids so that new ones can be recreated by WaypointRendering.update_render_text
+    -- Erase all render objects so that new ones can be recreated by WaypointRendering.update_render_text
     for _, waypoint in pairs(waypoint_info.waypoints) do
       waypoint.render = nil
     end

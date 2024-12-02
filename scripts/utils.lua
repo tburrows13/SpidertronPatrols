@@ -1,3 +1,7 @@
+---@param array table
+---@param element any
+---@param remove boolean?
+---@return boolean
 function contains(array, element, remove)
   for i, value in pairs(array) do
     if value == element then

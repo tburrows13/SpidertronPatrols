@@ -1,7 +1,17 @@
 local math2d = require "math2d"
 
+---@alias ItemName string
+---@alias QualityName string
+---@alias InventoryContents table<ItemName, table<QualityName, number>>
+
+---@class DockData
+---@field dock LuaEntity
+---@field connected_spidertron LuaEntity?
+---@field previous_contents {items: InventoryContents, filters: ItemFilter[]}
+
 local Dock = {}
 
+---@param event EventData.on_built_entity|EventData.on_entity_cloned
 local function on_built(event)
   local entity = event.entity or event.destination
   if entity then
@@ -21,6 +31,7 @@ end
 -- TODO add filter back
 -- local on_built_filter = {{filter = "type", type = "container"}, {filter = "type", type = "spider-vehicle"}}
 
+---@param event EventData.on_object_destroyed
 function on_object_destroyed(event)
   local unit_number = event.useful_id
   if unit_number then
@@ -53,13 +64,13 @@ function on_object_destroyed(event)
   end
 end
 
-
+---@param event EventData.on_pre_player_mined_item
 local function on_pre_player_mined_item(event)
   -- Dock inventories should never return their contents to the player
   -- because all their items are duplicates from the spidertron's inventory
   local dock = event.entity
   if dock and dock.name:sub(0, 19) == "sp-spidertron-dock-" then
-    local dock_inventory = dock.get_inventory(defines.inventory.chest)
+    local dock_inventory = dock.get_inventory(defines.inventory.chest)  ---@cast dock_inventory -?
     dock_inventory.clear()
   end
 end
@@ -105,8 +116,10 @@ local function animate_dock(dock)
     render_layer = "higher-object-under",
   }
 end
-  
 
+---@param dock LuaEntity
+---@param new_dock_name string
+---@return LuaEntity
 function replace_dock(dock, new_dock_name)
   if new_dock_name == "sp-spidertron-dock" and dock.name ~= "sp-spidertron-dock-closing" then
     -- Need to use temporary dock entity whilst closing animation is playing
@@ -119,7 +132,7 @@ function replace_dock(dock, new_dock_name)
   local to_be_deconstructed = dock.to_be_deconstructed()
 
   local circuit_read_contents
-  local control_behavior = dock.get_control_behavior()
+  local control_behavior = dock.get_control_behavior()  ---@cast control_behavior LuaContainerControlBehavior
   if control_behavior then
     circuit_read_contents = control_behavior.read_contents
   end
@@ -132,7 +145,14 @@ function replace_dock(dock, new_dock_name)
   end
 
   old_dock = dock
-  dock = dock.surface.create_entity{name = new_dock_name, position = dock.position, force = dock.force, spill = false, create_build_effect_smoke = false, fast_replace = true}
+  dock = dock.surface.create_entity({
+    name = new_dock_name,
+    position = dock.position,
+    force = dock.force,
+    spill = false,
+    create_build_effect_smoke = false,
+    fast_replace = true
+  })  --[[@as LuaEntity]]
 
   dock.health = health
   dock.last_user = last_user
@@ -151,7 +171,7 @@ function replace_dock(dock, new_dock_name)
   end
 
   if circuit_read_contents ~= nil then
-    local new_control_behavior = dock.get_or_create_control_behavior()
+    local new_control_behavior = dock.get_or_create_control_behavior()  ---@cast new_control_behavior LuaContainerControlBehavior
     new_control_behavior.read_contents = circuit_read_contents
   end
 
@@ -169,6 +189,8 @@ function replace_dock(dock, new_dock_name)
   return dock
 end
 
+---@param inventory LuaInventory
+---@return ItemFilter[]
 local function get_filters(inventory)
   if not inventory.is_filtered() then return {} end
   local filters = {}
@@ -181,8 +203,9 @@ local function get_filters(inventory)
   return filters
 end
 
+---@param inventory LuaInventory
+---@return InventoryContents
 local function get_contents_dict(inventory)
-  -- Temporary abstraction for 2.0 version, ignoring quality
   local contents_list = inventory.get_contents()
   local contents_dict = {}
   for _, item in pairs(contents_list) do
@@ -193,6 +216,10 @@ local function get_contents_dict(inventory)
   return contents_dict
 end
 
+---@param dock LuaEntity
+---@param spidertron LuaEntity
+---@param previous_contents {items: InventoryContents, filters: ItemFilter[]}
+---@return {items: InventoryContents, filters: ItemFilter[]}
 local function update_dock_inventory(dock, spidertron, previous_contents)
   local previous_items = previous_contents.items
   local previous_filters = previous_contents.filters
@@ -202,11 +229,11 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
     previous_filters = {}
   end
 
-  local spidertron_inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
+  local spidertron_inventory = spidertron.get_inventory(defines.inventory.spider_trunk)  ---@cast spidertron_inventory -?
   local spidertron_contents = get_contents_dict(spidertron_inventory)
   local spidertron_filters = get_filters(spidertron_inventory)
 
-  local dock_inventory = dock.get_inventory(defines.inventory.chest)
+  local dock_inventory = dock.get_inventory(defines.inventory.chest)  ---@cast dock_inventory -?
   local dock_contents = get_contents_dict(dock_inventory)
   local dock_filters = get_filters(dock_inventory)
 
@@ -281,17 +308,22 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
   return new_spidertron_contents
 end
 
-
+---@param bounding_box BoundingBox
+---@param increase number
+---@return BoundingBox
 local function increase_bounding_box(bounding_box, increase)
   local left_top = bounding_box.left_top
   local right_bottom = bounding_box.right_bottom
   return {left_top = {x = left_top.x - increase, y = left_top.y - increase}, right_bottom = {x = right_bottom.x + increase, y = right_bottom.y + increase}}
 end
 
-local function connect_to_spidertron(dock_data, spidertron, surface)
+---@param dock_data DockData
+---@param spidertron LuaEntity
+---@return boolean?
+local function connect_to_spidertron(dock_data, spidertron)
   if storage.spidertrons_docked[spidertron.unit_number] or spidertron.speed >= 0.1 or spidertron.name == "companion" or spidertron.autopilot_destination then return end
 
-  local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)
+  local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)  ---@cast inventory -?
   local inventory_size = #inventory
   if inventory_size == 0 then return end
 
@@ -344,7 +376,7 @@ local function connect_to_spidertron(dock_data, spidertron, surface)
   --surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-docked"}}
 
   local spidertron_contents = {items = get_contents_dict(inventory), filters = get_filters(inventory)}
-  local dock_inventory = dock.get_inventory(defines.inventory.chest)
+  local dock_inventory = dock.get_inventory(defines.inventory.chest)  ---@cast dock_inventory -?
   for index, filter in pairs(spidertron_contents.filters) do
     dock_inventory.set_filter(index, filter)
   end
@@ -357,6 +389,9 @@ local function connect_to_spidertron(dock_data, spidertron, surface)
   return true
 end
 
+---@param dock_data DockData
+---@return nil
+---@return boolean
 local function update_dock(dock_data)
   local dock = dock_data.dock
   local delete = false
@@ -387,7 +422,7 @@ local function update_dock(dock_data)
       if not dock.to_be_deconstructed() then
         local nearby_spidertrons = surface.find_entities_filtered{type = "spider-vehicle", area = increase_bounding_box(dock.bounding_box, 0.4), force = dock.force}
         for _, spidertron in pairs(nearby_spidertrons) do
-          local connected = connect_to_spidertron(dock_data, spidertron, surface)
+          local connected = connect_to_spidertron(dock_data, spidertron)
           if connected then
             delete = true
             break
@@ -401,6 +436,7 @@ local function update_dock(dock_data)
   return nil, delete  -- Deletes dock from global table
 end
 
+---@param event EventData.on_tick
 local function on_tick(event)
   local schedule = storage.scheduled_dock_replacements[event.tick]
   if schedule then

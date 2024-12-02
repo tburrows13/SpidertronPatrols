@@ -1,4 +1,4 @@
-local event_handler = require "__core__.lualib.event_handler"
+local event_handler = require "event_handler"
 util = require "util"
 require "scripts.utils"
 gui = require "scripts.gui-lite"
@@ -34,7 +34,18 @@ storage.spidertron_waypoints: indexed by spidertron.unit_number:
   renders :: array of LuaRenderObject
 ]]
 
+---@alias PlayerIndex uint
+---@alias UnitNumber uint
+---@alias GameTick uint
+---@alias LuaRenderID uint
 
+---@alias WaypointType "none" | "time-passed" | "inactivity" | "full-inventory" | "empty-inventory" | "robots-inactive" | "passenger-present" | "passenger-not-present" | "item-count" | "circuit-condition"
+---@alias WaypointIndex uint
+---@alias Waypoint { type: WaypointType, position: MapPosition, wait_time?: uint, item_count_info?: { item_name: string | SignalID, condition: uint, count: uint }, render: LuaRenderObject }
+---@alias WaypointInfo { spidertron: LuaEntity, waypoints: table<WaypointIndex, Waypoint>, renders: LuaRenderObject[], current_index: WaypointIndex, on_patrol: boolean, tick_arrived?: GameTick, tick_inactive?: GameTick, previous_inventories?: table }
+
+---@param spidertron LuaEntity
+---@return WaypointInfo
 function get_waypoint_info(spidertron)
   local waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
   if not waypoint_info then
@@ -53,18 +64,24 @@ end
 
 RemoteInterface = require "scripts.remote-interface"
 
-function Control.clear_spidertron_waypoints(spidertron, unit_number)
+---@param spidertron_id LuaEntity | UnitNumber
+function Control.clear_spidertron_waypoints(spidertron_id)
   -- Called on custom-input or whenever the current autopilot_destination is removed or when the spidertron is removed.
   -- Pass in either `spidertron` or `unit_number`
   local waypoint_info
-  if spidertron then
-    waypoint_info = get_waypoint_info(spidertron)
-    spidertron.autopilot_destination = nil
-  else
+  ---@type UnitNumber
+  local unit_number
+  if type(spidertron_id) == "number" then
+    ---@cast spidertron_id UnitNumber
     waypoint_info = storage.spidertron_waypoints[unit_number]
     if not waypoint_info then return end
+    unit_number = spidertron_id
+  else
+    ---@cast spidertron_id LuaEntity
+    waypoint_info = get_waypoint_info(spidertron_id)
+    spidertron_id.autopilot_destination = nil
+    unit_number = spidertron_id.unit_number  ---@cast unit_number -?
   end
-  if not unit_number then unit_number = spidertron.unit_number end
   log("Clearing spidertron waypoints for unit number " .. unit_number)
   for _, waypoint in pairs(waypoint_info.waypoints) do
     if waypoint.render then
@@ -79,7 +96,7 @@ end
 
 script.on_event("sp-delete-all-waypoints",
   function(event)
-    local player = game.get_player(event.player_index)
+    local player = game.get_player(event.player_index)  ---@cast player -?
     local spidertron_remote_selection = player.spidertron_remote_selection
     if spidertron_remote_selection then
       for _, spidertron in pairs(spidertron_remote_selection) do  -- TODO remove loop if enforcing only one connection to patrol remote?
@@ -92,8 +109,8 @@ script.on_event("sp-delete-all-waypoints",
 
 -- Detect when the player cancels a spidertron's autopilot_destination
 script.on_event({"move-right-custom", --[["move-left-custom",]] "move-up-custom", "move-down-custom"},
-  function(event)
-    local player = game.get_player(event.player_index)
+  function(event --[[@as EventData.CustomInputEvent]])
+    local player = game.get_player(event.player_index)  ---@cast player -?
     local vehicle = player.vehicle
     if vehicle and vehicle.type == "spider-vehicle" and player.render_mode == defines.render_mode.game then  -- Render mode means player isn't in map view...
       local waypoint_info = get_waypoint_info(vehicle)
@@ -103,17 +120,19 @@ script.on_event({"move-right-custom", --[["move-left-custom",]] "move-up-custom"
   end
 )
 
+---@param event EventData.on_object_destroyed
 local function on_object_destroyed(event)
   local unit_number = event.useful_id
-  Control.clear_spidertron_waypoints(nil, unit_number)
+  Control.clear_spidertron_waypoints(unit_number)
 end
 
 
 local function process_active_mods()
   local version_string = script.active_mods["base"]
-  local version = util.split(version_string, ".")
-  for i=1, #version do
-    version[i] = tonumber(version[i])
+  local version_strings = util.split(version_string, ".")
+  local version = {}  ---@type uint[]
+  for i=1, #version_strings do
+    version[i] = tonumber(version_strings[i])
   end
   storage.base_version = version
 
@@ -131,17 +150,26 @@ end
 
 local function setup()
   process_active_mods()
-  storage.spidertron_waypoints = {}     -- Indexed by spidertron.unit_number
-  storage.path_renders = {}  -- Indexed by player.index
-  storage.chart_tags = {} -- Indexed by render id
-  storage.remotes_in_cursor = {} -- Indexed by player.index
-  storage.blinking_renders = {} -- Indexed by player.index
+  ---@type table<UnitNumber, WaypointInfo>
+  storage.spidertron_waypoints = {}
+  ---@type table<PlayerIndex, table<UnitNumber, table<WaypointIndex, LuaRenderObject>>>
+  storage.path_renders = {}
+  ---@type table<LuaRenderID, LuaCustomChartTag[]>
+  storage.chart_tags = {}
+  ---@type table<PlayerIndex, WaypointIndex>
+  storage.remotes_in_cursor = {}
+  ---@type table<PlayerIndex, table<LuaRenderID, table<LuaRenderObject, GameTick>>>
+  storage.blinking_renders = {}
 
+  ---@type table<UnitNumber, DockData>
   storage.spidertron_docks = {}
+  ---@type table<UnitNumber, UnitNumber>
   storage.spidertrons_docked = {}
+  ---@type table<GameTick, {button: LuaGuiElement, tick_started: GameTick}>
   storage.scheduled_dock_replacements = {}
 
   storage.open_gui_elements = {}
+  ---@type table<PlayerIndex, table<UnitNumber, LuaRenderObject>>
   storage.player_highlights = {}  -- Indexed by player.index
 
   RemoteInterface.connect_to_remote_interfaces()
@@ -153,9 +181,9 @@ local function config_changed_setup(changed_data)
   process_active_mods()
   -- Only run when this mod was present in the previous save as well. Otherwise, on_init will run.
   local mod_changes = changed_data.mod_changes
-  local old_version
+  local old_version_string
   if mod_changes and mod_changes["SpidertronPatrols"] and mod_changes["SpidertronPatrols"]["old_version"] then
-    old_version = mod_changes["SpidertronPatrols"]["old_version"]
+    old_version_string = mod_changes["SpidertronPatrols"]["old_version"]
   else
     return
   end
@@ -164,7 +192,7 @@ local function config_changed_setup(changed_data)
   for _, player in pairs(game.players) do
     if player.opened_gui_type == defines.gui_type.entity then
       local entity = player.opened
-      if entity.type == "spider-vehicle" then
+      if entity and entity.type == "spider-vehicle" then
         player.opened = nil
       end
     end
@@ -172,10 +200,11 @@ local function config_changed_setup(changed_data)
 
   storage.wait_time_defaults = nil
 
-  log("Coming from old version: " .. old_version)
-  old_version = util.split(old_version, ".")
-  for i=1, #old_version do
-    old_version[i] = tonumber(old_version[i])
+  log("Coming from old version: " .. old_version_string)
+  local version_strings = util.split(old_version_string, ".")
+  local old_version
+  for i=1, #version_strings do
+    old_version[i] = tonumber(version_strings[i])
   end
 
   if old_version[1] == 2 then
@@ -204,7 +233,7 @@ local function config_changed_setup(changed_data)
       for _, dock_data in pairs(storage.spidertron_docks) do
         local spidertron = dock_data.connected_spidertron
         local dock = dock_data.dock
-      
+
         if dock and dock.valid and dock.name ~= "sp-spidertron-dock-closing" and spidertron and spidertron.valid then
           storage.spidertrons_docked[spidertron.unit_number] = nil
           dock = replace_dock(dock, "sp-spidertron-dock")
