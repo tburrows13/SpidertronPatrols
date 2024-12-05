@@ -1,4 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.4
+Date: 5 December 2024
+  Features:
+    - Debug keybind "Toggle entity" can now toggle a spidertron's "Automatic"/"Manual" mode
+    - "Item count" and "Circuit condition" wait conditions now check quality
+  Compatibility:
+    - Added compatibility with Maraxsis
+  Bugfixes:
+    - Fixed 'Alt + A' to give spidertron remote would also move player
+    - Fixed spidertrons with burner inventories would 'connect' to inserters
+---------------------------------------------------------------------------------------------------
 Version: 2.5.3
 Date: 13 November 2024
   Bugfixes:

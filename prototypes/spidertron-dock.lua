@@ -54,7 +54,6 @@ local function create_spidertron_dock(inventory_size, closing)
     inventory_size = inventory_size,
     inventory_type = "with_filters_and_bar",
     hidden = true,
-    scale_info_icons = false,
     picture = {
       layers = {
         {
