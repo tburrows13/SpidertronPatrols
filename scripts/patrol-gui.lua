@@ -799,25 +799,33 @@ local toggleable_entities = {
   ["constant-combinator"] = true,
   ["power-switch"] = true,
 }
+---Checks selected, then opened, then spidertron_remote_selection, then vehicle/physical_vehicle
 ---@param event EventData.CustomInputEvent
 local function toggle_spidertron_automatic_manual(event)
   local player = game.get_player(event.player_index)  ---@cast player -?
   local spidertron = player.selected
+  local spidertrons
   if not spidertron or spidertron.type ~= "spider-vehicle" then
     if spidertron and toggleable_entities[spidertron.type] then
       return  -- Don't check opened/vehicle because the player is toggling a different entity by selection
     end
     spidertron = player.opened  --[[@as LuaEntity]]
     if not spidertron or spidertron.object_name ~= "LuaEntity" or spidertron.type ~= "spider-vehicle" then
-      spidertron = player.vehicle or player.physical_vehicle
-      if not spidertron then
-        return
+      spidertrons = player.spidertron_remote_selection
+      if not spidertrons or not next(spidertrons) then
+        spidertron = player.vehicle or player.physical_vehicle
+        if not spidertron then
+          return
+        end
       end
     end
   end
-  local waypoint_info = get_waypoint_info(spidertron)
-  local new_on_patrol = not waypoint_info.on_patrol
-  set_on_patrol(new_on_patrol, spidertron, waypoint_info)
+  spidertrons = spidertrons or {spidertron}
+  for _, spidertron_ in pairs(spidertrons) do
+    local waypoint_info = get_waypoint_info(spidertron_)
+    local new_on_patrol = not waypoint_info.on_patrol
+    set_on_patrol(new_on_patrol, spidertron_, waypoint_info)
+  end
 end
 
 PatrolGui.events = {
