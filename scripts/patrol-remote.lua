@@ -27,35 +27,37 @@ script.on_event("sp-replace-previous-waypoint",
 ---@param event EventData.on_player_used_spidertron_remote
 local function on_player_used_spidertron_remote(event)
   local player = game.get_player(event.player_index)  ---@cast player -?
-  local spidertron = player.spidertron_remote_selection[1]
-  -- Prevent remote working on docked spidertrons from Space Spidertron
-  if spidertron.name:sub(1, 10) == "ss-docked-" then return end
+  local spidertrons = player.spidertron_remote_selection or {}
+  local single_spidertron_selected = #spidertrons == 1
+  for _, spidertron in pairs(spidertrons) do
+    -- Prevent remote working on docked spidertrons from Space Spidertron
+    if spidertron.name:sub(1, 10) == "ss-docked-" then return end
 
-  local remote = player.cursor_stack
+    local remote = player.cursor_stack
 
-  if remote and remote.valid_for_read and remote.name == "sp-spidertron-patrol-remote" then
-    local position = snap_waypoint_position(player.selected, event.position)
-    local replace_waypoint = replace_this_tick[event.player_index] == event.tick
+    if remote and remote.valid_for_read and remote.name == "sp-spidertron-patrol-remote" then
+      local position = snap_waypoint_position(player.selected, event.position)
+      local replace_waypoint = replace_this_tick[event.player_index] == event.tick
 
-    local waypoint_index = storage.remotes_in_cursor[player.index]
-    local waypoint_info = get_waypoint_info(spidertron)
-    local number_of_waypoints = #waypoint_info.waypoints
-    if waypoint_index and waypoint_index ~= -1 then
-      waypoint_index = math.min(number_of_waypoints + 1, waypoint_index)
-      if replace_waypoint then
-        storage.remotes_in_cursor[player.index] = waypoint_index
+      local waypoint_index = storage.remotes_in_cursor[player.index]
+      local waypoint_info = get_waypoint_info(spidertron)
+      local number_of_waypoints = #waypoint_info.waypoints
+      if single_spidertron_selected and waypoint_index and waypoint_index ~= -1 then
+        waypoint_index = math.min(number_of_waypoints + 1, waypoint_index)
+        if replace_waypoint then
+          storage.remotes_in_cursor[player.index] = waypoint_index
+        else
+          storage.remotes_in_cursor[player.index] = waypoint_index + 1
+        end
       else
-        storage.remotes_in_cursor[player.index] = waypoint_index + 1
+        waypoint_index = number_of_waypoints
       end
+      SpidertronControl.on_patrol_command_issued(spidertron, position, waypoint_index, replace_waypoint)
     else
-      waypoint_index = number_of_waypoints
+      local waypoint_info = get_waypoint_info(spidertron)
+      waypoint_info.on_patrol = false
+      PatrolGui.update_gui_switch(waypoint_info)
     end
-
-    SpidertronControl.on_patrol_command_issued(spidertron, position, waypoint_index, replace_waypoint)
-  else
-    local waypoint_info = get_waypoint_info(spidertron)
-    waypoint_info.on_patrol = false
-    PatrolGui.update_gui_switch(waypoint_info)
   end
 end
 
