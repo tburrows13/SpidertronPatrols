@@ -41,8 +41,25 @@ storage.spidertron_waypoints: indexed by spidertron.unit_number:
 
 ---@alias WaypointType "none" | "time-passed" | "inactivity" | "full-inventory" | "empty-inventory" | "robots-inactive" | "passenger-present" | "passenger-not-present" | "item-count" | "circuit-condition"
 ---@alias WaypointIndex uint
----@alias Waypoint { type: WaypointType, position: MapPosition, wait_time?: uint, item_count_info?: { item_name: string | SignalID, condition: uint, count: uint }, render: LuaRenderObject }
----@alias WaypointInfo { spidertron: LuaEntity, waypoints: table<WaypointIndex, Waypoint>, renders: LuaRenderObject[], current_index: WaypointIndex, on_patrol: boolean, tick_arrived?: GameTick, tick_inactive?: GameTick, previous_inventories?: table }
+
+---@class Waypoint
+---@field type WaypointType
+---@field position MapPosition
+---@field wait_time uint?
+---@field item_count_info table?
+---@field render LuaRenderObject
+
+---@class WaypointInfo
+---@field spidertron LuaEntity
+---@field waypoints table<WaypointIndex, Waypoint>
+---@field renders LuaRenderObject[]
+---@field current_index WaypointIndex
+---@field on_patrol boolean
+---@field tick_arrived GameTick?
+---@field tick_inactive GameTick?
+---@field previous_inventories table?
+---@field stopped boolean?
+---@field last_distance number?
 
 ---@param spidertron LuaEntity
 ---@return WaypointInfo
@@ -165,11 +182,12 @@ local function setup()
   storage.spidertron_docks = {}
   ---@type table<UnitNumber, UnitNumber>
   storage.spidertrons_docked = {}
-  ---@type table<GameTick, {button: LuaGuiElement, tick_started: GameTick}>
+  ---@type table<GameTick, LuaEntity[]>
   storage.scheduled_dock_replacements = {}
 
+  ---@type table<PlayerIndex, GuiElements>
   storage.open_gui_elements = {}
-  ---@type table<PlayerIndex, table<UnitNumber, LuaRenderObject>>
+  ---@type table<PlayerIndex, {button: LuaGuiElement, tick_started: GameTick}>
   storage.player_highlights = {}  -- Indexed by player.index
 
   RemoteInterface.connect_to_remote_interfaces()

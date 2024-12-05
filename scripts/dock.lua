@@ -7,7 +7,7 @@ local math2d = require "math2d"
 ---@class DockData
 ---@field dock LuaEntity
 ---@field connected_spidertron LuaEntity?
----@field previous_contents {items: InventoryContents, filters: ItemFilter[]}
+---@field previous_contents {items: InventoryContents, filters: ItemFilter[]}?
 
 local Dock = {}
 
@@ -225,6 +225,7 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
   local previous_filters = previous_contents.filters
   if not previous_items then
     -- Pre-2.2.7 migration
+    ---@diagnostic disable-next-line: cast-local-type
     previous_items = previous_contents
     previous_filters = {}
   end

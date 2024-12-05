@@ -1,3 +1,4 @@
+---@diagnostic disable: duplicate-set-field
 --- https://git.sr.ht/~raiguard/flib/tree/35b977ee865d2901e1c869c0c0530b52b7f72a9e/item/gui-lite.lua
 -- With `ref` table addition by Xorimuth
 
@@ -16,7 +17,7 @@ local handlers_lookup = {}
 --- @param parent LuaGuiElement
 --- @param def GuiElemDef Can be a single element, or an array of elements.
 --- @param elems table<string, LuaGuiElement>? Optional initial `elems` table.
---- @return table<string, LuaGuiElement> elems Elements with names will be collected into this table.
+--- @return table<string, LuaGuiElement|table> elems Elements with names will be collected into this table.
 --- @return LuaGuiElement first The element that was created first;  the "top level" element.
 function flib_gui.add(parent, def, elems)
   if not parent or not parent.valid then

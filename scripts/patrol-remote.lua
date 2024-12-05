@@ -61,7 +61,7 @@ end
 
 ---@param player LuaPlayer
 ---@param spidertron LuaEntity
----@param waypoint_index WaypointIndex
+---@param waypoint_index WaypointIndex?
 function PatrolRemote.give_remote(player, spidertron, waypoint_index)
   if not player.is_cursor_empty() then
     local cleared = player.clear_cursor()

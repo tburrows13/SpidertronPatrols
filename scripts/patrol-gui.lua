@@ -2,10 +2,26 @@ PatrolGui = {}
 local PatrolGuiWaypoint = {}
 local PatrolGuiGeneral = {}
 
+---@class GuiElements
+---@field sp-relative-frame LuaGuiElement
+---@field camera LuaGuiElement
+---@field on_patrol_switch LuaGuiElement
+---@field toggle_camera_button LuaGuiElement
+---@field toggle_center_button LuaGuiElement
+---@field schedule-scroll-pane LuaGuiElement
+---@field time_slider any
+---@field time_textfield any
+---@field waypoint_dropdown any
+---@field waypoint_button any
+
+---@param spidertron LuaEntity
+---@return boolean
 local function has_fuel_inventory(spidertron)
   return not not spidertron.get_fuel_inventory()
 end
 
+---@param spidertron LuaEntity
+---@return string[]
 local function dropdown_contents(spidertron)
   local contents = {
     {"description.no-limit"},
@@ -26,7 +42,9 @@ local function dropdown_contents(spidertron)
   return contents
 end
 
-
+---@param index number
+---@param spidertron LuaEntity
+---@return string
 local function dropdown_index_lookup(index, spidertron)
   local lookup = {
     "none",
@@ -47,6 +65,9 @@ local function dropdown_index_lookup(index, spidertron)
   return lookup[index]
 end
 
+---@param wait_condition WaypointType
+---@param spidertron LuaEntity
+---@return integer?
 local function dropdown_index(wait_condition, spidertron)
   local lookup = {
     "none",
@@ -78,6 +99,8 @@ condition_dropdown_contents = {">", "<", "=", "≥", "≤", "≠"}
 local slider_values = {5, 10, 30, 60, 120, 600}
 slider_values[0] = 0
 
+---@param input_value integer
+---@return integer
 local function slider_value_index(input_value)
   for i, slider_value in pairs(slider_values) do
     if input_value == slider_value then
@@ -89,7 +112,9 @@ local function slider_value_index(input_value)
   return #slider_values
 end
 
-
+---@param i WaypointIndex
+---@param waypoint Waypoint
+---@return table?
 local function build_waypoint_player_input(i, waypoint)
   local waypoint_type = waypoint.type
   if waypoint_type == "time-passed" or waypoint_type == "inactivity" then
@@ -111,7 +136,7 @@ local function build_waypoint_player_input(i, waypoint)
       }
     }
   elseif waypoint_type == "item-count" or waypoint_type == "circuit-condition" then
-    local info = waypoint.item_count_info
+    local info = waypoint.item_count_info  ---@cast info -?
     local elem_type = waypoint_type == "item-count" and "item" or "signal"
     return {
       {
@@ -130,6 +155,9 @@ local function build_waypoint_player_input(i, waypoint)
   end
 end
 
+---@param waypoint_info WaypointInfo
+---@param index WaypointIndex
+---@return table
 local function generate_button_status(waypoint_info, index)
   local toggled = false
   local sprite = "utility/play"
@@ -142,6 +170,9 @@ local function generate_button_status(waypoint_info, index)
   return {toggled = toggled, sprite = sprite}
 end
 
+---@param waypoint_info WaypointInfo
+---@param spidertron LuaEntity
+---@return table
 local function build_waypoint_frames(waypoint_info, spidertron)
   --waypoint_info.waypoints = {{type = "none"}, {type = "time-passed", wait_time = 5}, {type = "inactivity", wait_time = 10}}--{type = "full-inventory"}, {type = "empty-inventory"}, {type = "robots-inactive"}, {type = "passenger-present"}, {type = "passenger-not-present"}, {type = "none"}, {type = "time-passed", wait_time = 5}, {type = "inactivity", wait_time = 10}, {type = "full-inventory"}, {type = "empty-inventory"}, {type = "robots-inactive"}, {type = "passenger-present"}, {type = "passenger-not-present"}, {type = "none"}, {type = "time-passed", wait_time = 5}, {type = "inactivity", wait_time = 10}, {type = "full-inventory"}, {type = "empty-inventory"}, {type = "robots-inactive"}, {type = "passenger-present"}, {type = "passenger-not-present"}}
   local frames = {}
@@ -207,6 +238,8 @@ local function build_waypoint_frames(waypoint_info, spidertron)
   return frames
 end
 
+---@param waypoint_info WaypointInfo
+---@return table
 local function build_on_patrol_switch(waypoint_info)
   local switch_state
   if waypoint_info.on_patrol then switch_state = "left" else switch_state = "right" end
@@ -219,7 +252,8 @@ local function build_on_patrol_switch(waypoint_info)
     right_label_caption = {"gui-train.manual-mode"}}
 end
 
-
+---@param player LuaPlayer
+---@param spidertron LuaEntity
 local function build_gui(player, spidertron)
   local relative_frame = player.gui.relative["sp-relative-frame"]
   if relative_frame then
@@ -400,8 +434,9 @@ function PatrolGui.clear_highlights_for_player(player)
   end
 end
 
+---@param event EventData.on_gui_opened
 local function on_gui_opened(event)
-  local player = game.get_player(event.player_index)
+  local player = game.get_player(event.player_index)  ---@cast player -?
   local entity = event.entity
   if entity and entity.type == "spider-vehicle" then
     WaypointRendering.update_player_render_paths(player)
@@ -414,9 +449,9 @@ local function on_gui_opened(event)
   end
 end
 
-
+---@param event EventData.on_gui_closed
 local function on_gui_closed(event)
-  local player = game.get_player(event.player_index)
+  local player = game.get_player(event.player_index)  ---@cast player -?
   local entity = event.entity
   if entity and entity.type == "spider-vehicle" then
     -- Can't close relative GUI here because when SpidertronEnhancements/RemoteConfiguration re-opens
@@ -427,7 +462,9 @@ local function on_gui_closed(event)
   end
 end
 
-
+---@param player LuaPlayer
+---@param spidertron LuaEntity
+---@param gui_elements any
 function PatrolGui.toggle_camera(player, spidertron, gui_elements)
   local camera_button = gui_elements.toggle_camera_button
   local camera = gui_elements.camera
@@ -678,20 +715,38 @@ function PatrolGuiWaypoint.add_s(player, spidertron, gui_elements, waypoint_info
   textfield.text = textfield.text .. " s"
 end
 
+---@param player LuaPlayer
+---@param spidertron LuaEntity
+---@param gui_elements GuiElements
+---@param waypoint_info WaypointInfo
+---@param index WaypointIndex
+---@param element LuaGuiElement
 function PatrolGuiWaypoint.item_selected(player, spidertron, gui_elements, waypoint_info, index, element)
   local elem_button = element
   local item_count_info = waypoint_info.waypoints[index].item_count_info
   item_count_info.item_name = elem_button.elem_value
 end
 
+---@param player LuaPlayer
+---@param spidertron LuaEntity
+---@param gui_elements GuiElements
+---@param waypoint_info WaypointInfo
+---@param index WaypointIndex
+---@param element LuaGuiElement
 function PatrolGuiWaypoint.item_condition_changed(player, spidertron, gui_elements, waypoint_info, index, element)
   local dropdown = element
   local item_count_info = waypoint_info.waypoints[index].item_count_info
   item_count_info.condition = dropdown.selected_index
 end
 
+---@param player LuaPlayer
+---@param spidertron LuaEntity
+---@param gui_elements GuiElements
+---@param waypoint_info WaypointInfo
+---@param index WaypointIndex
+---@param element LuaGuiElement
 function PatrolGuiWaypoint.item_count_changed(player, spidertron, gui_elements, waypoint_info, index, element)
-  local item_count_info = waypoint_info.waypoints[index].item_count_info
+  local item_count_info = waypoint_info.waypoints[index].item_count_info  ---@cast item_count_info -?
   local text = element.text
   if text == "" then text = "0" end
   local item_count = tonumber(text)
@@ -700,7 +755,7 @@ end
 
 gui.add_handlers(PatrolGuiGeneral,  -- For handlers called from the addon GUI as well
   function(event, handler)
-    local player = game.get_player(event.player_index)
+    local player = game.get_player(event.player_index)  ---@cast player -?
     local spidertron = player.opened
     if player.gui.relative["sp-relative-frame"] then
       handler(player, spidertron)
@@ -710,7 +765,7 @@ gui.add_handlers(PatrolGuiGeneral,  -- For handlers called from the addon GUI as
 
 gui.add_handlers(PatrolGui,
   function(event, handler)
-    local player = game.get_player(event.player_index)
+    local player = game.get_player(event.player_index)  ---@cast player -?
     local spidertron = player.opened
     local gui_elements = storage.open_gui_elements[player.index]
     if gui_elements then
@@ -721,10 +776,10 @@ gui.add_handlers(PatrolGui,
 
 gui.add_handlers(PatrolGuiWaypoint,
   function(event, handler)
-    local player = game.get_player(event.player_index)
+    local player = game.get_player(event.player_index)  ---@cast player -?
     local spidertron = player.opened
     local gui_elements = storage.open_gui_elements[player.index]
-    if gui_elements then
+    if spidertron and gui_elements then
       local waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
       local index = event.element.tags.index
       -- TODO look at using event.element in all events or none
@@ -733,6 +788,7 @@ gui.add_handlers(PatrolGuiWaypoint,
   end
 )
 
+---@param event EventData.CustomInputEvent
 local function toggle_spidertron_automatic_manual(event)
   local player = game.get_player(event.player_index)  ---@cast player -?
   local spidertron = player.selected
