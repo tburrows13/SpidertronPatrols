@@ -136,20 +136,20 @@ local function build_waypoint_player_input(i, waypoint)
       }
     }
   elseif waypoint_type == "item-count" or waypoint_type == "circuit-condition" then
-    local info = waypoint.item_count_info  ---@cast info -?
-    local elem_type = waypoint_type == "item-count" and "item" or "signal"
+    local condition_info = waypoint.item_condition_info or waypoint.circuit_condition_info  ---@cast condition_info -?
+    local elem_type = waypoint_type == "item-count" and "item-with-quality" or "signal"
     return {
       {
-        type = "choose-elem-button", style = "train_schedule_item_select_button", elem_type = elem_type, item = info.item_name, signal = info.item_name,
-        handler = {[defines.events.on_gui_elem_changed] = PatrolGuiWaypoint.item_selected}, tags = {index = i},
+        type = "choose-elem-button", style = "train_schedule_item_select_button", elem_type = elem_type, ["item-with-quality"] = condition_info.elem, signal = condition_info.elem,
+        handler = {[defines.events.on_gui_elem_changed] = PatrolGuiWaypoint.condition_elem_selected}, tags = {index = i},
       },
       {
-        type = "drop-down", style = "train_schedule_circuit_condition_comparator_dropdown", items = condition_dropdown_contents, selected_index = info.condition,
-        handler = {[defines.events.on_gui_selection_state_changed] = PatrolGuiWaypoint.item_condition_changed}, tags = {index = i},
+        type = "drop-down", style = "train_schedule_circuit_condition_comparator_dropdown", items = condition_dropdown_contents, selected_index = condition_info.condition,
+        handler = {[defines.events.on_gui_selection_state_changed] = PatrolGuiWaypoint.condition_comparison_changed}, tags = {index = i},
       },
       {
-        type = "textfield", style = "sp_compact_slider_value_textfield", text = tostring(info.count), numeric = true, allow_decimal = false, allow_negative = waypoint_type == "circuit-condition", lose_focus_on_confirm = true,
-        handler = {[defines.events.on_gui_text_changed] = PatrolGuiWaypoint.item_count_changed}, tags = {index = i},
+        type = "textfield", style = "sp_compact_slider_value_textfield", text = tostring(condition_info.count), numeric = true, allow_decimal = false, allow_negative = waypoint_type == "circuit-condition", lose_focus_on_confirm = true,
+        handler = {[defines.events.on_gui_text_changed] = PatrolGuiWaypoint.condition_count_changed}, tags = {index = i},
       },
     }
   end
@@ -568,12 +568,15 @@ function PatrolGuiWaypoint.waypoint_type_changed(player, spidertron, gui_element
       waypoint.wait_time = nil
     end
     if new_waypoint_type == "item-count" then
-      waypoint.item_count_info = {item_name = nil, condition = 4, count = 100}
+      waypoint.item_condition_info = {elem = nil, condition = 4, count = 100}
+      waypoint.circuit_condition_info = nil
     elseif new_waypoint_type == "circuit-condition" then
-      waypoint.item_count_info = {item_name = nil, condition = 1, count = 0}
+      waypoint.circuit_condition_info = {elem = nil, condition = 1, count = 0}
+      waypoint.item_condition_info = nil
       element.tooltip = {"gui-patrol.circuit-condition-tooltip"}
     else
-      waypoint.item_count_info = nil
+      waypoint.item_condition_info = nil
+      waypoint.circuit_condition_info = nil
     end
     PatrolGui.update_gui_schedule(waypoint_info)
   end
@@ -721,10 +724,11 @@ end
 ---@param waypoint_info WaypointInfo
 ---@param index WaypointIndex
 ---@param element LuaGuiElement
-function PatrolGuiWaypoint.item_selected(player, spidertron, gui_elements, waypoint_info, index, element)
+function PatrolGuiWaypoint.condition_elem_selected(player, spidertron, gui_elements, waypoint_info, index, element)
   local elem_button = element
-  local item_count_info = waypoint_info.waypoints[index].item_count_info
-  item_count_info.item_name = elem_button.elem_value
+  local waypoint = waypoint_info.waypoints[index]
+  local condition_info = waypoint.item_condition_info or waypoint.circuit_condition_info  ---@cast condition_info -?
+  condition_info.elem = elem_button.elem_value  --[[@as ItemIDAndQualityIDPair|SignalID]]
 end
 
 ---@param player LuaPlayer
@@ -733,10 +737,11 @@ end
 ---@param waypoint_info WaypointInfo
 ---@param index WaypointIndex
 ---@param element LuaGuiElement
-function PatrolGuiWaypoint.item_condition_changed(player, spidertron, gui_elements, waypoint_info, index, element)
+function PatrolGuiWaypoint.condition_comparison_changed(player, spidertron, gui_elements, waypoint_info, index, element)
   local dropdown = element
-  local item_count_info = waypoint_info.waypoints[index].item_count_info
-  item_count_info.condition = dropdown.selected_index
+  local waypoint = waypoint_info.waypoints[index]
+  local condition_info = waypoint.item_condition_info or waypoint.circuit_condition_info  ---@cast condition_info -?
+  condition_info.condition = dropdown.selected_index
 end
 
 ---@param player LuaPlayer
@@ -745,12 +750,13 @@ end
 ---@param waypoint_info WaypointInfo
 ---@param index WaypointIndex
 ---@param element LuaGuiElement
-function PatrolGuiWaypoint.item_count_changed(player, spidertron, gui_elements, waypoint_info, index, element)
-  local item_count_info = waypoint_info.waypoints[index].item_count_info  ---@cast item_count_info -?
+function PatrolGuiWaypoint.condition_count_changed(player, spidertron, gui_elements, waypoint_info, index, element)
+  local waypoint = waypoint_info.waypoints[index]
+  local condition_info = waypoint.item_condition_info or waypoint.circuit_condition_info  ---@cast condition_info -?
   local text = element.text
   if text == "" then text = "0" end
-  local item_count = tonumber(text)
-  item_count_info.count = item_count
+  local item_count = tonumber(text)  ---@cast item_count -?
+  condition_info.count = item_count
 end
 
 gui.add_handlers(PatrolGuiGeneral,  -- For handlers called from the addon GUI as well

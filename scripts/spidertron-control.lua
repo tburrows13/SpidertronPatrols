@@ -167,9 +167,9 @@ local function handle_wait_timers()
         end
       elseif waypoint_type == "item-count" then
         local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)  ---@cast inventory -?
-        local item_count_info = waypoint.item_count_info  ---@cast item_count_info -?
-        local item_count = inventory.get_item_count(item_count_info.item_name --[[@as string]]) or 0
-        if check_condition(item_count_info.condition, item_count, item_count_info.count) then
+        local item_condition_info = waypoint.item_condition_info  ---@cast item_condition_info -?
+        local item_count = inventory.get_item_count(item_condition_info.elem) or 0
+        if check_condition(item_condition_info.condition, item_count, item_condition_info.count) then
           SpidertronControl.go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "fuel-full" then
@@ -184,13 +184,13 @@ local function handle_wait_timers()
           SpidertronControl.go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "circuit-condition" then
-        local item_count_info = waypoint.item_count_info  ---@cast item_count_info -?
+        local circuit_condition_info = waypoint.circuit_condition_info  ---@cast circuit_condition_info -?
         local dock_unit_number = storage.spidertrons_docked[spidertron.unit_number]
         if dock_unit_number then
           local dock = storage.spidertron_docks[dock_unit_number].dock
-          if dock and dock.valid and item_count_info.item_name and item_count_info.item_name.name then
-            local signal_count = dock.get_signal(item_count_info.item_name --[[@as SignalID]], defines.wire_connector_id.circuit_red, defines.wire_connector_id.circuit_green)
-            if check_condition(item_count_info.condition, signal_count, item_count_info.count) then
+          if dock and dock.valid and circuit_condition_info.elem and circuit_condition_info.elem.name then
+            local signal_count = dock.get_signal(circuit_condition_info.elem, defines.wire_connector_id.circuit_red, defines.wire_connector_id.circuit_green)
+            if check_condition(circuit_condition_info.condition, signal_count, circuit_condition_info.count) then
               SpidertronControl.go_to_next_waypoint(spidertron)
             end
           end

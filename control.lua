@@ -46,7 +46,8 @@ storage.spidertron_waypoints: indexed by spidertron.unit_number:
 ---@field type WaypointType
 ---@field position MapPosition
 ---@field wait_time uint?
----@field item_count_info table?
+---@field item_condition_info {elem: ItemIDAndQualityIDPair, count: integer, condition: integer}?
+---@field circuit_condition_info {elem: SignalID, count: integer, condition: integer}?
 ---@field render LuaRenderObject
 
 ---@class WaypointInfo
@@ -220,7 +221,7 @@ local function config_changed_setup(changed_data)
 
   log("Coming from old version: " .. old_version_string)
   local version_strings = util.split(old_version_string, ".")
-  local old_version
+  local old_version = {}
   for i=1, #version_strings do
     old_version[i] = tonumber(version_strings[i])
   end
