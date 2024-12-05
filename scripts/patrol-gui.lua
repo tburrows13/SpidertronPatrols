@@ -733,10 +733,21 @@ gui.add_handlers(PatrolGuiWaypoint,
   end
 )
 
+local function toggle_spidertron_automatic_manual(event)
+  local player = game.get_player(event.player_index)  ---@cast player -?
+  local spidertron = player.selected
+  if not spidertron or spidertron.type ~= "spider-vehicle" then return end
+  local waypoint_info = get_waypoint_info(spidertron)
+  local new_on_patrol = not waypoint_info.on_patrol
+  set_on_patrol(new_on_patrol, spidertron, waypoint_info)
+
+end
+
 PatrolGui.events = {
   [defines.events.on_gui_opened] = on_gui_opened,
   [defines.events.on_gui_closed] = on_gui_closed,
   [defines.events.on_tick] = on_tick,
+  ["toggle-entity-custom"] = toggle_spidertron_automatic_manual,
 }
 
 return PatrolGui

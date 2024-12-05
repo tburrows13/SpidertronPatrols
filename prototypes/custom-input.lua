@@ -49,5 +49,11 @@ data:extend{
     name = "move-down-custom",
     key_sequence = "",
     linked_game_control = "move-down"
+  },
+  {
+    type = "custom-input",
+    name = "toggle-entity-custom",
+    key_sequence = "",
+    linked_game_control = "toggle-entity"
   }
 }
