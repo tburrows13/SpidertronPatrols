@@ -241,17 +241,23 @@ local function update_dock_inventory(dock, spidertron, previous_contents)
   -- If Freight Forwarding is installed, we need to spill an container items on the ground because they aren't allowed inside spidertrons
   if storage.freight_forwarding_enabled then
     local is_container = storage.freight_forwarding_container_items
-    for item_name, count in pairs(dock_contents) do
-      if is_container[item_name] then
-        local position = dock.position
-        local removed = dock_inventory.remove({name = item_name, count = count})
-        if removed > 0 then
-          game.print({"freight-forwarding.containers-in-spider-vehicles", "[gps=" .. position.x .. "," .. position.y .. "," .. dock.surface.name .. "]"})
-          local spilled = dock.surface.spill_item_stack(
-            {position.x + 0.25, position.y + 2},
-            {name = item_name, count = removed}, true, nil, false)
-          if not next(spilled) then
-            game.print("Error: could not spill container from spidertron dock")
+    for item_name, quality_contents in pairs(dock_contents) do
+      for quality_name, count in pairs(quality_contents) do
+        if is_container[item_name] then
+          local position = dock.position
+          local removed = dock_inventory.remove({name = item_name, quality = quality_name, count = count})
+          if removed > 0 then
+            game.print({"freight-forwarding.containers-in-spider-vehicles", "[gps=" .. position.x .. "," .. position.y .. "," .. dock.surface.name .. "]"})
+            local spilled = dock.surface.spill_item_stack{
+              position = {position.x + 0.25, position.y + 2},
+              stack = {name = item_name, count = removed},
+              enable_looted = true,
+              force = nil,
+              allow_belts = false,
+            }
+            if not next(spilled) then
+              game.print("Error: could not spill container from spidertron dock")
+            end
           end
         end
       end
