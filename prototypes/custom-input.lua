@@ -3,7 +3,7 @@ data:extend{
   {
     type = "custom-input",
     name = "sp-replace-previous-waypoint",
-    key_sequence = "SHIFT + mouse-button-1",
+    key_sequence = "SHIFT + mouse-button-2",
     controller_key_sequence = "controller-righttrigger + controller-a",
     consuming = "none",
     order = "a"
