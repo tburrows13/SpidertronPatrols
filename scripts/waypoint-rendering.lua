@@ -212,7 +212,7 @@ function WaypointRendering.update_player_render_paths(player)
     create_render_paths(vehicle, player, false)
     rendered_spidertrons[vehicle.unit_number] = true
   end
-  local opened = player.opened
+  local opened = player.opened  --[[@as LuaEntity]]
   if opened and player.opened_gui_type == defines.gui_type.entity and opened.type == "spider-vehicle" and not rendered_spidertrons[opened.unit_number] then
     create_render_paths(opened, player, false)
     rendered_spidertrons[opened.unit_number] = true
@@ -240,7 +240,8 @@ end
 function WaypointRendering.update_spidertron_render_paths(unit_number)
   for player_index, player_renders in pairs(storage.path_renders) do
     if player_renders[unit_number] then
-      WaypointRendering.update_player_render_paths(game.get_player(player_index))
+      local player = game.get_player(player_index)  ---@cast player -?
+      WaypointRendering.update_player_render_paths(player)
     end
   end
 end

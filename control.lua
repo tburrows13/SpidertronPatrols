@@ -210,8 +210,8 @@ local function config_changed_setup(changed_data)
   -- Close all spidertron GUIs
   for _, player in pairs(game.players) do
     if player.opened_gui_type == defines.gui_type.entity then
-      local entity = player.opened
-      if entity and entity.type == "spider-vehicle" then
+      local entity = player.opened  --[[@as LuaEntity]]
+      if entity and entity.object_name == "LuaEntity" and entity.type == "spider-vehicle" then
         player.opened = nil
       end
     end
