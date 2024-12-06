@@ -852,7 +852,7 @@ PatrolGui.events = {
   [defines.events.on_gui_opened] = on_gui_opened,
   [defines.events.on_gui_closed] = on_gui_closed,
   [defines.events.on_tick] = on_tick,
-  ["toggle-entity-custom"] = toggle_spidertron_automatic_manual,
+  ["sp-toggle-spidertron-automatic-manual"] = toggle_spidertron_automatic_manual,
 }
 
 return PatrolGui

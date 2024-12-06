@@ -18,10 +18,17 @@ data:extend{
   },
   {
     type = "custom-input",
+    name = "sp-toggle-spidertron-automatic-manual",
+    key_sequence = "CONTROL + R",
+    consuming = "none",
+    order = "c"
+  },
+  {
+    type = "custom-input",
     name = "sp-confirm-gui",
     key_sequence = "",
     linked_game_control = "confirm-gui"
-  }
+  },
 }
 
 -- Allows getting movement control events to detect when to turn on 'manual' mode
@@ -50,10 +57,4 @@ data:extend{
     key_sequence = "",
     linked_game_control = "move-down"
   },
-  {
-    type = "custom-input",
-    name = "toggle-entity-custom",
-    key_sequence = "",
-    linked_game_control = "toggle-entity"
-  }
 }
