@@ -24,10 +24,8 @@ end
 ---@return boolean
 ---https://mods.factorio.com/mod/maraxsis
 local function is_maraxsis_submarine(spidertron)
-  if not script.active_mods["maraxsis"] then return false end
-  local _, submarine_list = pcall(remote.call, "maraxsis", "get_submarine_list")
-  if not submarine_list then return false end
-  return not not submarine_list[spidertron.name]
+  if not remote.interfaces.maraxsis then return false end
+  return not not remote.call("maraxsis", "get_submarine_list")[spidertron.name]
 end
 
 ---@param spidertron LuaEntity

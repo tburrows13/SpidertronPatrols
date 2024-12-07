@@ -229,8 +229,8 @@ local function on_spider_command_completed(event)
     local waypoint = waypoints[waypoint_info.current_index]
     local waypoint_type = waypoint.type
 
-    if waypoint_type == "submerge" then
-      pcall(remote.call, "maraxsis", "submerge_submarine", spidertron)
+    if waypoint_type == "submerge" and remote.interfaces.maraxsis then
+      remote.call("maraxsis", "submerge_submarine", spidertron)
     end
 
     if waypoint_type == "none" or ((waypoint_type == "time-passed" or waypoint_type == "inactivity") and waypoint.wait_time == 0) then
