@@ -25,7 +25,8 @@ end
 ---https://mods.factorio.com/mod/maraxsis
 local function is_maraxsis_submarine(spidertron)
   if not remote.interfaces.maraxsis then return false end
-  return not not remote.call("maraxsis", "get_submarine_list")[spidertron.name]
+  local melon = remote.call("maraxsis", "get_submarine_list")[spidertron.name]
+  return not not melon
 end
 
 ---@param spidertron LuaEntity
