@@ -232,7 +232,6 @@ local function on_spider_command_completed(event)
     script.raise_event("on_spidertron_patrol_waypoint_reached", {
       spidertron = spidertron,
       waypoint = waypoint,
-      waypoint_info = waypoint_info,
     })
 
     if waypoint_type == "none" or ((waypoint_type == "time-passed" or waypoint_type == "inactivity") and waypoint.wait_time == 0) then
