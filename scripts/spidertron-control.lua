@@ -230,6 +230,7 @@ local function on_spider_command_completed(event)
     local waypoint_type = waypoint.type
 
     if waypoint_type == "submerge" and remote.interfaces.maraxsis then
+      waypoint.wait_time = 2
       remote.call("maraxsis", "submerge_submarine", spidertron)
     end
 
