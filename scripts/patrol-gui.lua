@@ -21,6 +21,15 @@ local function has_fuel_inventory(spidertron)
 end
 
 ---@param spidertron LuaEntity
+---@return boolean
+---https://mods.factorio.com/mod/maraxsis
+local function is_maraxsis_submarine(spidertron)
+  if not remote.interfaces.maraxsis then return false end
+  local melon = remote.call("maraxsis", "get_submarine_list")[spidertron.name]
+  return not not melon
+end
+
+---@param spidertron LuaEntity
 ---@return string[]
 local function dropdown_contents(spidertron)
   local contents = {
@@ -38,6 +47,9 @@ local function dropdown_contents(spidertron)
   }
   if not has_fuel_inventory(spidertron) then
     table.remove(contents, 7)
+  end
+  if is_maraxsis_submarine(spidertron) then
+    table.insert(contents, {"gui-patrol.submerge"})
   end
   return contents
 end
@@ -62,6 +74,9 @@ local function dropdown_index_lookup(index, spidertron)
   if not has_fuel_inventory(spidertron) then
     table.remove(lookup, 7)
   end
+  if is_maraxsis_submarine(spidertron) then
+    table.insert(lookup, "submerge")
+  end
   return lookup[index]
 end
 
@@ -84,6 +99,9 @@ local function dropdown_index(wait_condition, spidertron)
   }
   if not has_fuel_inventory(spidertron) then
     table.remove(lookup, 7)
+  end
+  if is_maraxsis_submarine(spidertron) then
+    table.insert(lookup, "submerge")
   end
   for i, condition in pairs(lookup) do
     if condition == wait_condition then
@@ -564,6 +582,8 @@ function PatrolGuiWaypoint.waypoint_type_changed(player, spidertron, gui_element
       waypoint.wait_time = 30
     elseif new_waypoint_type == "inactivity" then
       waypoint.wait_time = 5
+    elseif new_waypoint_type == "submerge" then
+      waypoint.wait_time = 2
     else
       waypoint.wait_time = nil
     end

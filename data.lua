@@ -17,6 +17,11 @@ data:extend{{
   name = "on_spidertron_given_new_destination",
 }}
 
+data:extend{{
+  type = "custom-event",
+  name = "on_spidertron_patrol_waypoint_reached",
+}}
+
 -- Remove all military science, rocket launchers, etc from spidertrons if the setting is enabled
 if settings.startup["sp-remove-military-requirement"].value then
   if settings.startup["sp-enable-spiderling"].value then

@@ -145,7 +145,7 @@ local function handle_wait_timers()
       if waypoint_type == "none" then
         -- Can happen if waypoint type is changed whilst spidertron is at waypoint
         SpidertronControl.go_to_next_waypoint(spidertron)
-      elseif waypoint_type == "time-passed" then
+      elseif waypoint_type == "time-passed" or waypoint_type == "submerge" then
         if (game.tick - waypoint_info.tick_arrived) >= waypoint.wait_time * 60 then
           SpidertronControl.go_to_next_waypoint(spidertron)
         end
@@ -228,6 +228,11 @@ local function on_spider_command_completed(event)
     local waypoints = waypoint_info.waypoints
     local waypoint = waypoints[waypoint_info.current_index]
     local waypoint_type = waypoint.type
+
+    script.raise_event("on_spidertron_patrol_waypoint_reached", {
+      spidertron = spidertron,
+      waypoint = waypoint,
+    })
 
     if waypoint_type == "none" or ((waypoint_type == "time-passed" or waypoint_type == "inactivity") and waypoint.wait_time == 0) then
       SpidertronControl.go_to_next_waypoint(spidertron)
