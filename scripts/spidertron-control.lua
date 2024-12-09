@@ -229,10 +229,11 @@ local function on_spider_command_completed(event)
     local waypoint = waypoints[waypoint_info.current_index]
     local waypoint_type = waypoint.type
 
-    if waypoint_type == "submerge" and remote.interfaces.maraxsis then
-      waypoint.wait_time = 2
-      remote.call("maraxsis", "submerge_submarine", spidertron)
-    end
+    script.raise_event("on_spidertron_patrol_waypoint_reached", {
+      spidertron = spidertron,
+      waypoint = waypoint,
+      waypoint_info = waypoint_info,
+    })
 
     if waypoint_type == "none" or ((waypoint_type == "time-passed" or waypoint_type == "inactivity") and waypoint.wait_time == 0) then
       SpidertronControl.go_to_next_waypoint(spidertron)
