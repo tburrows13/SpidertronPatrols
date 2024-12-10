@@ -204,8 +204,10 @@ function WaypointRendering.update_player_render_paths(player)
   if cursor_stack and cursor_stack.valid_for_read
       and (cursor_stack.name == "sp-spidertron-patrol-remote")
       and spidertron_remote_selection then
-    create_render_paths(spidertron_remote_selection[1], player, true)
-    rendered_spidertrons[spidertron_remote_selection[1].unit_number] = true
+    for _, spidertron in pairs(spidertron_remote_selection) do
+      create_render_paths(spidertron, player, true)
+      rendered_spidertrons[spidertron.unit_number] = true
+    end
   end
   local vehicle = player.vehicle
   if vehicle and vehicle.type == "spider-vehicle" and not rendered_spidertrons[vehicle.unit_number] then
