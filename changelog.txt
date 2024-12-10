@@ -1,4 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.5
+Date: 10 December 2024
+  Features:
+    - Added new keybind 'Control + R' which toggles automatic/manual for spidertrons currently selected, opened, connected to held remote, or being driven
+    - Added initial tips and tricks page demonstrating patrol setup
+    - Patrol remote can now be used on multiple spidertrons at once
+  Bugfixes:
+    - Fixed incorrect keybinds in tooltips
+  Compatibility:
+    - Improved compatibility with Maraxsis mod with new "on_spidertron_patrol_waypoint_reached" custom event
+---------------------------------------------------------------------------------------------------
 Version: 2.5.4
 Date: 5 December 2024
   Features:
