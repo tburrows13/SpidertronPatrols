@@ -115,11 +115,14 @@ end
 script.on_event("sp-delete-all-waypoints",
   function(event)
     local player = game.get_player(event.player_index)  ---@cast player -?
-    local spidertron_remote_selection = player.spidertron_remote_selection
-    if spidertron_remote_selection then
-      for _, spidertron in pairs(spidertron_remote_selection) do  -- TODO remove loop if enforcing only one connection to patrol remote?
-        Control.clear_spidertron_waypoints(spidertron)
-        spidertron.autopilot_destination = nil
+    local cursor_stack = player.cursor_stack
+    if cursor_stack and cursor_stack.valid_for_read and cursor_stack.name == "sp-spidertron-patrol-remote" then
+      local spidertron_remote_selection = player.spidertron_remote_selection
+      if spidertron_remote_selection then
+        for _, spidertron in pairs(spidertron_remote_selection) do
+          Control.clear_spidertron_waypoints(spidertron)
+          spidertron.autopilot_destination = nil
+        end
       end
     end
   end
