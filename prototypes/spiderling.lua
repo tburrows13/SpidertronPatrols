@@ -4,12 +4,22 @@ end
 
 local item_sounds = require("__base__.prototypes.item_sounds")
 
+local factoriopedia_spiderling = {
+  init =
+  [[
+    game.simulation.camera_zoom = 1.3
+    game.simulation.camera_position = {0, -1}
+    game.surfaces[1].create_entity{name = "sp-spiderling", position = {0, 0}}
+  ]]
+}
+
 create_spidertron{
   name = "sp-spiderling",
   scale = 0.7,
   leg_scale = 0.75, -- relative to scale
   leg_thickness = 1.2, -- relative to leg_scale
-  leg_movement_speed = 0.62
+  leg_movement_speed = 0.62,
+  factoriopedia_simulation = factoriopedia_spiderling,
 }
 
 local spiderling = data.raw["spider-vehicle"]["sp-spiderling"]
