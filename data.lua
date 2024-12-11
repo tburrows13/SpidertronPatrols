@@ -1,3 +1,10 @@
+SPIDERTRON_NAME = "spidertron"
+SPIDERTRON_NAME_CAPITALISED = "Spidertron"
+if mods["maraxsis"] or mods["lex-aircraft"] then
+  SPIDERTRON_NAME = "vehicle"
+  SPIDERTRON_NAME_CAPITALISED = "Vehicle"
+end
+
 require "prototypes.spiderling"
 require "prototypes.spidertron-dock"
 require "prototypes.equipment-grid"

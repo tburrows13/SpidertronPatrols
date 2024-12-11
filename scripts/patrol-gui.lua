@@ -353,7 +353,7 @@ local function build_gui(player, spidertron)
                   handler = {[defines.events.on_gui_click] = PatrolGui.toggle_camera},
                 },
                 {
-                  type = "sprite-button", style = "tool_button", mouse_button_filter = {"left"}, sprite = "utility/center", tooltip = {"gui-patrol.toggle-center-on-spidertron"},
+                  type = "sprite-button", style = "tool_button", mouse_button_filter = {"left"}, sprite = "utility/center", tooltip = {"gui-patrol.toggle-center-on-spidertron", SPIDERTRON_NAME},
                   name = "toggle_center_button",
                   auto_toggle = true, toggled = true,
                   handler = {[defines.events.on_gui_click] = PatrolGui.toggle_camera_center_on_spidertron},

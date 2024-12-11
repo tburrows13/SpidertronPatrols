@@ -1,3 +1,10 @@
+SPIDERTRON_NAME = "spidertron"
+SPIDERTRON_NAME_CAPITALISED = "Spidertron"
+if script.active_mods["maraxsis"] or script.active_mods["lex-aircraft"] then
+  SPIDERTRON_NAME = "vehicle"
+  SPIDERTRON_NAME_CAPITALISED = "Vehicle"
+end
+
 local event_handler = require "event_handler"
 util = require "util"
 require "scripts.utils"

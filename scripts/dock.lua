@@ -344,7 +344,7 @@ local function connect_to_spidertron(dock_data, spidertron)
         if game.tick % 120 == 0 then
           if player.surface == spidertron.surface then
             player.create_local_flying_text{
-              text = {"flying-text.spidertron-toolbelts-cannot-be-docked"},
+              text = {"flying-text.spidertron-toolbelts-cannot-be-docked", SPIDERTRON_NAME_CAPITALISED},
               position = dock_data.dock.position,
             }
           end

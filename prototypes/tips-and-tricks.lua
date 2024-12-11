@@ -2,7 +2,7 @@ data:extend{
   {
     type = "tips-and-tricks-item-category",
     name = "spidertron-patrols",
-    order = "-[spidertron-patrols]"
+    order = "-b[spidertron-patrols]"
   },
   {
     type = "tips-and-tricks-item",
@@ -123,7 +123,7 @@ data:extend{
       ]]
     }
   },
-  {
+  --[[{
     type = "tips-and-tricks-item",
     name = "spidertron-patrols-gui",
     tag = "[item=sp-spidertron-patrol-remote]",
@@ -153,7 +153,7 @@ data:extend{
         game.simulation.camera_position = {0, 0.5}
 
         player.opened = spiderling
-      ]]
+      
     }
-  },
+  },]]
 }
