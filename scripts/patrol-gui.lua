@@ -554,7 +554,7 @@ function PatrolGui.delete_all_waypoints(player, spidertron, gui_elements)
   Control.clear_spidertron_waypoints(spidertron)
 end
 
-function set_on_patrol(on_patrol, spidertron, waypoint_info)
+function PatrolGui.set_on_patrol(on_patrol, spidertron, waypoint_info)
   if on_patrol then
     SpidertronControl.go_to_next_waypoint(spidertron, waypoint_info.current_index)
   else
@@ -568,7 +568,7 @@ function PatrolGui.toggle_on_patrol(player, spidertron, gui_elements)
   local switch = gui_elements.on_patrol_switch
   local waypoint_info = get_waypoint_info(spidertron)
   local on_patrol = switch.switch_state == "left"
-  set_on_patrol(on_patrol, spidertron, waypoint_info)
+  PatrolGui.set_on_patrol(on_patrol, spidertron, waypoint_info)
 end
 
 function PatrolGui.give_connected_remote(player, spidertron, gui_elements)
@@ -583,7 +583,7 @@ end
 function PatrolGuiWaypoint.go_to_waypoint(player, spidertron, gui_elements, waypoint_info, index)
   -- 'Play' button
   if not waypoint_info.on_patrol or index ~= waypoint_info.current_index then
-    set_on_patrol(true, spidertron, waypoint_info)
+    PatrolGui.set_on_patrol(true, spidertron, waypoint_info)
     SpidertronControl.go_to_next_waypoint(spidertron, index)
   end
 end
@@ -903,7 +903,7 @@ local function toggle_spidertron_automatic_manual(event)
   for _, spidertron_ in pairs(spidertrons) do
     local waypoint_info = get_waypoint_info(spidertron_)
     local new_on_patrol = not waypoint_info.on_patrol
-    set_on_patrol(new_on_patrol, spidertron_, waypoint_info)
+    PatrolGui.set_on_patrol(new_on_patrol, spidertron_, waypoint_info)
   end
 end
 

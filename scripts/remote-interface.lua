@@ -9,7 +9,8 @@ end
 remote.add_interface("SpidertronPatrols", {
   clear_waypoints = function(unit_number) Control.clear_spidertron_waypoints(unit_number) end,
   add_waypoints = function(spidertron, waypoints) remote_interface_assign_waypoints(spidertron, waypoints) end,
-  get_waypoints = get_waypoint_info,
+  get_waypoints = function(spidertron) get_waypoint_info(spidertron) end,
+  set_on_patrol = function(spidertron, on_patrol) PatrolGui.set_on_patrol(on_patrol, spidertron, get_waypoint_info(spidertron)) end,
   give_patrol_remote = function(player, spidertron, waypoint_index)  -- waypoint_index is optional
     PatrolRemote.give_remote(player, spidertron, waypoint_index)
   end,
