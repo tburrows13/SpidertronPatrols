@@ -274,11 +274,63 @@ local function on_entity_settings_pasted(event)
   end
 end
 
+---@param event EventData.on_player_setup_blueprint
+local function on_player_setup_blueprint(event)
+  local player = game.get_player(event.player_index)  ---@cast player -?
+
+  local item = player.cursor_stack
+  if not (item and item.valid_for_read) then
+    item = player.blueprint_to_setup
+    if not (item and item.valid_for_read) then return end
+  end
+  local count = item.get_blueprint_entity_count()
+  if count == 0 then return end
+
+  for index, entity in pairs(event.mapping.get()) do
+    if entity.valid and entity.type == "spider-vehicle" then
+      local waypoint_info = storage.spidertron_waypoints[entity.unit_number]
+      if waypoint_info then
+        if index <= count then
+          local waypoints = table.deepcopy(waypoint_info.waypoints)
+          for _, waypoint in pairs(waypoints) do
+            waypoint.render = nil
+          end
+          local waypoint_tags = {
+            waypoints = waypoints,
+            hide_gui = waypoint_info.hide_gui
+          }
+          --log(serpent.line(waypoint_tags))
+          item.set_blueprint_entity_tag(index, "spidertron_patrol_data", waypoint_tags)
+        end
+      end
+    end
+  end
+end
+
+local function on_spidertron_revived(event)
+  local entity = event.entity
+  if not (entity and entity.valid) then return end
+  if entity.type ~= "spider-vehicle" then return end
+
+  local tags = event.tags
+  if not tags then return end
+  local spidertron_patrol_data = tags.spidertron_patrol_data
+  if not spidertron_patrol_data then return end
+
+  local waypoint_info = get_waypoint_info(entity)
+  waypoint_info.waypoints = spidertron_patrol_data.waypoints
+  waypoint_info.hide_gui = spidertron_patrol_data.hide_gui
+  WaypointRendering.update_render_text(entity)
+end
 
 SpidertronControl.events = {
   [defines.events.on_tick] = on_tick,
   [defines.events.on_spider_command_completed] = on_spider_command_completed,
   [defines.events.on_entity_settings_pasted] = on_entity_settings_pasted,
+  [defines.events.on_player_setup_blueprint] = on_player_setup_blueprint,
+  [defines.events.on_built_entity] = on_spidertron_revived,
+  [defines.events.on_robot_built_entity] = on_spidertron_revived,
+  [defines.events.script_raised_revive] = on_spidertron_revived,
 }
 
 return SpidertronControl
