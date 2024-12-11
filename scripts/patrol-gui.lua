@@ -229,11 +229,13 @@ local function build_waypoint_frames(waypoint_info, spidertron)
         },
         {
           type = "sprite-button", name = "up", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-up-white",
+          tooltip = {"gui-patrol.move-to-top"},
           ref = {"waypoint_button", i, "up"},
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.move_waypoint_up}, tags = {index = i},
         },
         {
           type = "sprite-button", name = "down", style = "sp_schedule_move_button", mouse_button_filter = {"left"}, sprite = "sp-down-white",
+          tooltip = {"gui-patrol.move-to-bottom"},
           ref = {"waypoint_button", i, "down"},
           handler = {[defines.events.on_gui_click] = PatrolGuiWaypoint.move_waypoint_down}, tags = {index = i},
         },
@@ -627,73 +629,104 @@ function PatrolGuiWaypoint.waypoint_type_changed(player, spidertron, gui_element
   end
 end
 
-function PatrolGuiWaypoint.move_waypoint_up(player, spidertron, gui_elements, waypoint_info, index)
+function PatrolGuiWaypoint.move_waypoint_up(player, spidertron, gui_elements, waypoint_info, index, element, modifiers)
   local waypoints = waypoint_info.waypoints
   local index_to_move = index
-  if index_to_move ~= 1 then
-    local index_above = index - 1
+  if index_to_move == 1 then
+    -- Wrap around aka move to bottom with shift = true
+    PatrolGuiWaypoint.move_waypoint_down(player, spidertron, gui_elements, waypoint_info, index, element, {shift = true, wrap = true})
+  else
+    local new_index
+    if modifiers.shift then
+      -- Move waypoint to top
+      local waypoint_to_move = util.table.deepcopy(waypoints[index_to_move])
+      table.remove(waypoints, index_to_move)
+      table.insert(waypoints, 1, waypoint_to_move)
 
-    --[[
-    -- TODO Get shift-click working. Currently swaps top and current instead of shifting all down
-    if event.shift then
-      index_above = 1
+      local current_index = waypoint_info.current_index
+      if current_index then
+        if current_index == index_to_move then waypoint_info.current_index = 1 end
+        if current_index < index_to_move then waypoint_info.current_index = current_index + 1 end
+      end
+      new_index = 1
+    else
+      -- Move waypoint up one
+      local index_above = index - 1
+
+      local waypoint_to_move = util.table.deepcopy(waypoints[index_to_move])
+      local waypoint_above = util.table.deepcopy(waypoints[index_above])
+
+      waypoints[index_above] = waypoint_to_move
+      waypoints[index_to_move] = waypoint_above
+
+      local current_index = waypoint_info.current_index
+      if current_index then
+        if current_index == index_above then waypoint_info.current_index = index_to_move end
+        if current_index == index_to_move then waypoint_info.current_index = index_above end
+      end
+      new_index = index_above
     end
-    ]]
 
-    local waypoint_to_move = util.table.deepcopy(waypoints[index_to_move])
-    local waypoint_above = util.table.deepcopy(waypoints[index_above])
-
-    waypoints[index_above] = waypoint_to_move
-    waypoints[index_to_move] = waypoint_above
-
-    local current_index = waypoint_info.current_index
-    if current_index then
-      if current_index == index_above then waypoint_info.current_index = index_to_move end
-      if current_index == index_to_move then waypoint_info.current_index = index_above end
-    end
 
     PatrolGui.update_gui_schedule(waypoint_info)
     WaypointRendering.update_render_text(spidertron)
 
-    local button = gui_elements.waypoint_button[index_above].up
+    local buttons = gui_elements.waypoint_button[new_index]
+    local button = modifiers.wrap and buttons.down or buttons.up
     button.style = "sp_selected_schedule_move_button"
-    button.sprite = "sp-up-black"
+    button.sprite = modifiers.wrap and "sp-down-black" or "sp-up-black"
 
     PatrolGui.clear_highlights_for_player(player)
     storage.player_highlights[player.index] = {button = button, tick_started = game.tick}
   end
 end
 
-function PatrolGuiWaypoint.move_waypoint_down(player, spidertron, gui_elements, waypoint_info, index)
+function PatrolGuiWaypoint.move_waypoint_down(player, spidertron, gui_elements, waypoint_info, index, element, modifiers)
   local waypoints = waypoint_info.waypoints
   local index_to_move = index
-  if index_to_move ~= #waypoints then
-    local index_below = index + 1
+  local number_of_waypoints = #waypoints
+  if index_to_move == number_of_waypoints then
+    -- Wrap around aka move to top with shift = true
+    PatrolGuiWaypoint.move_waypoint_up(player, spidertron, gui_elements, waypoint_info, index, element, {shift = true, wrap = true})
+  else
+    local new_index
+    if modifiers.shift then
+      -- Move waypoint to bottom
+      local waypoint_to_move = util.table.deepcopy(waypoints[index_to_move])
+      table.remove(waypoints, index_to_move)
+      table.insert(waypoints, number_of_waypoints, waypoint_to_move)
 
-    --[[
-    if event.shift then
-      index_below = #waypoints
-    end
-    ]]
+      local current_index = waypoint_info.current_index
+      if current_index then
+        if current_index == index_to_move then waypoint_info.current_index = number_of_waypoints end
+        if current_index > index_to_move then waypoint_info.current_index = current_index - 1 end
+      end
+      new_index = number_of_waypoints
+    else
+      -- Move waypoint down one
+      local index_below = index + 1
 
-    local waypoint_to_move = util.table.deepcopy(waypoints[index_to_move])
-    local waypoint_below = util.table.deepcopy(waypoints[index_below])
+      local waypoint_to_move = util.table.deepcopy(waypoints[index_to_move])
+      local waypoint_below = util.table.deepcopy(waypoints[index_below])
 
-    waypoints[index_below] = waypoint_to_move
-    waypoints[index_to_move] = waypoint_below
+      waypoints[index_below] = waypoint_to_move
+      waypoints[index_to_move] = waypoint_below
 
-    local current_index = waypoint_info.current_index
-    if current_index then
-      if current_index == index_below then waypoint_info.current_index = index_to_move end
-      if current_index == index_to_move then waypoint_info.current_index = index_below end
+      local current_index = waypoint_info.current_index
+      if current_index then
+        if current_index == index_below then waypoint_info.current_index = index_to_move end
+        if current_index == index_to_move then waypoint_info.current_index = index_below end
+      end
+      new_index = index_below
     end
 
     PatrolGui.update_gui_schedule(waypoint_info)
     WaypointRendering.update_render_text(spidertron)
 
-    local button = gui_elements.waypoint_button[index_below].down
+    local buttons = gui_elements.waypoint_button[new_index]
+    local button = modifiers.wrap and buttons.up or buttons.down
     button.style = "sp_selected_schedule_move_button"
-    button.sprite = "sp-down-black"
+    button.sprite = modifiers.wrap and "sp-up-black" or "sp-down-black"
 
     PatrolGui.clear_highlights_for_player(player)
     storage.player_highlights[player.index] = {button = button, tick_started = game.tick}
@@ -833,8 +866,9 @@ gui.add_handlers(PatrolGuiWaypoint,
     if spidertron and gui_elements then
       local waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
       local index = event.element.tags.index
+      local modifiers = {shift = event.shift, control = event.control, alt = event.alt}
       -- TODO look at using event.element in all events or none
-      handler(player, spidertron, gui_elements, waypoint_info, index, event.element)
+      handler(player, spidertron, gui_elements, waypoint_info, index, event.element, modifiers)
     end
   end
 )

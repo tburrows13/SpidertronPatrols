@@ -85,6 +85,7 @@ styles.sp_selected_schedule_move_button = {
   parent = "sp_schedule_move_button",
   default_font_color = button_style.hovered_font_color,
   default_graphical_set = button_style.hovered_graphical_set,
+  invert_colors_of_picture_when_hovered_or_toggled = false,  -- only used with black sprite, when moving waypoint to show which waypoint was moved
 }
 
 styles.sp_spidertron_camera = {
