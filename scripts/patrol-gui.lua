@@ -266,8 +266,12 @@ local function build_on_patrol_switch(waypoint_info)
     name = "on_patrol_switch",
     handler = {[defines.events.on_gui_switch_state_changed] = PatrolGui.toggle_on_patrol},
     switch_state = switch_state,
+    tooltip = {"gui-patrol.toggle-automatic-manual-tooltip"},
     left_label_caption = {"gui-train.automatic-mode"},
-    right_label_caption = {"gui-train.manual-mode"}}
+    left_label_tooltip = {"gui-patrol.toggle-automatic-manual-tooltip"},
+    right_label_caption = {"gui-train.manual-mode"},
+    right_label_tooltip = {"gui-patrol.toggle-automatic-manual-tooltip"},
+  }
 end
 
 ---@param player LuaPlayer
