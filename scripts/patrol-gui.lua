@@ -251,7 +251,7 @@ local function build_waypoint_frames(waypoint_info, spidertron)
       mouse_button_filter = {"left"},
       caption = {"gui-patrol.add-waypoint"},
       tooltip = prototypes.item["sp-spidertron-patrol-remote"].localised_description,
-      handler = {[defines.events.on_gui_click] = PatrolGuiGeneral.give_connected_remote},
+      handler = {[defines.events.on_gui_click] = PatrolGui.give_connected_remote},
     })
   return frames
 end
@@ -285,7 +285,7 @@ local function build_gui(player, spidertron)
 
   local waypoint_info = get_waypoint_info(spidertron)
   local anchor = {gui = defines.relative_gui_type.spider_vehicle_gui, position = defines.relative_gui_position.right}
-  if not next(waypoint_info.waypoints) then
+  if waypoint_info.hide_gui then
     -- Add minimal GUI that gives player a connected remote
     gui.add(player.gui.relative, {
       {
@@ -305,7 +305,7 @@ local function build_gui(player, spidertron)
                 mouse_button_filter = {"left"},
                 sprite = "item/sp-spidertron-patrol-remote",
                 tooltip = prototypes.item["sp-spidertron-patrol-remote"].localised_description,
-                handler = {[defines.events.on_gui_click] = PatrolGuiGeneral.give_connected_remote},
+                handler = {[defines.events.on_gui_click] = PatrolGuiGeneral.unhide_gui},
               },
             }
           }
@@ -323,7 +323,14 @@ local function build_gui(player, spidertron)
       direction = "vertical",
       anchor = anchor,
       children = {
-        {type = "label", style = "frame_title", caption = {"gui-train.schedule"}, ignored_by_interaction = true},
+        {type = "flow", direction = "horizontal", style_mods = {horizontal_spacing = 8}, children = {
+          {type = "label", style = "frame_title", caption = {"gui-train.schedule"}, ignored_by_interaction = true},
+          {type = "empty-widget", style = "sp_stretchable_empty_widget"},
+          {
+            type = "sprite-button", style = "frame_action_button", sprite = "sp-hide-window", tooltip = {"gui-patrol.hide-gui"},
+            handler = {[defines.events.on_gui_click] = PatrolGui.hide_gui}
+          },
+        }},
         {type = "flow", direction = "vertical", style = "inset_frame_container_vertical_flow", children = {
           {type = "frame", style = "inside_shallow_frame", children = {
             {
@@ -484,6 +491,20 @@ local function on_gui_closed(event)
   end
 end
 
+function PatrolGuiGeneral.unhide_gui(player, spidertron)
+  -- Called from hidden GUI
+  local waypoint_info = get_waypoint_info(spidertron)
+  waypoint_info.hide_gui = false
+  build_gui(player, spidertron)
+  PatrolRemote.give_remote(player, spidertron)
+end
+
+function PatrolGui.hide_gui(player, spidertron, gui_elements)
+  local waypoint_info = get_waypoint_info(spidertron)
+  waypoint_info.hide_gui = true
+  build_gui(player, spidertron)
+end
+
 ---@param player LuaPlayer
 ---@param spidertron LuaEntity
 ---@param gui_elements any
@@ -548,7 +569,7 @@ function PatrolGui.toggle_on_patrol(player, spidertron, gui_elements)
   set_on_patrol(on_patrol, spidertron, waypoint_info)
 end
 
-function PatrolGuiGeneral.give_connected_remote(player, spidertron)
+function PatrolGui.give_connected_remote(player, spidertron, gui_elements)
   -- Can be called from addon GUI
   PatrolRemote.give_remote(player, spidertron)
 end

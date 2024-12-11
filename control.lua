@@ -31,6 +31,7 @@ storage.spidertron_waypoints: indexed by spidertron.unit_number:
   tick_inactive? :: int (only used whilst at an "inactivity" waypoint)
   previous_inventories? :: table (only used whilst at an "inactivity" waypoint)
   on_patrol :: bool
+  hide_gui :: bool
   renders :: array of LuaRenderObject
 ]]
 
@@ -56,6 +57,7 @@ storage.spidertron_waypoints: indexed by spidertron.unit_number:
 ---@field renders LuaRenderObject[]
 ---@field current_index WaypointIndex
 ---@field on_patrol boolean
+---@field hide_gui boolean
 ---@field tick_arrived GameTick?
 ---@field tick_inactive GameTick?
 ---@field previous_inventories table?
@@ -73,7 +75,8 @@ function get_waypoint_info(spidertron)
       waypoints = {},
       renders = {},
       current_index = 1,
-      on_patrol = false
+      on_patrol = false,
+      hide_gui = false,
     }
     waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
   end

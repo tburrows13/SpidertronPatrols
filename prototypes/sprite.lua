@@ -1,6 +1,13 @@
 data:extend{
   {
     type = "sprite",
+    name = "sp-hide-window",
+    filename = "__SpidertronPatrols__/graphics/gui/hide.png",
+    size = 32,
+    flags = { "gui-icon" }
+  },
+  {
+    type = "sprite",
     name = "sp-up-black",
     filename = "__SpidertronPatrols__/graphics/gui/up-black.png",
     size = 32,
