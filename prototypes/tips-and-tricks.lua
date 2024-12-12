@@ -51,6 +51,7 @@ data:extend{
     trigger = {type = "build-entity", entity = "spidertron", match_type_only = true},
     image = "__SpidertronPatrols__/graphics/tips-and-tricks/wait-conditions-tip.png"
   },
+  -- TODO add refuel tip if any burner spidertrons
   {
     type = "tips-and-tricks-item",
     name = "sp-aircraft-automation",

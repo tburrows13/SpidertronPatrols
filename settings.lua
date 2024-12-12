@@ -14,6 +14,14 @@ data:extend({
     order = "ac"
   },
   {
+    type = "string-setting",
+    name = "sp-spiderling-requires-fuel",
+    setting_type = "startup",
+    default_value = "No",
+    allowed_values = {"Yes", "No"},
+    order = "ad",
+  },
+  {
     type = "bool-setting",
     name = "sp-remove-military-requirement",
     setting_type = "startup",

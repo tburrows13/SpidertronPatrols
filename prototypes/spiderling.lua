@@ -42,6 +42,16 @@ spiderling = util.merge{
   }
 }
 spiderling.guns = {"sp-spiderling-rocket-launcher"}
+if settings.startup["sp-spiderling-requires-fuel"].value == "Yes" then
+  spiderling.energy_source = {
+    type = "burner",
+    fuel_categories = {"chemical"},
+    effectivity = 1,
+    fuel_inventory_size = 1,
+  }
+  spiderling.movement_energy_consumption = "250kW"
+  spiderling.alert_icon_shift = {0, 0}
+end
 data.raw["spider-vehicle"]["sp-spiderling"] = spiderling
 
 data:extend{
