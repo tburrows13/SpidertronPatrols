@@ -76,7 +76,7 @@ storage.spidertron_waypoints: indexed by spidertron.unit_number:
 function get_waypoint_info(spidertron)
   local waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
   if not waypoint_info then
-    log("No waypoint info found. Creating blank table")
+    --log("No waypoint info found. Creating blank table")
     storage.spidertron_waypoints[spidertron.unit_number] = {
       spidertron = spidertron,
       waypoints = {},
