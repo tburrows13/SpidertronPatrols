@@ -325,7 +325,7 @@ local function build_gui(player, spidertron)
       direction = "vertical",
       anchor = anchor,
       children = {
-        {type = "flow", direction = "horizontal", style_mods = {horizontal_spacing = 8}, children = {
+        {type = "flow", direction = "horizontal", style = "frame_header_flow", children = {
           {type = "label", style = "frame_title", caption = {"gui-train.schedule"}, ignored_by_interaction = true},
           {type = "empty-widget", style = "sp_stretchable_empty_widget"},
           {
@@ -341,7 +341,7 @@ local function build_gui(player, spidertron)
               name = "camera",
             },
           }},
-          {type = "frame", direction = "vertical", style = "inside_shallow_frame", children = {
+          {type = "frame", direction = "vertical", style = "sp_inside_shallow_frame", children = {
             {type = "frame", direction = "horizontal", style = "sp_stretchable_subheader_frame", children = {
               {type = "flow", style = "sp_patrol_schedule_mode_switch_horizontal_flow", children = {
                 build_on_patrol_switch(waypoint_info),
@@ -368,8 +368,9 @@ local function build_gui(player, spidertron)
                 },
               }},
             }},
-            {type = "scroll-pane", style = "sp_spidertron_schedule_scroll_pane", name = "schedule-scroll-pane", horizontal_scroll_policy = "never", vertical_scroll_policy = "auto-and-reserve-space", children =
-              build_waypoint_frames(waypoint_info, spidertron)
+            {
+              type = "scroll-pane", style = "sp_spidertron_schedule_scroll_pane", name = "schedule-scroll-pane", horizontal_scroll_policy = "never", vertical_scroll_policy = "auto-and-reserve-space",
+              children = build_waypoint_frames(waypoint_info, spidertron)
             }
           }},
         }},

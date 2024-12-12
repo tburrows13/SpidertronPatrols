@@ -5,6 +5,10 @@ local scroll_pane_width = frame_width + 8 + 8
 styles.sp_relative_stretchable_frame = {
   type = "frame_style",
   horizontally_stretchable = "on",
+  vertical_flow_style = {
+    type = "vertical_flow_style",
+    vertical_spacing = 0
+  }
   --vertically_stretchable = "off",
   --vertically_squashable = "on",
   -- maximal_height = 930,
@@ -21,6 +25,22 @@ styles.sp_titlebar_drag_handle = {
   horizontally_stretchable = "on"
 }
 
+-- Change 'position' of graphical_set to match subheader frame
+styles.sp_inside_shallow_frame =
+{
+  type = "frame_style",
+  parent = "inside_shallow_frame",
+  graphical_set =
+  {
+    base =
+    {
+      position = {17, 0}, corner_size = 8,
+      center = {position = {256, 25}, size = {1, 1}},
+      draw_type = "outer"
+    },
+    shadow = default_inner_shadow
+  },
+}
 
 styles.sp_spidertron_schedule_scroll_pane = {
   type = "scroll_pane_style",
@@ -38,7 +58,10 @@ styles.sp_spidertron_schedule_scroll_pane = {
     overall_tiling_vertical_spacing = 12,
     overall_tiling_vertical_size = 28,
     overall_tiling_vertical_padding = 4
-  }
+  },
+  graphical_set = {  -- Remove graphical_set, dark colour will be provided by containing sp_inside_shallow_frame
+    shadow = default_inner_shadow
+  },
 }
 
 styles.sp_empty_filler = {
@@ -50,7 +73,6 @@ styles.sp_stretchable_subheader_frame = {
   parent = "subheader_frame",
   horizontally_stretchable = "on",
   horizontally_squashable = "on",
-  --margin = 0,
 }
 
 styles.sp_patrol_schedule_mode_switch_horizontal_flow = {
