@@ -319,6 +319,13 @@ local function on_runtime_mod_setting_changed(event)
   end
 end
 
+local function on_spidertron_teleported(event)
+  -- Redraw patrol paths on new surface if teleported cross-surface (e.g. Maraxsis submarines)
+  local spidertron = event.entity
+  if spidertron.type ~= "spider-vehicle" then return end
+  if spidertron.surface.index == event.old_surface_index then return end
+  WaypointRendering.update_render_text(spidertron)
+end
 
 WaypointRendering.events = {
   [defines.events.on_tick] = on_tick,
@@ -328,6 +335,7 @@ WaypointRendering.events = {
   [defines.events.on_selected_entity_changed] = need_to_update_player_render_paths,
   [defines.events.on_player_joined_game] = WaypointRendering.update_render_players,
   [defines.events.on_runtime_mod_setting_changed] = on_runtime_mod_setting_changed,
+  [defines.events.script_raised_teleported] = on_spidertron_teleported,
 }
 
 return WaypointRendering
