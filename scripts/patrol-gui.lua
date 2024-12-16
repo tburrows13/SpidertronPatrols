@@ -503,19 +503,6 @@ local function on_gui_opened(event)
   end
 end
 
----@param event EventData.on_gui_closed
-local function on_gui_closed(event)
-  local player = game.get_player(event.player_index)  ---@cast player -?
-  local entity = event.entity
-  if entity and entity.type == "spider-vehicle" then
-    -- Can't close relative GUI here because when SpidertronEnhancements/RemoteConfiguration re-opens
-    -- the GUI in on_gui_closed, we recieve on_gui_closed after on_gui_opened
-
-    -- Spidertron's color could have changed
-    WaypointRendering.update_render_text(entity)
-  end
-end
-
 function PatrolGuiGeneral.unhide_gui(player, spidertron)
   -- Called from hidden GUI
   local waypoint_info = get_waypoint_info(spidertron)

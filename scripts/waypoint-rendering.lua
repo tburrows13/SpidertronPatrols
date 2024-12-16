@@ -327,6 +327,12 @@ local function on_spidertron_teleported(event)
   WaypointRendering.update_render_text(spidertron)
 end
 
+local function on_spidertron_color_changed(event)
+  local spidertron = event.entity
+  if spidertron.type ~= "spider-vehicle" then return end
+  WaypointRendering.update_render_text(spidertron)
+end
+
 WaypointRendering.events = {
   [defines.events.on_tick] = on_tick,
   [defines.events.on_player_cursor_stack_changed] = need_to_update_player_render_paths,
@@ -336,6 +342,7 @@ WaypointRendering.events = {
   [defines.events.on_player_joined_game] = WaypointRendering.update_render_players,
   [defines.events.on_runtime_mod_setting_changed] = on_runtime_mod_setting_changed,
   [defines.events.script_raised_teleported] = on_spidertron_teleported,
+  [defines.events.on_entity_color_changed] = on_spidertron_color_changed,
 }
 
 return WaypointRendering
