@@ -238,6 +238,11 @@ local function on_spider_command_completed(event)
   if waypoint_info.on_patrol then
     local waypoints = waypoint_info.waypoints
     local waypoint = waypoints[waypoint_info.current_index]
+    if not waypoint then
+      -- Command was not issued by Spidertron Patrols, so disable patrol mode
+      PatrolGui.set_on_patrol(false, spidertron, waypoint_info)
+      return
+    end
     local waypoint_type = waypoint.type
 
     script.raise_event("on_spidertron_patrol_waypoint_reached", {
