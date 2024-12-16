@@ -286,7 +286,11 @@ local function build_gui(player, spidertron)
   storage.open_gui_elements[player.index] = nil
 
   local waypoint_info = get_waypoint_info(spidertron)
-  local anchor = {gui = defines.relative_gui_type.spider_vehicle_gui, position = defines.relative_gui_position.right}
+  local anchor = {
+    gui = defines.relative_gui_type.spider_vehicle_gui,
+    type = "spider-vehicle",  -- Need to specify type to avoid it appearing on ghost spidertron GUIs
+    position = defines.relative_gui_position.right,
+  }
   if waypoint_info.hide_gui then
     -- Add minimal GUI that gives player a connected remote
     gui.add(player.gui.relative, {
