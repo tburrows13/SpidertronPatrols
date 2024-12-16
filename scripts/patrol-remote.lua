@@ -30,8 +30,7 @@ local function on_player_used_spidertron_remote(event)
   local spidertrons = player.spidertron_remote_selection or {}
   local single_spidertron_selected = #spidertrons == 1
   for _, spidertron in pairs(spidertrons) do
-    -- Prevent remote working on docked spidertrons from Space Spidertron
-    if spidertron.name:sub(1, 10) == "ss-docked-" then return end
+    if not is_allowed_spidertron_name[spidertron.name] then return end
 
     local remote = player.cursor_stack
 
@@ -71,6 +70,8 @@ function PatrolRemote.give_remote(player, spidertron, waypoint_index)
   end
   local cursor = player.cursor_stack
   if not cursor then return end
+  if not is_allowed_spidertron_name[spidertron.name] then return end
+
   cursor.set_stack("sp-spidertron-patrol-remote")
   player.spidertron_remote_selection = {spidertron}
 

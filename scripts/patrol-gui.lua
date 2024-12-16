@@ -306,7 +306,7 @@ local function build_gui(player, spidertron)
   local waypoint_info = get_waypoint_info(spidertron)
   local anchor = {
     gui = defines.relative_gui_type.spider_vehicle_gui,
-    type = "spider-vehicle",  -- Need to specify type to avoid it appearing on ghost spidertron GUIs
+    names = allowed_spidertron_names_array,  -- Avoids ghosts, constructrons, etc
     position = defines.relative_gui_position.right,
   }
   if waypoint_info.hide_gui then
@@ -492,7 +492,7 @@ end
 local function on_gui_opened(event)
   local player = game.get_player(event.player_index)  ---@cast player -?
   local entity = event.entity
-  if entity and entity.type == "spider-vehicle" then
+  if entity and entity.type == "spider-vehicle" and is_allowed_spidertron_name[entity.name] then
     WaypointRendering.update_player_render_paths(player)
 
     local relative_frame = player.gui.relative["sp-relative-frame"]

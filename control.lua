@@ -92,6 +92,17 @@ end
 
 RemoteInterface = require "scripts.remote-interface"
 
+local spidertron_names = prototypes.get_entity_filtered{{filter = "type", type = "spider-vehicle"}}
+allowed_spidertron_names_array = {}
+is_allowed_spidertron_name = {}
+for name, _ in pairs(spidertron_names) do
+  -- Prevent remote working on constructrons, docked spidertrons from Space Spidertron
+  if name ~= "constructron" and name ~= "deconstructron" and name:sub(1, 10) ~= "ss-docked-" then
+    table.insert(allowed_spidertron_names_array, name)
+    is_allowed_spidertron_name[name] = true
+  end
+end
+
 ---@param spidertron_id LuaEntity | UnitNumber
 function Control.clear_spidertron_waypoints(spidertron_id)
   -- Called on custom-input or whenever the current autopilot_destination is removed or when the spidertron is removed.
