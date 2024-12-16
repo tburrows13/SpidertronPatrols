@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.8
+Date: 16 December 2024
+  Features:
+    - Added new "Empty trash" wait condition
+  Bugfixes:
+    - Fixed schedule GUI appearing on spidertron ghosts
+    - Fixed waypoint renders on ground not being cleared when the spidertron is removed
+    - Fixed crash when spidertron arrives at an autopilot destination while in "Automatic" mode but with no waypoints set
+  Compatibility:
+    - Constructrons from "Constructron"/"Spidertron Automation" can no longer have waypoints set
+    - Fixed schedule GUI appearing extremely wide in some circumstances when used with "Constructron"/"Spidertron Automation"
+---------------------------------------------------------------------------------------------------
 Version: 2.5.7
 Date: 12 December 2024
   Compatibility:
