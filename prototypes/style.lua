@@ -4,7 +4,7 @@ local scroll_pane_width = frame_width + 8 + 8
 
 styles.sp_relative_stretchable_frame = {
   type = "frame_style",
-  horizontally_stretchable = "on",
+  horizontally_stretchable = "off",
   vertical_flow_style = {
     type = "vertical_flow_style",
     vertical_spacing = 0
