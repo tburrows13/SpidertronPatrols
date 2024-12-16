@@ -556,7 +556,7 @@ function PatrolGui.delete_all_waypoints(player, spidertron, gui_elements)
 end
 
 function PatrolGui.set_on_patrol(on_patrol, spidertron, waypoint_info)
-  if on_patrol then
+  if on_patrol and #waypoint_info.waypoints > 0 then
     SpidertronControl.go_to_next_waypoint(spidertron, waypoint_info.current_index)
   else
     spidertron.autopilot_destination = nil
