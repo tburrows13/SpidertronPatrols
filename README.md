@@ -1,4 +1,4 @@
-![Animated docks demo](https://cdn.discordapp.com/attachments/231518135231053825/1053131611971010570/animated-docks-demo.mp4)
+![Demo](https://github.com/tburrows13/SpidertronPatrols/raw/master/resources/animated-docks-demo.mp4)
 
 # Features
 
@@ -29,7 +29,7 @@
 - For performance reasons, when items with associated data (such as modular armor) in a spidertron inventory are taken out of a connected dock's inventory, they lose all their data. This loses all the equipment in that armor's equipment grid 
 - Performance is good, but not insignificant:
     - Docks are limited so that only 20 are updated each tick. Adding lots of docks will simply increase the update delay for each dock instead of reducing UPS
-    - Spidertrons waiting at waypoints also add to the mod update time. The "Inactivity" wait condition is particularly expensive
+    - Spidertrons waiting at waypoints also add to the mod update time
     - If you are running into performance problems, send me the save and I can probably make some improvements to the mod to help you
 - Use `/reset-sp-render-objects` if render objects (numbers and lines on the ground) are behaving unexpectedly
 
@@ -37,7 +37,6 @@
 ## Future Updates?
 
 - Progress bars for wait conditions inside schedule user interface
-- Shortcut that toggles spidertron "Automatic"/"Manual"
 
 -----
 ## Translation
