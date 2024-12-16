@@ -99,6 +99,7 @@ function Control.clear_spidertron_waypoints(spidertron_id)
   local waypoint_info
   ---@type UnitNumber
   local unit_number
+  local hide_gui
   if type(spidertron_id) == "number" then
     ---@cast spidertron_id UnitNumber
     waypoint_info = storage.spidertron_waypoints[unit_number]
@@ -109,6 +110,7 @@ function Control.clear_spidertron_waypoints(spidertron_id)
     waypoint_info = get_waypoint_info(spidertron_id)
     spidertron_id.autopilot_destination = nil
     unit_number = spidertron_id.unit_number  ---@cast unit_number -?
+    hide_gui = waypoint_info.hide_gui
   end
   log("Clearing spidertron waypoints for unit number " .. unit_number)
   for _, waypoint in pairs(waypoint_info.waypoints) do
@@ -119,7 +121,14 @@ function Control.clear_spidertron_waypoints(spidertron_id)
   waypoint_info.waypoints = {}
   PatrolGui.update_gui_schedule(waypoint_info)
   WaypointRendering.update_spidertron_render_paths(unit_number)
+
   storage.spidertron_waypoints[unit_number] = nil
+  if hide_gui then
+    -- Spidertron isn't destroyed, so keep hide_gui
+    ---@cast spidertron_id LuaEntity
+    local new_waypoint_info = get_waypoint_info(spidertron_id)
+    new_waypoint_info.hide_gui = hide_gui
+  end
 end
 
 script.on_event("sp-delete-all-waypoints",
