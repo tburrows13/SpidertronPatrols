@@ -165,6 +165,17 @@ local function handle_wait_timers()
         if spidertron.get_inventory(defines.inventory.spider_trunk).is_empty() then
           SpidertronControl.go_to_next_waypoint(spidertron)
         end
+      elseif waypoint_type == "empty-trash" then
+        local trash_inventory = spidertron.get_inventory(defines.inventory.spider_trash)
+        if trash_inventory then
+          if trash_inventory.is_empty() then
+            SpidertronControl.go_to_next_waypoint(spidertron)
+          end
+        else
+          -- Spidertron prototype no longer has a trash inventory, so reset its waypoint type
+          waypoint.type = "none"
+          SpidertronControl.go_to_next_waypoint(spidertron)
+        end
       elseif waypoint_type == "item-count" then
         local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)  ---@cast inventory -?
         local item_condition_info = waypoint.item_condition_info  ---@cast item_condition_info -?

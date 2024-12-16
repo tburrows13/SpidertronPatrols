@@ -22,6 +22,12 @@ end
 
 ---@param spidertron LuaEntity
 ---@return boolean
+local function has_trash_inventory(spidertron)
+  return not not spidertron.get_inventory(defines.inventory.spider_trash)
+end
+
+---@param spidertron LuaEntity
+---@return boolean
 ---https://mods.factorio.com/mod/maraxsis
 local function is_maraxsis_submarine(spidertron)
   if not remote.interfaces.maraxsis then return false end
@@ -38,15 +44,19 @@ local function dropdown_contents(spidertron)
     {"gui-train.add-inactivity-condition"},
     {"gui-patrol.full-inventory-condition"},
     {"gui-patrol.empty-inventory-condition"},
+    {"gui-patrol.empty-trash-condition"},
     {"gui-train.add-item-count-condition"},
-    {"gui-patrol.fuel-full-condition"},
+    {"gui-train.add-fuel-full-condition"},
     {"gui-train.add-circuit-condition"},
     {"gui-train.add-robots-inactive-condition"},
     {"gui-patrol.driver-present"},
     {"gui-patrol.driver-not-present"},
   }
   if not has_fuel_inventory(spidertron) then
-    table.remove(contents, 7)
+    table.remove(contents, 8)
+  end
+  if not has_trash_inventory(spidertron) then
+    table.remove(contents, 6)
   end
   if is_maraxsis_submarine(spidertron) then
     table.insert(contents, {"gui-patrol.submerge"})
@@ -64,6 +74,7 @@ local function dropdown_index_lookup(index, spidertron)
     "inactivity",
     "full-inventory",
     "empty-inventory",
+    "empty-trash",
     "item-count",
     "fuel-full",
     "circuit-condition",
@@ -72,7 +83,10 @@ local function dropdown_index_lookup(index, spidertron)
     "passenger-not-present",
   }
   if not has_fuel_inventory(spidertron) then
-    table.remove(lookup, 7)
+    table.remove(lookup, 8)
+  end
+  if not has_trash_inventory(spidertron) then
+    table.remove(lookup, 6)
   end
   if is_maraxsis_submarine(spidertron) then
     table.insert(lookup, "submerge")
@@ -90,6 +104,7 @@ local function dropdown_index(wait_condition, spidertron)
     "inactivity",
     "full-inventory",
     "empty-inventory",
+    "empty-trash",
     "item-count",
     "fuel-full",
     "circuit-condition",
@@ -98,7 +113,10 @@ local function dropdown_index(wait_condition, spidertron)
     "passenger-not-present",
   }
   if not has_fuel_inventory(spidertron) then
-    table.remove(lookup, 7)
+    table.remove(lookup, 8)
+  end
+  if not has_trash_inventory(spidertron) then
+    table.remove(lookup, 6)
   end
   if is_maraxsis_submarine(spidertron) then
     table.insert(lookup, "submerge")
@@ -324,8 +342,8 @@ local function build_gui(player, spidertron)
   storage.open_gui_elements[player.index] = gui.add(player.gui.relative, {
     {
       type = "frame",
-      style = "sp_relative_stretchable_frame",
       name = "sp-relative-frame",
+      style = "sp_relative_stretchable_frame",
       direction = "vertical",
       anchor = anchor,
       children = {
