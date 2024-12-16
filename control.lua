@@ -102,7 +102,7 @@ function Control.clear_spidertron_waypoints(spidertron_id)
   local hide_gui
   if type(spidertron_id) == "number" then
     ---@cast spidertron_id UnitNumber
-    waypoint_info = storage.spidertron_waypoints[unit_number]
+    waypoint_info = storage.spidertron_waypoints[spidertron_id]
     if not waypoint_info then return end
     unit_number = spidertron_id
   else
@@ -281,6 +281,10 @@ local function config_changed_setup(changed_data)
           storage.spidertron_docks[dock.unit_number] = {dock = dock}
         end
       end
+    end
+    if old_version[2] < 5 or (old_version[2] == 5 and old_version[3] < 8) then
+      -- Pre 2.5.8
+      reset_render_objects()
     end
   end
 end
