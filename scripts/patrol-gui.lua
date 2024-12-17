@@ -603,7 +603,7 @@ function PatrolGuiWaypoint.move_camera_to_waypoint(player, spidertron, gui_eleme
   local center_button = gui_elements.toggle_center_button
   local camera = gui_elements.camera
 
-  center_button.style = "tool_button"
+  center_button.toggled = false
   camera.entity = nil
   camera.position = waypoint_info.waypoints[index].position
 end
