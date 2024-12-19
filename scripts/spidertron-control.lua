@@ -29,31 +29,31 @@ end
 ---@param replace boolean?
 function SpidertronControl.on_patrol_command_issued(spidertron, position, index, replace)
   -- Called when remote used and on remote interface call
-  local waypoint_info = get_waypoint_info(spidertron)
-  -- We are in patrol mode
+  local patrol_data = get_patrol_data(spidertron)
   --log("Player used patrol remote on position " .. util.positiontostr(position))
 
   -- Add to patrol
-  if not index then index = #waypoint_info.waypoints end
-  if replace and next(waypoint_info.waypoints) then
-    local waypoint = waypoint_info.waypoints[index]
+  if not index then index = #patrol_data.waypoints end
+  if replace and next(patrol_data.waypoints) then
+    local waypoint = patrol_data.waypoints[index]
     waypoint.position = position
-    waypoint_info.waypoints[index] = waypoint
+    patrol_data.waypoints[index] = waypoint
   else
     local waypoint = {position = position, type = "none"}
-    table.insert(waypoint_info.waypoints, index + 1, waypoint)
+    table.insert(patrol_data.waypoints, index + 1, waypoint)
   end
 
-  if waypoint_info.on_patrol then
-    -- Send the spidertron to current_index waypoint, and add all other waypoints to autopilot_destinations
-    local waypoints = waypoint_info.waypoints
-    --local number_of_waypoints = #waypoints
-    local current_index = waypoint_info.current_index
-    spidertron.autopilot_destination = waypoints[current_index].position
+  -- Since #waypoints >= 1, current_index should be set
+  patrol_data.current_index = patrol_data.current_index or 1
+
+  if patrol_data.on_patrol then
+    -- Using remote will have set autopilot to the wrong place. Send the spidertron to current_index waypoint instead
+    local waypoints = patrol_data.waypoints
+    spidertron.autopilot_destination = waypoints[patrol_data.current_index].position
   else
     spidertron.autopilot_destination = nil
   end
-  PatrolGui.update_gui_schedule(waypoint_info)
+  PatrolGui.update_gui_schedule(patrol_data)
   WaypointRendering.update_render_text(spidertron)  -- Inserts text at the position that we have just added
 end
 
@@ -77,26 +77,22 @@ local function was_spidertron_inactive(spidertron, old_inventories)
   return true
 end
 
+--- Spidertron must be on patrol, and there must be at least one waypoint
 ---@param spidertron LuaEntity
 ---@param next_index WaypointIndex?
 function SpidertronControl.go_to_next_waypoint(spidertron, next_index)
-  local waypoint_info = get_waypoint_info(spidertron)
+  local patrol_data = get_patrol_data(spidertron)
 
-  local number_of_waypoints = #waypoint_info.waypoints
+  local number_of_waypoints = #patrol_data.waypoints
   if number_of_waypoints > 0 then
-    -- Nil some data that is only needed whilst at a waypoint
-    waypoint_info.tick_arrived = nil
-    waypoint_info.tick_inactive = nil
-    waypoint_info.previous_inventories = nil
-    waypoint_info.stopped = nil
-    waypoint_info.last_distance = nil
+    patrol_data.on_patrol.at_waypoint = nil  -- Clear data only relevant when at waypoint
 
-    next_index = next_index or ((waypoint_info.current_index) % number_of_waypoints) + 1
-    local next_position = waypoint_info.waypoints[next_index].position
+    next_index = next_index or ((patrol_data.current_index) % number_of_waypoints) + 1
+    local next_position = patrol_data.waypoints[next_index].position
     spidertron.autopilot_destination = next_position
-    waypoint_info.current_index = next_index
+    patrol_data.current_index = next_index
 
-    PatrolGui.update_gui_button_states(waypoint_info)
+    PatrolGui.update_gui_button_states(patrol_data)
     -- The spidertron is now walking towards a new waypoint
     script.raise_event("on_spidertron_given_new_destination", {vehicle = spidertron, position = next_position, success = true})
   end
@@ -104,10 +100,11 @@ end
 
 function on_tick()
   -- Handles spider stopping
-  for _, waypoint_info in pairs(storage.spidertron_waypoints) do
-    if waypoint_info.on_patrol and waypoint_info.tick_arrived and not waypoint_info.stopped and waypoint_info.spidertron.valid then
-      local spidertron = waypoint_info.spidertron
-      local waypoint = waypoint_info.waypoints[waypoint_info.current_index]
+  for _, patrol_data in pairs(storage.patrol_data) do
+    local on_patrol_data = patrol_data.on_patrol
+    if on_patrol_data and on_patrol_data.at_waypoint and on_patrol_data.at_waypoint.tick_arrived and not on_patrol_data.at_waypoint.stopped and patrol_data.spidertron.valid then
+      local spidertron = patrol_data.spidertron
+      local waypoint = patrol_data.waypoints[patrol_data.current_index]
       local waypoint_position = waypoint.position
 
       local distance = util.distance(spidertron.position, waypoint_position)
@@ -119,15 +116,15 @@ function on_tick()
           -- Spidertron is too far away
           spidertron.teleport(waypoint_position)
         end
-        waypoint_info.stopped = true
+        on_patrol_data.at_waypoint.stopped = true
       else
-        local last_distance = waypoint_info.last_distance
+        local last_distance = on_patrol_data.at_waypoint.last_distance
         if distance < 0.3 or (last_distance and distance > last_distance) or speed > 0.4 then
           -- We are either very close, getting further away, or going so fast that we need to stop ASAP
           spidertron.stop_spider()
-          waypoint_info.last_distance = nil
+          on_patrol_data.at_waypoint.last_distance = nil
         else
-          waypoint_info.last_distance = distance
+          on_patrol_data.at_waypoint.last_distance = distance
         end
       end
     end
@@ -135,27 +132,30 @@ function on_tick()
 end
 
 local function handle_wait_timers()
-  for _, waypoint_info in pairs(storage.spidertron_waypoints) do
-    if waypoint_info.on_patrol and waypoint_info.tick_arrived and waypoint_info.spidertron.valid then
+  for _, patrol_data in pairs(storage.patrol_data) do
+    if patrol_data.on_patrol and patrol_data.on_patrol.at_waypoint and patrol_data.spidertron.valid then
       -- Spidertron is waiting
-      local spidertron = waypoint_info.spidertron
-      local waypoint = waypoint_info.waypoints[waypoint_info.current_index]
+      local spidertron = patrol_data.spidertron
+      local waypoint = patrol_data.waypoints[patrol_data.current_index]
       local waypoint_type = waypoint.type
+
+      local at_waypoint_data = patrol_data.on_patrol.at_waypoint  ---@cast at_waypoint_data -?
 
       if waypoint_type == "none" then
         -- Can happen if waypoint type is changed whilst spidertron is at waypoint
         SpidertronControl.go_to_next_waypoint(spidertron)
       elseif waypoint_type == "time-passed" or waypoint_type == "submerge" then
-        if (game.tick - waypoint_info.tick_arrived) >= waypoint.wait_time * 60 then
+        if (game.tick - at_waypoint_data.tick_arrived) >= waypoint.wait_time * 60 then
           SpidertronControl.go_to_next_waypoint(spidertron)
         end
       elseif waypoint_type == "inactivity" then
-        if was_spidertron_inactive(spidertron, waypoint_info.previous_inventories) then
-          if (game.tick - waypoint_info.tick_inactive) >= waypoint.wait_time * 60 then
+        at_waypoint_data.previous_inventories = at_waypoint_data.previous_inventories or {}
+        if was_spidertron_inactive(spidertron, at_waypoint_data.previous_inventories) then
+          if (game.tick - at_waypoint_data.tick_inactive) >= waypoint.wait_time * 60 then
             SpidertronControl.go_to_next_waypoint(spidertron)
           end
         else
-          waypoint_info.tick_inactive = game.tick
+          at_waypoint_data.tick_inactive = game.tick
         end
       elseif waypoint_type == "full-inventory" then
         if spidertron.get_inventory(defines.inventory.spider_trunk).is_full() then
@@ -211,7 +211,7 @@ local function handle_wait_timers()
         if logistic_cell then
           local logistic_network = logistic_cell.logistic_network
           -- Always wait some time in case "Enable logistics while moving" is false
-          if (game.tick - waypoint_info.tick_arrived) >= 120 and (not logistic_network or not next(logistic_network.construction_robots)) then
+          if (game.tick - at_waypoint_data.tick_arrived) >= 120 and (not logistic_network or not next(logistic_network.construction_robots)) then
             SpidertronControl.go_to_next_waypoint(spidertron)
           end
         else
@@ -234,15 +234,15 @@ script.on_nth_tick(5, handle_wait_timers)
 ---@param event EventData.on_spider_command_completed
 local function on_spider_command_completed(event)
   local spidertron = event.vehicle
-  local waypoint_info = get_waypoint_info(spidertron)
-  if waypoint_info.on_patrol then
-    local waypoints = waypoint_info.waypoints
-    local waypoint = waypoints[waypoint_info.current_index]
-    if not waypoint then
+  local patrol_data = get_patrol_data(spidertron)
+  if patrol_data.on_patrol then
+    if not patrol_data.current_index then
       -- Command was not issued by Spidertron Patrols, so disable patrol mode
-      PatrolGui.set_on_patrol(false, spidertron, waypoint_info)
+      PatrolGui.set_on_patrol(false, spidertron, patrol_data)
       return
     end
+    local waypoints = patrol_data.waypoints
+    local waypoint = waypoints[patrol_data.current_index]
     local waypoint_type = waypoint.type
 
     script.raise_event("on_spidertron_patrol_waypoint_reached", {
@@ -253,9 +253,10 @@ local function on_spider_command_completed(event)
     if waypoint_type == "none" or ((waypoint_type == "time-passed" or waypoint_type == "inactivity") and waypoint.wait_time == 0) then
       SpidertronControl.go_to_next_waypoint(spidertron)
     else
-      waypoint_info.previous_inventories = {}
-      waypoint_info.tick_arrived = game.tick
-      PatrolGui.update_gui_button_states(waypoint_info)
+      patrol_data.on_patrol.at_waypoint = {
+        tick_arrived = game.tick,
+      }
+      PatrolGui.update_gui_button_states(patrol_data)
     end
   end
 end
@@ -267,25 +268,23 @@ local function on_entity_settings_pasted(event)
   if source.type == "spider-vehicle" and destination.type == "spider-vehicle" then
 
     -- Erase render ids from receiving spidertron
-    local destination_waypoint_info = get_waypoint_info(destination)
+    local destination_waypoint_info = get_patrol_data(destination)
     for _, waypoint in pairs(destination_waypoint_info.waypoints) do
       waypoint.render.destroy()
     end
 
-    local waypoint_info = util.table.deepcopy(get_waypoint_info(source))
-    waypoint_info.on_patrol = destination_waypoint_info.on_patrol
-    waypoint_info.spidertron = destination
-    waypoint_info.tick_arrived = nil
-    waypoint_info.tick_inactive = nil
-    waypoint_info.previous_inventories = nil
+    local patrol_data = util.table.deepcopy(get_patrol_data(source))
+    patrol_data.spidertron = destination
+    patrol_data.on_patrol = table.deepcopy(destination_waypoint_info.on_patrol)
+    patrol_data.on_patrol.at_waypoint = nil
 
     -- Erase all render objects so that new ones can be recreated by WaypointRendering.update_render_text
-    for _, waypoint in pairs(waypoint_info.waypoints) do
+    for _, waypoint in pairs(patrol_data.waypoints) do
       waypoint.render = nil
     end
 
-    storage.spidertron_waypoints[destination.unit_number] = waypoint_info
-    PatrolGui.update_gui_schedule(waypoint_info)
+    storage.patrol_data[destination.unit_number] = patrol_data
+    PatrolGui.update_gui_schedule(patrol_data)
     WaypointRendering.update_render_text(destination)  -- Inserts text at the position that we have just added
   end
 end
@@ -304,16 +303,16 @@ local function on_player_setup_blueprint(event)
 
   for index, entity in pairs(event.mapping.get()) do
     if entity.valid and entity.type == "spider-vehicle" then
-      local waypoint_info = storage.spidertron_waypoints[entity.unit_number]
-      if waypoint_info then
+      local patrol_data = storage.patrol_data[entity.unit_number]
+      if patrol_data then
         if index <= count then
-          local waypoints = table.deepcopy(waypoint_info.waypoints)
+          local waypoints = table.deepcopy(patrol_data.waypoints)
           for _, waypoint in pairs(waypoints) do
             waypoint.render = nil
           end
           local waypoint_tags = {
             waypoints = waypoints,
-            hide_gui = waypoint_info.hide_gui
+            hide_gui = patrol_data.hide_gui
           }
           --log(serpent.line(waypoint_tags))
           item.set_blueprint_entity_tag(index, "spidertron_patrol_data", waypoint_tags)
@@ -333,9 +332,12 @@ local function on_spidertron_revived(event)
   local spidertron_patrol_data = tags.spidertron_patrol_data
   if not spidertron_patrol_data then return end
 
-  local waypoint_info = get_waypoint_info(entity)
-  waypoint_info.waypoints = spidertron_patrol_data.waypoints
-  waypoint_info.hide_gui = spidertron_patrol_data.hide_gui
+  local patrol_data = get_patrol_data(entity)
+  patrol_data.waypoints = spidertron_patrol_data.waypoints
+  if #patrol_data.waypoints >= 1 then
+    patrol_data.current_index = 1
+  end
+  patrol_data.hide_gui = spidertron_patrol_data.hide_gui
   WaypointRendering.update_render_text(entity)
 end
 

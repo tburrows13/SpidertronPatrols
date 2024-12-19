@@ -41,13 +41,13 @@ end
 ---@param player LuaPlayer
 ---@param create_chart_tags boolean?
 local function create_render_paths(spidertron, player, create_chart_tags)
-  local waypoint_info = get_waypoint_info(spidertron)
+  local patrol_data = get_patrol_data(spidertron)
 
   local color = add_alpha(spidertron.color, true)
   local surface = spidertron.surface.name
-  local force = player.force
+  local force = player.force  --[[@as LuaForce]]
 
-  local waypoints = waypoint_info.waypoints
+  local waypoints = patrol_data.waypoints
   local number_of_waypoints = #waypoints
 
   local path_renders = {}
@@ -251,7 +251,7 @@ end
 ---@param spidertron LuaEntity
 function WaypointRendering.update_render_text(spidertron)
   -- Updates numbered text on ground for given spidertron
-  local waypoint_info = get_waypoint_info(spidertron)
+  local patrol_data = get_patrol_data(spidertron)
 
   local viewing_players = storage.render_players
   local is_at_least_one_player = not not next(viewing_players)
@@ -259,7 +259,7 @@ function WaypointRendering.update_render_text(spidertron)
   local color = add_alpha(spidertron.color)
 
   -- Re-render all waypoints
-  for i, waypoint in pairs(waypoint_info.waypoints) do
+  for i, waypoint in pairs(patrol_data.waypoints) do
     local render = waypoint.render
     if render and render.valid then
       render.text = i
@@ -297,8 +297,8 @@ function WaypointRendering.update_render_players()
   end
   local is_at_least_one_player = not not next(render_players)
 
-  for _, waypoint_info in pairs(storage.spidertron_waypoints) do
-    for _, waypoint in pairs(waypoint_info.waypoints) do
+  for _, patrol_data in pairs(storage.patrol_data) do
+    for _, waypoint in pairs(patrol_data.waypoints) do
       local render = waypoint.render
       if render and render.valid then
         render.players = render_players

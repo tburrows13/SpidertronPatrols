@@ -5,7 +5,8 @@ if script.active_mods["maraxsis"] or script.active_mods["lex-aircraft"] then
   SPIDERTRON_NAME_CAPITALISED = "Vehicle"
 end
 
-local event_handler = require "event_handler"
+---@type event_handler_lib
+event_handler = require "event_handler"
 util = require "util"
 require "scripts.utils"
 gui = require "scripts.gui-lite"
@@ -19,29 +20,6 @@ WaypointRendering = require "scripts.waypoint-rendering"
 
 Control = {}
 
---[[
-Globals:
-storage.spidertron_waypoints: indexed by spidertron.unit_number:
-  spidertron :: LuaEntity
-  waypoints :: array of Waypoint
-  Waypoint contains
-    type :: string ("none", "time-passed", "inactivity", "full-inventory", "empty-inventory", "robots-inactive", "passenger-present", "passenger-not-present", "item-count", "circuit-condition")
-    position :: Position (Concept)
-    wait_time? :: int (in seconds, only with "time-passed" or "inactivity")
-    item_count_info? :: array containing
-      item_name :: string or SignalID (depending on if type is "item-count" or "circuit-condition")
-      condition :: int (index of condition_dropdown_contents)
-      count :: int
-    render :: LuaRenderObject
-  current_index :: int (index of waypoints)
-  tick_arrived? :: int (only set when at a waypoint)
-  tick_inactive? :: int (only used whilst at an "inactivity" waypoint)
-  previous_inventories? :: table (only used whilst at an "inactivity" waypoint)
-  on_patrol :: bool
-  hide_gui :: bool
-  renders :: array of LuaRenderObject
-]]
-
 ---@alias PlayerIndex uint
 ---@alias UnitNumber uint
 ---@alias GameTick uint
@@ -53,41 +31,42 @@ storage.spidertron_waypoints: indexed by spidertron.unit_number:
 ---@class Waypoint
 ---@field type WaypointType
 ---@field position MapPosition
----@field wait_time uint?
----@field item_condition_info {elem: ItemIDAndQualityIDPair, count: integer, condition: integer}?
----@field circuit_condition_info {elem: SignalID, count: integer, condition: integer}?
+---@field wait_time uint? In seconds. Only if type is "time-passed" or "inactivity".
+---@field item_condition_info {elem: ItemIDAndQualityIDPair, count: integer, condition: integer}? Only if type is "item-count".
+---@field circuit_condition_info {elem: SignalID, count: integer, condition: integer}? Only if type is "circuit-condition".
 ---@field render LuaRenderObject
 
----@class WaypointInfo
+---@class AtWaypointData
+---@field tick_arrived GameTick
+---@field tick_inactive GameTick? Only if type is "inactivity".
+---@field previous_inventories {trunk: table, ammo: table}? Only if type is "inactivity".
+---@field stopped boolean? Default: false. Set to true in on_tick when the spidertron has stopped over the waypoint position.
+---@field last_distance number? Used in conjunction with `stopped`.
+
+---@class OnPatrolData
+---@field at_waypoint AtWaypointData? If exists, then spidertron is at waypoint.
+
+---@class PatrolData
 ---@field spidertron LuaEntity
 ---@field waypoints table<WaypointIndex, Waypoint>
----@field renders LuaRenderObject[]
----@field current_index WaypointIndex
----@field on_patrol boolean
+---@field current_index WaypointIndex? Waypoint spidertron is at or travelling to. No inherent correlation to `on_patrol` as we can be in automatic mode with no waypoints, or in manual but with a saved `current_index`.
+---@field on_patrol OnPatrolData? If exists, then spidertron is in automatic mode.
 ---@field hide_gui boolean
----@field tick_arrived GameTick?
----@field tick_inactive GameTick?
----@field previous_inventories table?
----@field stopped boolean?
----@field last_distance number?
 
 ---@param spidertron LuaEntity
----@return WaypointInfo
-function get_waypoint_info(spidertron)
-  local waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
-  if not waypoint_info then
+---@return PatrolData
+function get_patrol_data(spidertron)
+  local patrol_data = storage.patrol_data[spidertron.unit_number]
+  if not patrol_data then
     --log("No waypoint info found. Creating blank table")
-    storage.spidertron_waypoints[spidertron.unit_number] = {
+    storage.patrol_data[spidertron.unit_number] = {
       spidertron = spidertron,
       waypoints = {},
-      renders = {},
-      current_index = 1,
-      on_patrol = false,
       hide_gui = false,
     }
-    waypoint_info = storage.spidertron_waypoints[spidertron.unit_number]
+    patrol_data = storage.patrol_data[spidertron.unit_number]
   end
-  return waypoint_info
+  return patrol_data
 end
 
 RemoteInterface = require "scripts.remote-interface"
@@ -107,42 +86,42 @@ end
 function Control.clear_spidertron_waypoints(spidertron_id)
   -- Called on custom-input or whenever the current autopilot_destination is removed or when the spidertron is removed.
   -- Pass in either `spidertron` or `unit_number`
-  local waypoint_info
+  local patrol_data
   ---@type UnitNumber
   local unit_number
   local hide_gui
   if type(spidertron_id) == "number" then
     ---@cast spidertron_id UnitNumber
-    waypoint_info = storage.spidertron_waypoints[spidertron_id]
-    if not waypoint_info then return end
+    patrol_data = storage.patrol_data[spidertron_id]
+    if not patrol_data then return end
     unit_number = spidertron_id
   else
     ---@cast spidertron_id LuaEntity
-    waypoint_info = get_waypoint_info(spidertron_id)
+    patrol_data = get_patrol_data(spidertron_id)
     spidertron_id.autopilot_destination = nil
     unit_number = spidertron_id.unit_number  ---@cast unit_number -?
-    hide_gui = waypoint_info.hide_gui
+    hide_gui = patrol_data.hide_gui
   end
   log("Clearing spidertron waypoints for unit number " .. unit_number)
-  for _, waypoint in pairs(waypoint_info.waypoints) do
+  for _, waypoint in pairs(patrol_data.waypoints) do
     if waypoint.render then
       waypoint.render.destroy()
     end
   end
-  waypoint_info.waypoints = {}
-  PatrolGui.update_gui_schedule(waypoint_info)
+  patrol_data.waypoints = {}
+  PatrolGui.update_gui_schedule(patrol_data)
   WaypointRendering.update_spidertron_render_paths(unit_number)
 
-  storage.spidertron_waypoints[unit_number] = nil
+  storage.patrol_data[unit_number] = nil
   if hide_gui then
     -- Spidertron isn't destroyed, so keep hide_gui
     ---@cast spidertron_id LuaEntity
-    local new_waypoint_info = get_waypoint_info(spidertron_id)
+    local new_waypoint_info = get_patrol_data(spidertron_id)
     new_waypoint_info.hide_gui = hide_gui
   end
 end
 
-script.on_event("sp-delete-all-waypoints",
+script.on_event(prototypes.custom_input["sp-delete-all-waypoints"],
   function(event)
     local player = game.get_player(event.player_index)  ---@cast player -?
     local cursor_stack = player.cursor_stack
@@ -160,13 +139,14 @@ script.on_event("sp-delete-all-waypoints",
 
 -- Detect when the player cancels a spidertron's autopilot_destination
 script.on_event({"move-right-custom", --[["move-left-custom",]] "move-up-custom", "move-down-custom"},
-  function(event --[[@as EventData.CustomInputEvent]])
+  ---@param event EventData.CustomInputEvent
+  function(event)
     local player = game.get_player(event.player_index)  ---@cast player -?
     local vehicle = player.vehicle
     if vehicle and vehicle.type == "spider-vehicle" and player.render_mode == defines.render_mode.game then  -- Render mode means player isn't in map view...
-      local waypoint_info = get_waypoint_info(vehicle)
-      waypoint_info.on_patrol = false
-      PatrolGui.update_gui_switch(waypoint_info)
+      local patrol_data = get_patrol_data(vehicle)
+      patrol_data.on_patrol = nil
+      PatrolGui.update_gui_switch(patrol_data)
     end
   end
 )
@@ -201,15 +181,15 @@ end
 
 local function setup()
   process_active_mods()
-  ---@type table<UnitNumber, WaypointInfo>
-  storage.spidertron_waypoints = {}
+  ---@type table<UnitNumber, PatrolData>
+  storage.patrol_data = {}
   ---@type table<PlayerIndex, table<UnitNumber, table<WaypointIndex, LuaRenderObject>>>
   storage.path_renders = {}
   ---@type table<LuaRenderID, LuaCustomChartTag[]>
   storage.chart_tags = {}
   ---@type table<PlayerIndex, WaypointIndex>
   storage.remotes_in_cursor = {}
-  ---@type table<PlayerIndex, table<LuaRenderID, table<LuaRenderObject, GameTick>>>
+  ---@type table<PlayerIndex, table<LuaRenderID, {render: LuaRenderObject, toggle_tick: GameTick}>>
   storage.blinking_renders = {}
 
   ---@type table<UnitNumber, DockData>
@@ -297,6 +277,34 @@ local function config_changed_setup(changed_data)
       -- Pre 2.5.8
       reset_render_objects()
     end
+    if old_version[2] < 5 or (old_version[2] == 5 and old_version[3] < 9) then
+      local spidertron_waypoints = storage.spidertron_waypoints
+      storage.patrol_data = spidertron_waypoints
+      storage.spidertron_waypoints = nil
+
+      for _, patrol_data in pairs(storage.patrol_data) do
+        if patrol_data.current_index == 1 and not next(patrol_data.waypoints) then
+          patrol_data.current_index = nil
+          if patrol_data.on_patrol then
+            patrol_data.on_patrol = {}
+            if patrol_data.tick_arrived then
+              patrol_data.on_patrol.at_waypoint = {
+                tick_arrived = patrol_data.tick_arrived,
+                tick_inactive = patrol_data.tick_inactive,
+                previous_inventories = patrol_data.previous_inventories,
+                stopped = patrol_data.stopped,
+                last_distance = patrol_data.last_distance,
+              }
+              patrol_data.tick_arrived = nil  ---@diagnostic disable-line: inject-field
+              patrol_data.tick_inactive = nil  ---@diagnostic disable-line: inject-field
+              patrol_data.previous_inventories = nil  ---@diagnostic disable-line: inject-field
+              patrol_data.stopped = nil  ---@diagnostic disable-line: inject-field
+              patrol_data.last_distance = nil  ---@diagnostic disable-line: inject-field
+            end
+          end
+        end
+      end
+    end
   end
 end
 
@@ -311,10 +319,10 @@ function reset_render_objects()
   storage.path_renders = {}
   storage.blinking_renders = {}
   WaypointRendering.update_render_players()
-  for _, waypoint_info in pairs(storage.spidertron_waypoints) do
-    local spidertron = waypoint_info.spidertron
+  for _, patrol_data in pairs(storage.patrol_data) do
+    local spidertron = patrol_data.spidertron
     if spidertron and spidertron.valid then
-      WaypointRendering.update_render_text(waypoint_info.spidertron)
+      WaypointRendering.update_render_text(patrol_data.spidertron)
     end
   end
   for _, player in pairs(game.players) do

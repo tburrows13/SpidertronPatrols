@@ -18,7 +18,7 @@ local function snap_waypoint_position(selected, position)
   end
 end
 
-script.on_event("sp-replace-previous-waypoint",
+script.on_event(prototypes.custom_input["sp-replace-previous-waypoint"],
   function(event)
     replace_this_tick[event.player_index] = event.tick
   end
@@ -39,8 +39,8 @@ local function on_player_used_spidertron_remote(event)
       local replace_waypoint = replace_this_tick[event.player_index] == event.tick
 
       local waypoint_index = storage.remotes_in_cursor[player.index]
-      local waypoint_info = get_waypoint_info(spidertron)
-      local number_of_waypoints = #waypoint_info.waypoints
+      local patrol_data = get_patrol_data(spidertron)
+      local number_of_waypoints = #patrol_data.waypoints
       if single_spidertron_selected and waypoint_index and waypoint_index ~= -1 then
         waypoint_index = math.min(number_of_waypoints + 1, waypoint_index)
         if replace_waypoint then
@@ -53,9 +53,9 @@ local function on_player_used_spidertron_remote(event)
       end
       SpidertronControl.on_patrol_command_issued(spidertron, position, waypoint_index, replace_waypoint)
     else
-      local waypoint_info = get_waypoint_info(spidertron)
-      waypoint_info.on_patrol = false
-      PatrolGui.update_gui_switch(waypoint_info)
+      local patrol_data = get_patrol_data(spidertron)
+      patrol_data.on_patrol = nil
+      PatrolGui.update_gui_switch(patrol_data)
     end
   end
 end

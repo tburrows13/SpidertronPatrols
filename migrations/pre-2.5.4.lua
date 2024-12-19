@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-field, inject-field
-for _, waypoint_info in pairs(storage.spidertron_waypoints) do
-  for _, waypoint in pairs(waypoint_info.waypoints) do
+for _, patrol_data in pairs(storage.patrol_data) do
+  for _, waypoint in pairs(patrol_data.waypoints) do
     if waypoint.type == "item-count" then
       if waypoint.item_count_info then
         waypoint.item_condition_info = {

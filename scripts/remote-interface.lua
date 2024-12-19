@@ -9,8 +9,9 @@ end
 remote.add_interface("SpidertronPatrols", {
   clear_waypoints = function(unit_number) Control.clear_spidertron_waypoints(unit_number) end,
   add_waypoints = function(spidertron, waypoints) remote_interface_assign_waypoints(spidertron, waypoints) end,
-  get_waypoints = function(spidertron) get_waypoint_info(spidertron) end,
-  set_on_patrol = function(spidertron, on_patrol) PatrolGui.set_on_patrol(on_patrol, spidertron, get_waypoint_info(spidertron)) end,
+  get_waypoints = function(spidertron) get_patrol_data(spidertron) end,  -- deprecated
+  get_patrol_data = function(spidertron) get_patrol_data(spidertron) end,
+  set_on_patrol = function(spidertron, on_patrol) PatrolGui.set_on_patrol(on_patrol, spidertron, get_patrol_data(spidertron)) end,
   give_patrol_remote = function(player, spidertron, waypoint_index)  -- waypoint_index is optional
     PatrolRemote.give_remote(player, spidertron, waypoint_index)
   end,
@@ -20,10 +21,10 @@ local function spidertron_replaced(event)
   -- Called in response to Spidertron Weapon Switcher or Spidertron Enhancements event
   local previous_unit_number = event.old_spidertron.unit_number
   local spidertron = event.new_spidertron
-  if storage.spidertron_waypoints[previous_unit_number] then
-    storage.spidertron_waypoints[spidertron.unit_number] = storage.spidertron_waypoints[previous_unit_number]
-    storage.spidertron_waypoints[spidertron.unit_number].spidertron = spidertron
-    storage.spidertron_waypoints[previous_unit_number] = nil
+  if storage.patrol_data[previous_unit_number] then
+    storage.patrol_data[spidertron.unit_number] = storage.patrol_data[previous_unit_number]
+    storage.patrol_data[spidertron.unit_number].spidertron = spidertron
+    storage.patrol_data[previous_unit_number] = nil
   end
 
   for player_index, path_render_info in pairs(storage.path_renders) do

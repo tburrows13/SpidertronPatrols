@@ -355,8 +355,8 @@ local function connect_to_spidertron(dock_data, spidertron)
   end
 
   -- Check if driver has prevent-docking-when-driving enabled
-  local waypoint_info = get_waypoint_info(spidertron)
-  if not waypoint_info.on_patrol then  -- Only check for drivers if not in automatic mode
+  local patrol_data = get_patrol_data(spidertron)
+  if not patrol_data.on_patrol then  -- Only check for drivers if not in automatic mode
     local driver = spidertron.get_driver()
     if driver then
       if driver.object_name == "LuaEntity" then
