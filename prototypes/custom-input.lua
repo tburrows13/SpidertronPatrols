@@ -2,6 +2,13 @@
 data:extend{
   {
     type = "custom-input",
+    name = "sp-use-item-custom",
+    key_sequence = "",
+    linked_game_control = "use-item",
+    consuming = "none",
+  },
+  {
+    type = "custom-input",
     name = "sp-replace-previous-waypoint",
     key_sequence = "SHIFT + mouse-button-2",
     controller_key_sequence = "controller-righttrigger + controller-a",

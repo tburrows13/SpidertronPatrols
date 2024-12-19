@@ -44,7 +44,7 @@ local function create_render_paths(spidertron, player, create_chart_tags)
   local patrol_data = get_patrol_data(spidertron)
 
   local color = add_alpha(spidertron.color, true)
-  local surface = spidertron.surface.name
+  local surface = player.surface.name
   local force = player.force  --[[@as LuaForce]]
 
   local waypoints = patrol_data.waypoints
@@ -62,7 +62,7 @@ local function create_render_paths(spidertron, player, create_chart_tags)
     -- First draw waypoint number like in WaypointRendering.update_render_text() in case alt-mode is not on
     local render = rendering.draw_text{
       text = tostring(i),
-      surface = spidertron.surface,
+      surface = surface,
       target = {waypoint.position.x, waypoint.position.y},
       color = color,
       scale = 5,
@@ -261,6 +261,10 @@ function WaypointRendering.update_render_text(spidertron)
   -- Re-render all waypoints
   for i, waypoint in pairs(patrol_data.waypoints) do
     local render = waypoint.render
+    if render and render.valid and render.surface ~= spidertron.surface then
+      -- If spidertron was teleported cross-surface
+      render.destroy()
+    end
     if render and render.valid then
       render.text = i
       render.color = color
@@ -339,10 +343,16 @@ WaypointRendering.events = {
   --[defines.events.on_player_configured_spider_remote] = need_to_update_player_render_paths,  TODO replace?
   [defines.events.on_player_driving_changed_state] = need_to_update_player_render_paths,
   [defines.events.on_selected_entity_changed] = need_to_update_player_render_paths,
+  [defines.events.on_player_changed_surface] = need_to_update_player_render_paths,
   [defines.events.on_player_joined_game] = WaypointRendering.update_render_players,
   [defines.events.on_runtime_mod_setting_changed] = on_runtime_mod_setting_changed,
-  [defines.events.script_raised_teleported] = on_spidertron_teleported,
   [defines.events.on_entity_color_changed] = on_spidertron_color_changed,
 }
+-- Maraxsis
+if prototypes.custom_event["maraxsis-on-submerged"] then
+  WaypointRendering.events[prototypes.custom_event["maraxsis-on-submerged"]] = on_spidertron_teleported
+else
+  WaypointRendering.events[defines.events.script_raised_teleported] = on_spidertron_teleported
+end
 
 return WaypointRendering

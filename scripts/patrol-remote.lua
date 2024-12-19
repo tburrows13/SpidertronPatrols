@@ -60,6 +60,29 @@ local function on_player_used_spidertron_remote(event)
   end
 end
 
+--- For Maraxsis, when clicking with remote connected to spidertron on a different surface
+script.on_event(prototypes.custom_input["sp-use-item-custom"],
+  function(event)
+    local player = game.get_player(event.player_index)  ---@cast player -?
+    local spidertrons = player.spidertron_remote_selection or {}
+    local all_spidertrons_on_other_surfaces = true
+    for _, spidertron in pairs(spidertrons) do
+      if player.surface == spidertron.surface then
+        all_spidertrons_on_other_surfaces = false
+        break
+      end
+    end
+    if all_spidertrons_on_other_surfaces then
+      on_player_used_spidertron_remote{
+        name = defines.events.on_player_used_spidertron_remote,
+        tick = event.tick,
+        player_index = event.player_index,
+        position = event.cursor_position,
+      }
+    end
+  end
+)
+
 ---@param player LuaPlayer
 ---@param spidertron LuaEntity
 ---@param waypoint_index WaypointIndex?
