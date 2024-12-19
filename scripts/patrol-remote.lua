@@ -18,11 +18,6 @@ local function snap_waypoint_position(selected, position)
   end
 end
 
-script.on_event(prototypes.custom_input["sp-replace-previous-waypoint"],
-  function(event)
-    replace_this_tick[event.player_index] = event.tick
-  end
-)
 
 ---@param event EventData.on_player_used_spidertron_remote
 local function on_player_used_spidertron_remote(event)
@@ -61,25 +56,30 @@ local function on_player_used_spidertron_remote(event)
 end
 
 --- For Maraxsis, when clicking with remote connected to spidertron on a different surface
-script.on_event(prototypes.custom_input["sp-use-item-custom"],
+function on_player_right_clicked(event)
+  local player = game.get_player(event.player_index)  ---@cast player -?
+  local spidertrons = player.spidertron_remote_selection or {}
+  local all_spidertrons_on_other_surfaces = true
+  for _, spidertron in pairs(spidertrons) do
+    if player.surface == spidertron.surface then
+      all_spidertrons_on_other_surfaces = false
+      break
+    end
+  end
+  if all_spidertrons_on_other_surfaces then
+    on_player_used_spidertron_remote{
+      name = defines.events.on_player_used_spidertron_remote,
+      tick = event.tick,
+      player_index = event.player_index,
+      position = event.cursor_position,
+    }
+  end
+end
+
+script.on_event(prototypes.custom_input["sp-replace-previous-waypoint"],
   function(event)
-    local player = game.get_player(event.player_index)  ---@cast player -?
-    local spidertrons = player.spidertron_remote_selection or {}
-    local all_spidertrons_on_other_surfaces = true
-    for _, spidertron in pairs(spidertrons) do
-      if player.surface == spidertron.surface then
-        all_spidertrons_on_other_surfaces = false
-        break
-      end
-    end
-    if all_spidertrons_on_other_surfaces then
-      on_player_used_spidertron_remote{
-        name = defines.events.on_player_used_spidertron_remote,
-        tick = event.tick,
-        player_index = event.player_index,
-        position = event.cursor_position,
-      }
-    end
+    replace_this_tick[event.player_index] = event.tick
+    on_player_right_clicked(event)
   end
 )
 
@@ -107,6 +107,7 @@ end
 
 PatrolRemote.events = {
   [defines.events.on_player_used_spidertron_remote] = on_player_used_spidertron_remote,
+  [prototypes.custom_input["sp-use-item-custom"]] = on_player_right_clicked
 }
 
 return PatrolRemote
