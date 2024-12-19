@@ -283,24 +283,26 @@ local function config_changed_setup(changed_data)
       storage.spidertron_waypoints = nil
 
       for _, patrol_data in pairs(storage.patrol_data) do
-        if patrol_data.current_index == 1 and not next(patrol_data.waypoints) then
+        if not next(patrol_data.waypoints) then
           patrol_data.current_index = nil
-          if patrol_data.on_patrol then
-            patrol_data.on_patrol = {}
-            if patrol_data.tick_arrived then
-              patrol_data.on_patrol.at_waypoint = {
-                tick_arrived = patrol_data.tick_arrived,
-                tick_inactive = patrol_data.tick_inactive,
-                previous_inventories = patrol_data.previous_inventories,
-                stopped = patrol_data.stopped,
-                last_distance = patrol_data.last_distance,
-              }
-              patrol_data.tick_arrived = nil  ---@diagnostic disable-line: inject-field
-              patrol_data.tick_inactive = nil  ---@diagnostic disable-line: inject-field
-              patrol_data.previous_inventories = nil  ---@diagnostic disable-line: inject-field
-              patrol_data.stopped = nil  ---@diagnostic disable-line: inject-field
-              patrol_data.last_distance = nil  ---@diagnostic disable-line: inject-field
-            end
+        end
+        if patrol_data.on_patrol == false then
+          patrol_data.on_patrol = nil
+        else
+          patrol_data.on_patrol = {}
+          if patrol_data.tick_arrived then
+            patrol_data.on_patrol.at_waypoint = {
+              tick_arrived = patrol_data.tick_arrived,
+              tick_inactive = patrol_data.tick_inactive,
+              previous_inventories = patrol_data.previous_inventories,
+              stopped = patrol_data.stopped,
+              last_distance = patrol_data.last_distance,
+            }
+            patrol_data.tick_arrived = nil  ---@diagnostic disable-line: inject-field
+            patrol_data.tick_inactive = nil  ---@diagnostic disable-line: inject-field
+            patrol_data.previous_inventories = nil  ---@diagnostic disable-line: inject-field
+            patrol_data.stopped = nil  ---@diagnostic disable-line: inject-field
+            patrol_data.last_distance = nil  ---@diagnostic disable-line: inject-field
           end
         end
       end
