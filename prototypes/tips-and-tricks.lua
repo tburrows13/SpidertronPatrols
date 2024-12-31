@@ -17,6 +17,9 @@ data:extend{
     trigger = {type = "build-entity", entity = "spidertron", match_type_only = true},
     simulation = simulations.spidertron_patrols
   },
+}
+if settings.startup["sp-enable-dock"].value then
+  data:extend{
   {
     type = "tips-and-tricks-item",
     name = "sp-dock",
@@ -28,7 +31,9 @@ data:extend{
     starting_status = "unlocked",
     trigger = {type = "unlock-recipe", recipe = "sp-spidertron-dock"},
     simulation = simulations.dock
-  },
+  }}
+end
+data:extend{
   {
     type = "tips-and-tricks-item",
     name = "sp-spidertron-automation",
@@ -51,7 +56,10 @@ data:extend{
     trigger = {type = "build-entity", entity = "spidertron", match_type_only = true},
     image = "__SpidertronPatrols__/graphics/tips-and-tricks/wait-conditions-tip.png"
   },
-  -- TODO add refuel tip if any burner spidertrons
+}
+-- TODO add refuel tip if any burner spidertrons
+if mods["lex-aircraft"] then
+  data:extend{
   {
     type = "tips-and-tricks-item",
     name = "sp-aircraft-automation",
@@ -68,7 +76,10 @@ data:extend{
       },
     },
     simulation = simulations.aircraft
-  },
+  }}
+end
+if mods["maraxsis"] then
+  data:extend{
   {
     type = "tips-and-tricks-item",
     name = "sp-submarine-automation",
@@ -84,12 +95,5 @@ data:extend{
       },
     },
     simulation = simulations.submarine
-  },
-}
-
-if not mods["lex-aircraft"] then
-  data.raw["tips-and-tricks-item"]["sp-aircraft-automation"] = nil
-end
-if not mods["maraxsis"] then
-  data.raw["tips-and-tricks-item"]["sp-submarine-automation"] = nil
+  }}
 end
