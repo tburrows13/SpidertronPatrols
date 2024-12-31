@@ -65,3 +65,7 @@ data:extend{
     linked_game_control = "move-down"
   },
 }
+
+if settings.startup["sp-enable-spiderling"].value then
+  data.raw["shortcut"]["give-spidertron-remote"].technology_to_unlock = "sp-spiderling"
+end

@@ -49,7 +49,7 @@ if settings.startup["sp-remove-military-requirement"].value then
     end
     table.remove(data.raw.technology["sp-spiderling"].prerequisites, 6)  -- Remove rocketry from spiderling prereqs
     table.remove(data.raw.technology["sp-spiderling"].prerequisites, 5)  -- Remove military-3 from spiderling prereqs
-    table.insert(data.raw.technology["spidertron"], "rocketry")  
+    table.insert(data.raw.technology["spidertron"], "rocketry")
   end
 
   if settings.startup["sp-enable-dock"].value then
