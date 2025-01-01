@@ -1,8 +1,8 @@
-SPIDERTRON_NAME = "spidertron"
-SPIDERTRON_NAME_CAPITALISED = "Spidertron"
+SPIDERTRON_NAME = {"spe-dynamic-entity-name.spidertron-lowercase"}
+SPIDERTRON_NAME_CAPITALISED = {"entity-name.spidertron"}
 if script.active_mods["maraxsis"] or script.active_mods["lex-aircraft"] then
-  SPIDERTRON_NAME = "vehicle"
-  SPIDERTRON_NAME_CAPITALISED = "Vehicle"
+  SPIDERTRON_NAME = {"spe-dynamic-entity-name.vehicle-lowercase"}
+  SPIDERTRON_NAME_CAPITALISED = {"spe-dynamic-entity-name.vehicle"}
 end
 
 ---@type event_handler_lib
