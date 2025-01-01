@@ -258,25 +258,6 @@ local function config_changed_setup(changed_data)
       storage.remotes_in_cursor = {}
       storage.blinking_renders = {}
     end
-    if old_version[2] < 5 then
-      -- Pre 2.5. Has to go at end so that globals can be initialized first.
-      reset_render_objects()
-      -- Disconnect all spidertrons from docks, since previous_items format has changed
-      for _, dock_data in pairs(storage.spidertron_docks) do
-        local spidertron = dock_data.connected_spidertron
-        local dock = dock_data.dock
-
-        if dock and dock.valid and dock.name ~= "sp-spidertron-dock-closing" and spidertron and spidertron.valid then
-          storage.spidertrons_docked[spidertron.unit_number] = nil
-          dock = replace_dock(dock, "sp-spidertron-dock")
-          storage.spidertron_docks[dock.unit_number] = {dock = dock}
-        end
-      end
-    end
-    if old_version[2] < 5 or (old_version[2] == 5 and old_version[3] < 8) then
-      -- Pre 2.5.8
-      reset_render_objects()
-    end
     if old_version[2] < 5 or (old_version[2] == 5 and old_version[3] < 9) then
       local spidertron_waypoints = storage.spidertron_waypoints
       storage.patrol_data = spidertron_waypoints
@@ -306,6 +287,25 @@ local function config_changed_setup(changed_data)
           end
         end
       end
+    end
+    if old_version[2] < 5 then
+      -- Pre 2.5. Has to go at end so that globals can be initialized first.
+      reset_render_objects()
+      -- Disconnect all spidertrons from docks, since previous_items format has changed
+      for _, dock_data in pairs(storage.spidertron_docks) do
+        local spidertron = dock_data.connected_spidertron
+        local dock = dock_data.dock
+
+        if dock and dock.valid and dock.name ~= "sp-spidertron-dock-closing" and spidertron and spidertron.valid then
+          storage.spidertrons_docked[spidertron.unit_number] = nil
+          dock = replace_dock(dock, "sp-spidertron-dock")
+          storage.spidertron_docks[dock.unit_number] = {dock = dock}
+        end
+      end
+    end
+    if old_version[2] < 5 or (old_version[2] == 5 and old_version[3] < 8) then
+      -- Pre 2.5.8
+      reset_render_objects()
     end
   end
 end

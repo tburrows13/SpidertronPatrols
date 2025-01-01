@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-field, inject-field
-for _, patrol_data in pairs(storage.patrol_data) do
+for _, patrol_data in pairs(storage.patrol_data or {}) do
   for _, waypoint in pairs(patrol_data.waypoints) do
     if waypoint.type == "item-count" then
       if waypoint.item_count_info then
