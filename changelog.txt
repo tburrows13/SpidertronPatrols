@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.9
+Date: 15 January 2024
+  Features:
+    - Improved cross-surface patrol support for Maraxsis planet
+    - Added patrol remote shortcut
+  Bugfixes:
+    - Fixed error on load when spidertron docks are disabled in mod settings
+    - Fixed spidertron remote not being unlocked alongside spiderling
+---------------------------------------------------------------------------------------------------
 Version: 2.5.8
 Date: 16 December 2024
   Features:
