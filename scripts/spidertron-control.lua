@@ -276,7 +276,9 @@ local function on_entity_settings_pasted(event)
     local patrol_data = util.table.deepcopy(get_patrol_data(source))
     patrol_data.spidertron = destination
     patrol_data.on_patrol = table.deepcopy(destination_waypoint_info.on_patrol)
-    patrol_data.on_patrol.at_waypoint = nil
+    if patrol_data.on_patrol then
+      patrol_data.on_patrol.at_waypoint = nil
+    end
 
     -- Erase all render objects so that new ones can be recreated by WaypointRendering.update_render_text
     for _, waypoint in pairs(patrol_data.waypoints) do
