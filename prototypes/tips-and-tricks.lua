@@ -57,7 +57,19 @@ data:extend{
     image = "__SpidertronPatrols__/graphics/tips-and-tricks/wait-conditions-tip.png"
   },
 }
--- TODO add refuel tip if any burner spidertrons
+if mods["lex-aircraft"] or mods["maraxsis"] then
+  data:extend{
+  {
+    type = "tips-and-tricks-item",
+    name = "sp-automatic-refueling",
+    tag = "[item=rocket-fuel]",
+    category = "spidertron-patrols",
+    order = "e",
+    indent = 1,
+    starting_status = "unlocked",
+    trigger = {type = "build-entity", entity = "spidertron", match_type_only = true},
+  }}
+end
 if mods["lex-aircraft"] then
   data:extend{
   {
@@ -65,7 +77,7 @@ if mods["lex-aircraft"] then
     name = "sp-aircraft-automation",
     tag = "[entity=lex-flying-cargo]",
     category = "spidertron-patrols",
-    order = "e",
+    order = "f",
     indent = 1,
     starting_status = "unlocked",
     trigger = {
@@ -85,7 +97,7 @@ if mods["maraxsis"] then
     name = "sp-submarine-automation",
     tag = "[entity=maraxsis-diesel-submarine]",
     category = "spidertron-patrols",
-    order = "f",
+    order = "g",
     indent = 1,
     starting_status = "unlocked",
     trigger = {
