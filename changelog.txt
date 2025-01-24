@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.10
+Date: 24 January 2024
+  Features:
+    - Added tip for automatic refueling when Maraxsis or Lex's Aircraft are installed
+  Bugfixes:
+    - Fixed crash when copy-pasting spidertron configurations
+---------------------------------------------------------------------------------------------------
 Version: 2.5.9
 Date: 15 January 2024
   Features:
