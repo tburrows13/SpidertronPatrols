@@ -7,57 +7,42 @@ local hit_effects = require ("__base__.prototypes.entity.hit-effects")
 
 local circuit_connections = require "circuit-connections"
 
-local dock_item = {
-  type = "item",
-  name = "sp-spidertron-dock",
-  icon = "__SpidertronPatrols__/graphics/icons/spidertron-dock.png",
-  icon_size = 64,
-  stack_size = 50,
-  place_result = "sp-spidertron-dock",
-  order = "b[personal-transport]-c[spidertron]-c[[dock]",  -- '[[' ensures that it is ordered before all spidertron-logistics items
-  subgroup = "transport",
-  inventory_move_sound = item_sounds.metal_chest_inventory_move,
-  pick_sound = item_sounds.metal_chest_inventory_pickup,
-  drop_sound = item_sounds.metal_chest_inventory_move,
-}
-
-local dock_recipe = {
-  type = "recipe",
-  name = "sp-spidertron-dock",
-  ingredients = {
-    {type="item", name="steel-chest", amount=4},
-    {type="item", name="bulk-inserter", amount=4},
+data:extend{
+  {
+    type = "item",
+    name = "sp-spidertron-dock",
+    icon = "__SpidertronPatrols__/graphics/icons/spidertron-dock.png",
+    icon_size = 64,
+    stack_size = 50,
+    place_result = "sp-spidertron-dock",
+    order = "b[personal-transport]-c[spidertron]-c[[dock]",  -- '[[' ensures that it is ordered before all spidertron-logistics items
+    subgroup = "transport",
+    inventory_move_sound = item_sounds.metal_chest_inventory_move,
+    pick_sound = item_sounds.metal_chest_inventory_pickup,
+    drop_sound = item_sounds.metal_chest_inventory_move,
   },
-  energy_required = 4,
-  results = {{type="item", name="sp-spidertron-dock", amount=1}},
-  enabled = false
-}
-
-local function create_spidertron_dock(inventory_size, closing)
-  local name = "sp-spidertron-dock-" .. inventory_size
-  local filename = "spidertron-dock-open.png"
-  if closing then
-    name = "sp-spidertron-dock-closing"
-  end
-  if inventory_size == 0 and not closing then
-    name = "sp-spidertron-dock"
-    filename = "spidertron-dock-closed.png"
-  end
-
-  local dock = {
-    type = "container",
-    name = name,
+  {
+    type = "recipe",
+    name = "sp-spidertron-dock",
+    ingredients = {
+      {type="item", name="steel-chest", amount=4},
+      {type="item", name="bulk-inserter", amount=4},
+    },
+    energy_required = 4,
+    results = {{type="item", name="sp-spidertron-dock", amount=1}},
+    enabled = false
+  },
+  {
+    type = "proxy-container",
+    name = "sp-spidertron-dock",
     localised_name = {"entity-name.sp-spidertron-dock", SPIDERTRON_NAME_CAPITALISED},
     localised_description = {"entity-description.sp-spidertron-dock", SPIDERTRON_NAME},
     icon = "__SpidertronPatrols__/graphics/icons/spidertron-dock.png",
     icon_size = 64,
-    inventory_size = inventory_size,
-    inventory_type = "with_filters_and_bar",
-    hidden = true,
     picture = {
       layers = {
         {
-          filename = "__SpidertronPatrols__/graphics/entity/hr-" .. filename,
+          filename = "__SpidertronPatrols__/graphics/entity/spidertron-dock-closed.png",
           height = 199,
           width = 207,
           priority = "high",
@@ -98,29 +83,28 @@ local function create_spidertron_dock(inventory_size, closing)
     flags = {"placeable-neutral", "placeable-player", "player-creation"},
     squeak_behaviour = false,  -- Stops squeak through from further reducing the collision box
     se_allow_in_space = true,
+  },
+  {
+    type = "animation",
+    name = "sp-spidertron-dock-port-animation",
+    filename = "__SpidertronPatrols__/graphics/entity/dock-port-animation.png",
+    priority = "medium",
+    width = 97,
+    height = 79,
+    frame_count = 16,
+    animation_speed = 0.5,
+    --shift = {0.015625, -0.890625},
+    scale = 0.5,
+  },
+  {
+    type = "sprite",
+    name = "sp-spidertron-dock-port-open",
+    filename = "__SpidertronPatrols__/graphics/entity/dock-port-open.png",
+    priority = "medium",
+    width = 97,
+    height = 79,
+    scale = 0.5,
   }
-  data:extend{dock}
-end
-
-create_spidertron_dock(0)
-data.raw["container"]["sp-spidertron-dock"].hidden = false
-create_spidertron_dock(0, true)  -- "closing" dock, used while the closing animation is being played
-
--- Standard dock for deepcopying in data-final-fixes
--- Doesn't actually matter if the spidertron ends up with a different inventory_size to 80
-create_spidertron_dock(80)
-
-local open_animation = {
-  type = "animation",
-  name = "sp-spidertron-dock-door",
-  filename = "__SpidertronPatrols__/graphics/entity/hr-spidertron-dock-animation.png",
-  priority = "medium",
-  width = 97,
-  height = 79,
-  frame_count = 16,
-  animation_speed = 0.5,
-  --shift = {0.015625, -0.890625},
-  scale = 0.5,
 }
 
 -- TODO sounds
@@ -128,6 +112,3 @@ local open_animation = {
   sounds.roboport_door_open,
   sounds.roboport_door_close
 ]]
-
-
-data:extend{dock_item, dock_recipe, open_animation}
