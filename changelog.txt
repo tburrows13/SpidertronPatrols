@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.11
+Date: 4 March 2025
+  Changes:
+    - Minimum factorio version increased to 2.0.38
+    - Drastically improved performance of spidertron docks using new proxy-container feature
+    - Items with data no longer lose their data when transferred through docks
+---------------------------------------------------------------------------------------------------
 Version: 2.5.10
 Date: 24 January 2025
   Features:
