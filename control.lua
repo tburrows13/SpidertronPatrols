@@ -294,6 +294,10 @@ local function config_changed_setup(changed_data)
         end
       end
     end
+    if old_version[2] < 5 or (old_version[2] == 5 and old_version[3] < 12) then
+      -- Pre 2.5.12
+      storage.from_k = nil
+    end
   end
 end
 
