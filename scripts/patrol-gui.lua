@@ -700,7 +700,6 @@ function PatrolGuiWaypoint.waypoint_type_changed(player, spidertron, gui_element
       waypoint.wait_time = 5
     elseif new_waypoint_type == "submerge" then
       waypoint.wait_time = 2
-    else
     elseif new_waypoint_type == "liftoff" then
       waypoint.wait_time = 2
     else
