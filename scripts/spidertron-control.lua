@@ -144,7 +144,7 @@ local function handle_wait_timers()
       if waypoint_type == "none" then
         -- Can happen if waypoint type is changed whilst spidertron is at waypoint
         SpidertronControl.go_to_next_waypoint(spidertron)
-      elseif waypoint_type == "time-passed" or waypoint_type == "submerge" then
+      elseif waypoint_type == "time-passed" or waypoint_type == "submerge" or waypoint_type == "liftoff" then
         if (game.tick - at_waypoint_data.tick_arrived) >= waypoint.wait_time * 60 then
           SpidertronControl.go_to_next_waypoint(spidertron)
         end

@@ -36,6 +36,15 @@ local function is_maraxsis_submarine(spidertron)
 end
 
 ---@param spidertron LuaEntity
+---@return boolean
+---https://mods.factorio.com/mod/dea-dia-system
+local function is_lex_aircraft(spidertron)
+  if not remote.interfaces.dea_dia_system then return false end
+  return remote.call("dea_dia_system", "is_aircraft",spidertron)
+end
+
+
+---@param spidertron LuaEntity
 ---@return string[]
 local function dropdown_contents(spidertron)
   local contents = {
@@ -91,6 +100,9 @@ local function dropdown_index_lookup(index, spidertron)
   if is_maraxsis_submarine(spidertron) then
     table.insert(lookup, "submerge")
   end
+  if is_lex_aircraft(spidertron) then
+    table.insert(contents, { "gui-patrol.liftoff" })
+  end
   return lookup[index]
 end
 
@@ -120,6 +132,9 @@ local function dropdown_index(wait_condition, spidertron)
   end
   if is_maraxsis_submarine(spidertron) then
     table.insert(lookup, "submerge")
+  end
+  if is_lex_aircraft(spidertron) then
+    table.insert(lookup, "liftoff" )
   end
   for i, condition in pairs(lookup) do
     if condition == wait_condition then
@@ -171,6 +186,18 @@ local function build_waypoint_player_input(i, waypoint)
         tags = {index = i},
       }
     }
+  elseif waypoint_type == "liftoff" then
+     local condition_info = waypoint.circuit_condition_info ---@cast condition_info -?
+     return {
+       {
+         type = "choose-elem-button",
+         style = "train_schedule_item_select_button",
+         elem_type = "space-location",
+         ["space-location"] = condition_info.elem,
+         handler = { [defines.events.on_gui_elem_changed] = PatrolGuiWaypoint.condition_elem_selected },
+         tags = { index = i },
+       }
+     }
   elseif waypoint_type == "item-count" or waypoint_type == "circuit-condition" then
     local condition_info = waypoint.item_condition_info or waypoint.circuit_condition_info  ---@cast condition_info -?
     local elem_type = waypoint_type == "item-count" and "item-with-quality" or "signal"
@@ -673,6 +700,9 @@ function PatrolGuiWaypoint.waypoint_type_changed(player, spidertron, gui_element
     elseif new_waypoint_type == "submerge" then
       waypoint.wait_time = 2
     else
+    elseif new_waypoint_type == "liftoff" then
+      waypoint.wait_time = 2
+    else
       waypoint.wait_time = nil
     end
     if new_waypoint_type == "item-count" then
@@ -682,6 +712,10 @@ function PatrolGuiWaypoint.waypoint_type_changed(player, spidertron, gui_element
       waypoint.circuit_condition_info = {elem = nil, condition = 1, count = 0}
       waypoint.item_condition_info = nil
       element.tooltip = {"gui-patrol.circuit-condition-tooltip"}
+    elseif new_waypoint_type == "liftoff" then
+      waypoint.circuit_condition_info = { elem = nil, condition = 1, count = 0 }
+      waypoint.item_condition_info = nil
+      element.tooltip = { "gui-patrol.liftoff-tooltip" }
     else
       waypoint.item_condition_info = nil
       waypoint.circuit_condition_info = nil
