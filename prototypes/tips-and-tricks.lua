@@ -23,7 +23,7 @@ if settings.startup["sp-enable-dock"].value then
   {
     type = "tips-and-tricks-item",
     name = "sp-dock",
-    localised_name = data.raw.container["sp-spidertron-dock"].localised_name,
+    localised_name = data.raw["proxy-container"]["sp-spidertron-dock"].localised_name,
     tag = "[entity=sp-spidertron-dock]",
     category = "spidertron-patrols",
     order = "b",

@@ -166,17 +166,6 @@ local function process_active_mods()
     version[i] = tonumber(version_strings[i])
   end
   storage.base_version = version
-
-  storage.freight_forwarding_enabled = script.active_mods["FreightForwarding"] ~= nil
-  storage.freight_forwarding_container_items = {}
-  if storage.freight_forwarding_enabled then
-    for name, _ in pairs(prototypes.item) do
-      if name:sub(1, 15) == "deadlock-crate-" or name:sub(1, 13) == "ic-container-" then
-        -- Old versions of FF use DCM, newer versions use IC
-        storage.freight_forwarding_container_items[name] = true
-      end
-    end
-  end
 end
 
 local function setup()
@@ -196,8 +185,8 @@ local function setup()
   storage.spidertron_docks = {}
   ---@type table<UnitNumber, UnitNumber>
   storage.spidertrons_docked = {}
-  ---@type table<GameTick, LuaEntity[]>
-  storage.scheduled_dock_replacements = {}
+  ---@type table<GameTick, UnitNumber[]>
+  storage.scheduled_docks_opening = {}
 
   ---@type table<PlayerIndex, GuiElements>
   storage.open_gui_elements = {}
@@ -245,10 +234,6 @@ local function config_changed_setup(changed_data)
       storage.path_renders = {}
       storage.player_highlights = {}
     end
-    if old_version[2] < 3 then
-      -- Pre 2.3
-      storage.scheduled_dock_replacements = {}
-    end
     if old_version[2] < 3 or (old_version[2] == 3 and old_version[3] < 2) then
       -- Pre 2.3.2
       storage.chart_tags = {}
@@ -291,21 +276,27 @@ local function config_changed_setup(changed_data)
     if old_version[2] < 5 then
       -- Pre 2.5. Has to go at end so that globals can be initialized first.
       reset_render_objects()
-      -- Disconnect all spidertrons from docks, since previous_items format has changed
-      for _, dock_data in pairs(storage.spidertron_docks) do
-        local spidertron = dock_data.connected_spidertron
-        local dock = dock_data.dock
-
-        if dock and dock.valid and dock.name ~= "sp-spidertron-dock-closing" and spidertron and spidertron.valid then
-          storage.spidertrons_docked[spidertron.unit_number] = nil
-          dock = replace_dock(dock, "sp-spidertron-dock")
-          storage.spidertron_docks[dock.unit_number] = {dock = dock}
-        end
-      end
     end
     if old_version[2] < 5 or (old_version[2] == 5 and old_version[3] < 8) then
       -- Pre 2.5.8
       reset_render_objects()
+    end
+    if old_version[2] < 5 or (old_version[2] == 5 and old_version[3] < 11) then
+      -- Pre 2.5.11
+      storage.spidertrons_docked = {}
+      storage.scheduled_dock_replacements = nil
+      storage.spidertron_docks = {}
+      storage.scheduled_docks_opening = {}
+      for _, surface in pairs(game.surfaces) do
+        for _, entity in pairs(surface.find_entities_filtered{name="sp-spidertron-dock"}) do
+          ---@diagnostic disable-next-line: missing-fields
+          Dock.events[defines.events.on_built_entity]({entity = entity})
+        end
+      end
+    end
+    if old_version[2] < 5 or (old_version[2] == 5 and old_version[3] < 12) then
+      -- Pre 2.5.12
+      storage.from_k = nil
     end
   end
 end
