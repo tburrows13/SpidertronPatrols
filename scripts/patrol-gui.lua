@@ -101,7 +101,7 @@ local function dropdown_index_lookup(index, spidertron)
     table.insert(lookup, "submerge")
   end
   if is_lex_aircraft(spidertron) then
-    table.insert(contents, { "gui-patrol.liftoff" })
+    table.insert(lookup, "liftoff")
   end
   return lookup[index]
 end
@@ -186,18 +186,7 @@ local function build_waypoint_player_input(i, waypoint)
         tags = {index = i},
       }
     }
-  elseif waypoint_type == "liftoff" then
-     local condition_info = waypoint.circuit_condition_info ---@cast condition_info -?
-     return {
-       {
-         type = "choose-elem-button",
-         style = "train_schedule_item_select_button",
-         elem_type = "space-location",
-         ["space-location"] = condition_info.elem,
-         handler = { [defines.events.on_gui_elem_changed] = PatrolGuiWaypoint.condition_elem_selected },
-         tags = { index = i },
-       }
-     }
+
   elseif waypoint_type == "item-count" or waypoint_type == "circuit-condition" then
     local condition_info = waypoint.item_condition_info or waypoint.circuit_condition_info  ---@cast condition_info -?
     local elem_type = waypoint_type == "item-count" and "item-with-quality" or "signal"
@@ -215,6 +204,18 @@ local function build_waypoint_player_input(i, waypoint)
         handler = {[defines.events.on_gui_text_changed] = PatrolGuiWaypoint.condition_count_changed}, tags = {index = i},
       },
     }
+  elseif waypoint_type == "liftoff" then
+     local condition_info = waypoint.circuit_condition_info ---@cast condition_info -?
+     return {
+       {
+         type = "choose-elem-button",
+         style = "train_schedule_item_select_button",
+         elem_type = "space-location",
+         ["space-location"] = condition_info.elem,
+         handler = { [defines.events.on_gui_elem_changed] = PatrolGuiWaypoint.condition_elem_selected },
+         tags = { index = i },
+       }
+     }
   end
 end
 
