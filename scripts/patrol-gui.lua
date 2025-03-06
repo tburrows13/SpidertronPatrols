@@ -186,7 +186,6 @@ local function build_waypoint_player_input(i, waypoint)
         tags = {index = i},
       }
     }
-
   elseif waypoint_type == "item-count" or waypoint_type == "circuit-condition" then
     local condition_info = waypoint.item_condition_info or waypoint.circuit_condition_info  ---@cast condition_info -?
     local elem_type = waypoint_type == "item-count" and "item-with-quality" or "signal"
