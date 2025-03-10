@@ -9,7 +9,7 @@ end
 event_handler = require "event_handler"
 util = require "util"
 require "scripts.utils"
-gui = require "scripts.gui-lite"
+gui = require "scripts.flib-gui"
 
 local Dock = require "scripts.dock"
 local DockGui = require "scripts.dock-gui"
