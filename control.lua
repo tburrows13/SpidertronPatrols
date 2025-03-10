@@ -348,7 +348,7 @@ commands.add_command("reset-sp-render-objects",
 )
 
 event_handler.add_libraries{
-  gui,
+  gui --[[@as event_handler]],
   Control,
   RemoteInterface,
   Dock,
