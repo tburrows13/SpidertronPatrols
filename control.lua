@@ -307,6 +307,12 @@ local function config_changed_setup(changed_data)
           dock.proxy_target_inventory = defines.inventory.spider_trunk
         end
       end
+      local current_tick = game.tick
+      for tick, _ in pairs(storage.scheduled_docks_opening) do
+        if tick < current_tick then
+          storage.scheduled_docks_opening[tick] = nil
+        end
+      end
     end
   end
 end

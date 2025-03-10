@@ -223,7 +223,7 @@ local function on_tick(event)
   if schedule then
     for _, dock_unit_number in pairs(schedule) do
       local dock_data = storage.spidertron_docks[dock_unit_number]
-      if dock_data and dock_data.dock.valid then
+      if dock_data and dock_data.dock.valid and dock_data.connected_spidertron then
         local open_port_sprite = rendering.draw_sprite{
           sprite = "sp-spidertron-dock-port-open",
           target = {
@@ -236,6 +236,7 @@ local function on_tick(event)
         dock_data.open_port_sprite = open_port_sprite
       end
     end
+    storage.scheduled_docks_opening[event.tick] = nil
   end
   if next(storage.spidertron_docks) then
     -- TODO Replace '20' with configurable setting?
