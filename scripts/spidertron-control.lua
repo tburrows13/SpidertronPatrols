@@ -199,8 +199,16 @@ local function handle_wait_timers()
         local dock_unit_number = storage.spidertrons_docked[spidertron.unit_number]
         if dock_unit_number then
           local dock = storage.spidertron_docks[dock_unit_number].dock
-          if dock and dock.valid and circuit_condition_info.elem and circuit_condition_info.elem.name then
-            local signal_count = dock.get_signal(circuit_condition_info.elem, defines.wire_connector_id.circuit_red, defines.wire_connector_id.circuit_green)
+          if dock and dock.valid then
+            local signal_count = 0
+            if circuit_condition_info.elem and circuit_condition_info.elem.name then
+              signal_count = dock.get_signal(circuit_condition_info.elem, defines.wire_connector_id.circuit_red, defines.wire_connector_id.circuit_green)
+            else
+              local signals = dock.get_signals(defines.wire_connector_id.circuit_red, defines.wire_connector_id.circuit_green)
+              for _, signal in pairs(signals or {}) do
+                signal_count = signal_count + signal.count
+              end
+            end
             if check_condition(circuit_condition_info.condition, signal_count, circuit_condition_info.count) then
               SpidertronControl.go_to_next_waypoint(spidertron)
             end

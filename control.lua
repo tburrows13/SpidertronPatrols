@@ -33,8 +33,8 @@ Control = {}
 ---@field type WaypointType
 ---@field position MapPosition
 ---@field wait_time uint? In seconds. Only if type is "time-passed" or "inactivity".
----@field item_condition_info {elem: ItemIDAndQualityIDPair, count: integer, condition: integer}? Only if type is "item-count".
----@field circuit_condition_info {elem: SignalID, count: integer, condition: integer}? Only if type is "circuit-condition".
+---@field item_condition_info {elem: ItemIDAndQualityIDPair?, count: integer, condition: integer}? Only if type is "item-count". If `elem` is nil, all items are considered for condition.
+---@field circuit_condition_info {elem: SignalID?, count: integer, condition: integer}? Only if type is "circuit-condition". If `elem` is nil, all signals are considered for condition.
 ---@field render LuaRenderObject
 
 ---@class AtWaypointData

@@ -68,14 +68,15 @@ function flib_gui.add(parent, def, elems)
         elems[def.name] = elem
       end
       -- Added by Xorimuth
-      if def.ref then
-        local refs = def.ref
+      local refs = def.ref
+      if refs then
         local ref_length = #refs
         local current_table = elems
         for j, ref in pairs(refs) do
           if j ~= ref_length then
             -- Add table
             if not current_table[ref] then
+              ---@diagnostic disable-next-line: missing-fields
               current_table[ref] = {}
             end
             current_table = current_table[ref]

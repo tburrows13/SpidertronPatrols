@@ -103,8 +103,6 @@ function Dock.animate_dock(dock_data, opening)
     surface = dock.surface,
     time_to_live = frames,
     animation_offset = animation_offset,
-    --animation_offset = (tick * (speed - speed') + offset) % #frames`
-    --animation_offset = new_dock_name == "sp-spidertron-dock" and (game.tick % 8) or (8 - (game.tick % 8)),
     animation_speed = animation_speed,
     render_layer = "object",
   }
@@ -128,12 +126,13 @@ local function connect_to_spidertron(dock_data, spidertron)
 
   local inventory = spidertron.get_inventory(defines.inventory.spider_trunk)  ---@cast inventory -?
   local inventory_size = #inventory
-  if inventory_size == 0 then return end  -- TODO check prototype instead?
+  if inventory_size == 0 then return end
 
-  -- Don't connect to spidertrons containing toolbelt equipment, because we will not have a dock with the correct inventory size defined
+  -- Don't connect to spidertrons containing toolbelt equipment for balance reasons
   local grid = spidertron.grid
   if grid then
     -- Inventory size bonus remains the tick that the toolbelt is removed. This works, and maybe a future `grid.inventory_bonus` would work too
+    -- TODO replace with `spidertron.prototype.get_inventory_size(defines.inventory.spider_trunk, spidertron.quality.name)` once fixed
     if inventory_size ~= math.floor(spidertron.prototype.get_inventory_size(defines.inventory.spider_trunk) * (1 + (spidertron.quality.level * 0.3))) then
       for _, player in pairs(spidertron.force.players) do
         -- Only print warning every 2 seconds. This may fail when more than 20 docks are placed...
@@ -172,7 +171,6 @@ local function connect_to_spidertron(dock_data, spidertron)
   storage.spidertrons_docked[spidertron.unit_number] = dock_data.dock.unit_number
 
   Dock.animate_dock(dock_data, true)
-  --game.print("Spidertron docked")
   --surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-docked"}}
   return true
 end
