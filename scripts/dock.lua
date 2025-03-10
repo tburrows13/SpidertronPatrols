@@ -18,8 +18,15 @@ local function on_built(event)
     if entity.type == "spider-vehicle" then
       script.register_on_object_destroyed(entity)
     elseif entity.name == "sp-spidertron-dock" then
+      if entity.proxy_target_inventory == 0 then
+        entity.proxy_target_inventory = defines.inventory.spider_trunk
+      end
       storage.spidertron_docks[entity.unit_number] = {dock = entity}
       script.register_on_object_destroyed(entity)
+    elseif entity.name == "entity-ghost" and entity.ghost_name == "sp-spidertron-dock" then
+      if entity.proxy_target_inventory == 0 then
+        entity.proxy_target_inventory = defines.inventory.spider_trunk
+      end
     end
   end
 end
@@ -161,7 +168,6 @@ local function connect_to_spidertron(dock_data, spidertron)
   end
 
   dock_data.dock.proxy_target_entity = spidertron
-  dock_data.dock.proxy_target_inventory = defines.inventory.spider_trunk
   dock_data.connected_spidertron = spidertron
   storage.spidertrons_docked[spidertron.unit_number] = dock_data.dock.unit_number
 
@@ -237,6 +243,15 @@ local function on_tick(event)
   end
 end
 
+---@param event EventData.on_entity_settings_pasted
+local function on_entity_settings_pasted(event)
+  local source = event.source
+  local destination = event.destination
+  if source.name == "sp-spidertron-dock" and destination.name == "sp-spidertron-dock" then
+    destination.proxy_target_inventory = source.proxy_target_inventory
+  end
+end
+
 Dock.events = {
   [defines.events.on_built_entity] = on_built,
   [defines.events.on_robot_built_entity] = on_built,
@@ -245,6 +260,7 @@ Dock.events = {
   [defines.events.script_raised_built] = on_built,
   [defines.events.on_entity_cloned] = on_built,
   [defines.events.on_object_destroyed] = on_object_destroyed,
+  [defines.events.on_entity_settings_pasted] = on_entity_settings_pasted,
   [defines.events.on_tick] = on_tick,
 }
 

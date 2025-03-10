@@ -12,6 +12,7 @@ require "scripts.utils"
 gui = require "scripts.gui-lite"
 
 local Dock = require "scripts.dock"
+local DockGui = require "scripts.dock-gui"
 local PatrolGui = require "scripts.patrol-gui"
 SpidertronControl = require "scripts.spidertron-control"
 PatrolRemote = require "scripts.patrol-remote"
@@ -298,6 +299,15 @@ local function config_changed_setup(changed_data)
       -- Pre 2.5.12
       storage.from_k = nil
     end
+    if old_version[2] < 5 or (old_version[2] == 5 and old_version[3] < 13) then
+      -- Pre 2.5.13
+      for _, dock_data in pairs(storage.spidertron_docks) do
+        local dock = dock_data.dock
+        if dock.valid then
+          dock.proxy_target_inventory = defines.inventory.spider_trunk
+        end
+      end
+    end
   end
 end
 
@@ -336,6 +346,7 @@ event_handler.add_libraries{
   Control,
   RemoteInterface,
   Dock,
+  DockGui,
   PatrolGui,
   PatrolRemote,
   SpidertronControl,
