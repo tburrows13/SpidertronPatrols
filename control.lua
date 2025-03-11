@@ -299,8 +299,8 @@ local function config_changed_setup(changed_data)
       -- Pre 2.5.12
       storage.from_k = nil
     end
-    if old_version[2] < 5 or (old_version[2] == 5 and old_version[3] < 13) then
-      -- Pre 2.5.13
+    if old_version[2] < 6 then
+      -- Pre 2.6
       for _, dock_data in pairs(storage.spidertron_docks) do
         local dock = dock_data.dock
         if dock.valid then
