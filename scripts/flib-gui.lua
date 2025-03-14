@@ -1,5 +1,5 @@
 ---@diagnostic disable: duplicate-set-field
---- https://git.sr.ht/~raiguard/flib/tree/35b977ee865d2901e1c869c0c0530b52b7f72a9e/item/gui-lite.lua
+--- https://github.com/factoriolib/flib/blob/ae2c608f53cbafd29f683703734eea421e6e35fb/gui.lua
 -- With `ref` table addition by Xorimuth
 
 --- Utilities for building GUIs and handling GUI events.
@@ -14,10 +14,10 @@ local handlers = {}
 local handlers_lookup = {}
 
 --- Add a new child or children to the given GUI element.
---- @param parent LuaGuiElement
---- @param def GuiElemDef Can be a single element, or an array of elements.
+--- @param parent LuaGuiElement The parent GUI element.
+--- @param def GuiElemDef|GuiElemDef[] The element definition, or an array of element definitions.
 --- @param elems table<string, LuaGuiElement>? Optional initial `elems` table.
---- @return table<string, LuaGuiElement|table> elems Elements with names will be collected into this table.
+--- @return table<string, LuaGuiElement> elems Elements with names or refs will be collected into this table.
 --- @return LuaGuiElement first The element that was created first;  the "top level" element.
 function flib_gui.add(parent, def, elems)
   if not parent or not parent.valid then
@@ -67,14 +67,16 @@ function flib_gui.add(parent, def, elems)
       if def.name then
         elems[def.name] = elem
       end
-      if def.ref then  -- Added by Xorimuth
-        local refs = def.ref
+      -- Added by Xorimuth
+      local refs = def.ref
+      if refs then
         local ref_length = #refs
         local current_table = elems
         for j, ref in pairs(refs) do
           if j ~= ref_length then
             -- Add table
             if not current_table[ref] then
+              ---@diagnostic disable-next-line: missing-fields
               current_table[ref] = {}
             end
             current_table = current_table[ref]
@@ -84,6 +86,7 @@ function flib_gui.add(parent, def, elems)
           end
         end
       end
+      -- Endof added by Xorimuth
       if style_mods then
         for key, value in pairs(style_mods) do
           elem.style[key] = value
@@ -130,6 +133,7 @@ function flib_gui.add(parent, def, elems)
       def.elem_mods = elem_mods
       def.handler = handler
       def.style_mods = style_mods
+      def.drag_target = drag_target
     elseif def.tab and def.content then
       local _, tab = flib_gui.add(parent, def.tab, elems)
       local _, content = flib_gui.add(parent, def.content, elems)
@@ -144,8 +148,12 @@ end
 --- can be used to execute logic or gather data common to all handler functions for this GUI.
 --- @param new_handlers table<string, fun(e: GuiEventData)>
 --- @param wrapper fun(e: GuiEventData, handler: function)?
-function flib_gui.add_handlers(new_handlers, wrapper)
+--- @param prefix string?
+function flib_gui.add_handlers(new_handlers, wrapper, prefix)
   for name, handler in pairs(new_handlers) do
+    if prefix then
+      name = prefix .. "/" .. name
+    end
     if type(handler) == "function" then
       if handlers_lookup[name] then
         error("Attempted to register two GUI event handlers with the same name: " .. name)
@@ -208,25 +216,61 @@ function flib_gui.handle_events()
   end
 end
 
+--- Format the given handlers for use in a GUI element's tags. An alternative to using `flib_gui.add` if event handling
+--- is the only desired feature.
+---
+--- ### Example
+---
+--- ```lua
+--- --- @param e EventData.on_gui_click
+--- local function on_button_clicked(e)
+---   game.print("You clicked it!")
+--- end
+---
+--- player.gui.screen.add({
+---   type = "button",
+---   caption = "Click me!",
+---   tags = flib_gui.format_handlers({ [defines.events.on_gui_click] = on_button_clicked }),
+--- })
+---
+--- flib_gui.handle_events({ on_button_clicked = on_button_clicked })
+--- ```
+--- @param input GuiElemHandler|table<defines.events, GuiElemHandler?>
+--- @param existing Tags?
+--- @return Tags
+function flib_gui.format_handlers(input, existing)
+  local out
+  if type(input) == "table" then
+    out = {}
+    for name, handler in pairs(input) do
+      out[tostring(name)] = handlers[handler]
+    end
+  else
+    out = handlers[input]
+  end
+  if existing then
+    existing[handler_tag_key] = out
+    return existing
+  end
+  return { [handler_tag_key] = out }
+end
+
 --- A GUI element definition. This extends `LuaGuiElement.add_param` with several new attributes.
 --- Children may be defined in the array portion as an alternative to the `children` subtable.
---- @class GuiElemDefClass: LuaGuiElement.add_param
---- @field ref string[]? 
---- @field style_mods LuaStyle? Modifications to make to the element's style
---- @field elem_mods LuaGuiElement? Modifications to make to the element itself
+--- @class GuiElemDef: LuaGuiElement.add_param.button|LuaGuiElement.add_param.camera|LuaGuiElement.add_param.checkbox|LuaGuiElement.add_param.choose_elem_button|LuaGuiElement.add_param.drop_down|LuaGuiElement.add_param.flow|LuaGuiElement.add_param.frame|LuaGuiElement.add_param.line|LuaGuiElement.add_param.list_box|LuaGuiElement.add_param.minimap|LuaGuiElement.add_param.progressbar|LuaGuiElement.add_param.radiobutton|LuaGuiElement.add_param.scroll_pane|LuaGuiElement.add_param.slider|LuaGuiElement.add_param.sprite|LuaGuiElement.add_param.sprite_button|LuaGuiElement.add_param.switch|LuaGuiElement.add_param.tab|LuaGuiElement.add_param.table|LuaGuiElement.add_param.text_box|LuaGuiElement.add_param.textfield
+--- @field ref string[]? Added by Xorimuth. Adds the element to the returned list of elements, using the specified hierarchy.
+--- @field style_mods LuaStyle? Modifications to make to the element's style.
+--- @field elem_mods LuaGuiElement? Modifications to make to the element itself.
 --- @field drag_target string? Set the element's drag target to the element whose name matches this string. The drag target must be present in the `elems` table.
---- @field handler GuiElemHandler? Handler(s) to assign to this element
---- @field children GuiElemDef[]? Children to add to this element
+--- @field handler (GuiElemHandler|table<defines.events, GuiElemHandler>)? Handler(s) to assign to this element. If assigned to a function, that function will be called for any GUI event on this element.
+--- @field children GuiElemDef[]? Children to add to this element.
 --- @field tab GuiElemDef? To add a tab, specify `tab` and `content` and leave all other fields unset.
 --- @field content GuiElemDef? To add a tab, specify `tab` and `content` and leave all other fields unset.
 
---- @alias GuiElemDef GuiElemDefClass|GuiElemDef[]
-
---- A handler function to invoke when receiving GUI events for this element. Alternatively, separate handlers may be
---- specified for different events.
---- @alias GuiElemHandler fun(e: GuiEventData)|table<defines.events, fun(e: GuiEventData)>
+--- A handler function to invoke when receiving GUI events for this element.
+--- @alias GuiElemHandler fun(e: GuiEventData)
 
 --- Aggregate type of all possible GUI events.
---- @alias GuiEventData  EventData.on_gui_checked_state_changed|EventData.on_gui_click|EventData.on_gui_closed|EventData.on_gui_confirmed|EventData.on_gui_elem_changed|EventData.on_gui_location_changed|EventData.on_gui_opened|EventData.on_gui_selected_tab_changed|EventData.on_gui_selection_state_changed|EventData.on_gui_switch_state_changed|EventData.on_gui_text_changed|EventData.on_gui_value_changed
+--- @alias GuiEventData EventData.on_gui_checked_state_changed|EventData.on_gui_click|EventData.on_gui_closed|EventData.on_gui_confirmed|EventData.on_gui_elem_changed|EventData.on_gui_location_changed|EventData.on_gui_opened|EventData.on_gui_selected_tab_changed|EventData.on_gui_selection_state_changed|EventData.on_gui_switch_state_changed|EventData.on_gui_text_changed|EventData.on_gui_value_changed
 
 return flib_gui

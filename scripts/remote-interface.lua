@@ -65,7 +65,8 @@ end
 
 -- Used to be raised by SpidertronEnhancements
 if prototypes.custom_event["on_player_disconnected_spider_remote"] then
-  script.on_event("on_player_disconnected_spider_remote", function(event)
+  script.on_event(prototypes.custom_event["on_player_disconnected_spider_remote"], function(event)
+    ---@diagnostic disable-next-line: undefined-field
     local player = game.get_player(event.player_index)
     if player then
       WaypointRendering.update_player_render_paths(player)

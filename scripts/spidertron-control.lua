@@ -199,8 +199,16 @@ local function handle_wait_timers()
         local dock_unit_number = storage.spidertrons_docked[spidertron.unit_number]
         if dock_unit_number then
           local dock = storage.spidertron_docks[dock_unit_number].dock
-          if dock and dock.valid and circuit_condition_info.elem and circuit_condition_info.elem.name then
-            local signal_count = dock.get_signal(circuit_condition_info.elem, defines.wire_connector_id.circuit_red, defines.wire_connector_id.circuit_green)
+          if dock and dock.valid then
+            local signal_count = 0
+            if circuit_condition_info.elem and circuit_condition_info.elem.name then
+              signal_count = dock.get_signal(circuit_condition_info.elem, defines.wire_connector_id.circuit_red, defines.wire_connector_id.circuit_green)
+            else
+              local signals = dock.get_signals(defines.wire_connector_id.circuit_red, defines.wire_connector_id.circuit_green)
+              for _, signal in pairs(signals or {}) do
+                signal_count = signal_count + signal.count
+              end
+            end
             if check_condition(circuit_condition_info.condition, signal_count, circuit_condition_info.count) then
               SpidertronControl.go_to_next_waypoint(spidertron)
             end
@@ -295,15 +303,19 @@ end
 local function on_player_setup_blueprint(event)
   local player = game.get_player(event.player_index)  ---@cast player -?
 
-  local item = player.cursor_stack
-  if not (item and item.valid_for_read) then
-    item = player.blueprint_to_setup
-    if not (item and item.valid_for_read) then return end
+  ---@type LuaItemStack | LuaRecord
+  local blueprint = event.stack
+  if not blueprint then
+    blueprint = event.record  -- Blueprint in library is being reassigned
   end
-  local count = item.get_blueprint_entity_count()
+  if not blueprint then
+    player.print("[Spidertron Patrols] No blueprint item found when setting up blueprint. Please report this.")
+    return
+  end
+  local count = blueprint.get_blueprint_entity_count()
   if count == 0 then return end
 
-  for index, entity in pairs(event.mapping.get()) do
+  for index, entity in pairs(event.mapping.get() --[[@as table<UnitNumber, LuaEntity>]]) do
     if entity.valid and entity.type == "spider-vehicle" then
       local patrol_data = storage.patrol_data[entity.unit_number]
       if patrol_data then
@@ -317,7 +329,7 @@ local function on_player_setup_blueprint(event)
             hide_gui = patrol_data.hide_gui
           }
           --log(serpent.line(waypoint_tags))
-          item.set_blueprint_entity_tag(index, "spidertron_patrol_data", waypoint_tags)
+          blueprint.set_blueprint_entity_tag(index, "spidertron_patrol_data", waypoint_tags)
         end
       end
     end
