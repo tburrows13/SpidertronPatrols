@@ -70,6 +70,9 @@ local function dropdown_contents(spidertron)
   if is_maraxsis_submarine(spidertron) then
     table.insert(contents, {"gui-patrol.submerge"})
   end
+  if is_lex_aircraft(spidertron) then
+    table.insert(contents, {"gui-patrol.liftoff"})
+  end
   return contents
 end
 
