@@ -887,7 +887,7 @@ function PatrolGuiWaypoint.update_text_field(player, spidertron, gui_elements, p
   local wait_time = slider_values[gui_elements.time_slider[index].slider_value]
   gui_elements.time_textfield[index].text = tostring(wait_time) .. " s"
 
-  set_waypoint_time(wait_time, player.opened, index)
+  set_waypoint_time(wait_time, spidertron, index)
 end
 
 ---@param player LuaPlayer
@@ -906,7 +906,7 @@ function PatrolGuiWaypoint.update_slider(player, spidertron, gui_elements, patro
   local wait_time = tonumber(text) or 5
   gui_elements.time_slider[index].slider_value = slider_value_index(wait_time)
 
-  set_waypoint_time(wait_time, player.opened, index)
+  set_waypoint_time(wait_time, spidertron, index)
 end
 
 ---@param player LuaPlayer

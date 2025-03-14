@@ -9,9 +9,10 @@ end
 event_handler = require "event_handler"
 util = require "util"
 require "scripts.utils"
-gui = require "scripts.gui-lite"
+gui = require "scripts.flib-gui"
 
 local Dock = require "scripts.dock"
+local DockGui = require "scripts.dock-gui"
 local PatrolGui = require "scripts.patrol-gui"
 SpidertronControl = require "scripts.spidertron-control"
 PatrolRemote = require "scripts.patrol-remote"
@@ -32,8 +33,8 @@ Control = {}
 ---@field type WaypointType
 ---@field position MapPosition
 ---@field wait_time uint? In seconds. Only if type is "time-passed" or "inactivity".
----@field item_condition_info {elem: ItemIDAndQualityIDPair, count: integer, condition: integer}? Only if type is "item-count".
----@field circuit_condition_info {elem: SignalID, count: integer, condition: integer}? Only if type is "circuit-condition".
+---@field item_condition_info {elem: ItemIDAndQualityIDPair?, count: integer, condition: integer}? Only if type is "item-count". If `elem` is nil, all items are considered for condition.
+---@field circuit_condition_info {elem: SignalID?, count: integer, condition: integer}? Only if type is "circuit-condition". If `elem` is nil, all signals are considered for condition.
 ---@field render LuaRenderObject
 
 ---@class AtWaypointData
@@ -298,6 +299,21 @@ local function config_changed_setup(changed_data)
       -- Pre 2.5.12
       storage.from_k = nil
     end
+    if old_version[2] < 6 then
+      -- Pre 2.6
+      for _, dock_data in pairs(storage.spidertron_docks) do
+        local dock = dock_data.dock
+        if dock.valid then
+          dock.proxy_target_inventory = defines.inventory.spider_trunk
+        end
+      end
+      local current_tick = game.tick
+      for tick, _ in pairs(storage.scheduled_docks_opening) do
+        if tick < current_tick then
+          storage.scheduled_docks_opening[tick] = nil
+        end
+      end
+    end
   end
 end
 
@@ -332,10 +348,11 @@ commands.add_command("reset-sp-render-objects",
 )
 
 event_handler.add_libraries{
-  gui,
+  gui --[[@as event_handler]],
   Control,
   RemoteInterface,
   Dock,
+  DockGui,
   PatrolGui,
   PatrolRemote,
   SpidertronControl,

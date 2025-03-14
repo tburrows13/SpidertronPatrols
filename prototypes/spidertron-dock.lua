@@ -81,7 +81,9 @@ data:extend{
     tile_width = 3,
     tile_height = 3,
     flags = {"placeable-neutral", "placeable-player", "player-creation"},
+    ---@diagnostic disable-next-line: assign-type-mismatch
     squeak_behaviour = false,  -- Stops squeak through from further reducing the collision box
+    ---@diagnostic disable-next-line: assign-type-mismatch
     se_allow_in_space = true,
   },
   {

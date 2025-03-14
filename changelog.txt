@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.6.0
+Date: 11 March 2025
+  Features:
+    - Docks can now be configured to connect to a specific inventory of the connected spidertron (Trunk/Trash/Ammo/Fuel/FuelOutput)
+  Bugfixes:
+    - Fixed spidertron schedule not being saved in blueprints when using "Select new contents" button in blueprints
+    - Fixed dock door graphics remaining open if a spidertron disconnects from a dock immediately after connecting
+---------------------------------------------------------------------------------------------------
 Version: 2.5.12
 Date: 5 March 2025
   Bugfixes:

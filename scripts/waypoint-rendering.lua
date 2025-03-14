@@ -11,10 +11,6 @@ local function add_alpha(color, active)
   end
 end
 
-local function colors_eq(color1, color2)
-  return color1.r == color2.r and color1.g == color2.g and color1.b == color2.b and color1.a == color2.a
-end
-
 local WaypointRendering = {}
 
 local BLINK_LENGTH = 30
@@ -315,6 +311,7 @@ function WaypointRendering.update_render_players()
   storage.render_players = render_players
 end
 
+---@param event EventData.on_runtime_mod_setting_changed
 local function on_runtime_mod_setting_changed(event)
   if event.setting_type == "runtime-per-user" then
     if event.setting == "sp-show-waypoint-numbers-in-alt-mode" then
@@ -323,6 +320,7 @@ local function on_runtime_mod_setting_changed(event)
   end
 end
 
+---@param event EventData.script_raised_teleported
 local function on_spidertron_teleported(event)
   -- Redraw patrol paths on new surface if teleported cross-surface (e.g. Maraxsis submarines)
   local spidertron = event.entity
@@ -331,6 +329,7 @@ local function on_spidertron_teleported(event)
   WaypointRendering.update_render_text(spidertron)
 end
 
+---@param event EventData.on_entity_color_changed
 local function on_spidertron_color_changed(event)
   local spidertron = event.entity
   if spidertron.type ~= "spider-vehicle" then return end
