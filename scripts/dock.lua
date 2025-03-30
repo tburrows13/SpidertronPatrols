@@ -35,6 +35,7 @@ end
 
 ---@param event EventData.on_object_destroyed
 function on_object_destroyed(event)
+  if event.type ~= defines.target_type.entity then return end
   local unit_number = event.useful_id
   if unit_number then
     -- Entity is a dock

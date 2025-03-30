@@ -154,6 +154,7 @@ script.on_event({"move-right-custom", --[["move-left-custom",]] "move-up-custom"
 
 ---@param event EventData.on_object_destroyed
 local function on_object_destroyed(event)
+  if event.type ~= defines.target_type.entity then return end
   local unit_number = event.useful_id
   Control.clear_spidertron_waypoints(unit_number)
 end
