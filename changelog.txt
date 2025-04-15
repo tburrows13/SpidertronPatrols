@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.6.1
+Date: 15 April 2025
+  Bugfixes:
+    - Hopefully fixed rare bug where spidertrons would get into a faulty state where they can't dock
+    - Fixed dock graphics sometimes getting stuck in the open state
+---------------------------------------------------------------------------------------------------
 Version: 2.6.0
 Date: 11 March 2025
   Features:
