@@ -183,6 +183,14 @@ local function update_dock(dock_data)
   local dock = dock_data.dock
   local delete = false
   if dock.valid then
+    -- Reset stuck animation state
+    -- TODO investigate actual cause
+    if dock_data.open_port_sprite and not dock_data.connected_spidertron then
+      dock_data.open_port_sprite.destroy()
+      dock_data.open_port_sprite = nil
+      Dock.animate_dock(dock_data, false)
+    end
+
     local surface = dock.surface
     local spidertron = dock_data.connected_spidertron
     if spidertron and spidertron.valid then
