@@ -199,7 +199,8 @@ local function update_dock(dock_data)
     else
       if spidertron then
         -- `spidertron` is not valid
-        dock_data = {dock = dock_data.dock}
+        storage.spidertron_docks[dock.unit_number] = {dock = dock_data.dock}
+        dock_data = storage.spidertron_docks[dock.unit_number]
       end
 
       -- Check if dock should initiate connection
@@ -263,5 +264,40 @@ Dock.events = {
   [defines.events.on_entity_settings_pasted] = on_entity_settings_pasted,
   [defines.events.on_tick] = on_tick,
 }
+
+Dock.on_configuration_changed = function()
+  -- Validate all dock connections
+  local fixed_spidertrons = 0
+  for unit_number, dock_unit_number in pairs(storage.spidertrons_docked) do
+    local dock_data = storage.spidertron_docks[dock_unit_number]
+    if not dock_data
+      or not dock_data.connected_spidertron
+      or not dock_data.connected_spidertron.valid
+      or dock_data.connected_spidertron.unit_number ~= unit_number
+    then
+      -- Spidertron is not connected to the dock
+      storage.spidertrons_docked[unit_number] = nil
+      fixed_spidertrons = fixed_spidertrons + 1
+    end
+  end
+  if fixed_spidertrons > 0 then
+    game.print("[Spidertron Patrols] Found and fixed " .. fixed_spidertrons .. " vehicle with inconsistent dock connections.")
+  end
+
+  for _, dock_data in pairs(storage.spidertron_docks) do
+    if dock_data.open_port_sprite and (not dock_data.connected_spidertron or
+       not dock_data.connected_spidertron.valid) then
+      -- Clean up invalid state
+      if dock_data.open_port_sprite.valid then
+        dock_data.open_port_sprite.destroy()
+      end
+      dock_data.open_port_sprite = nil
+      dock_data.connected_spidertron = nil
+      if dock_data.dock.valid then
+        Dock.animate_dock(dock_data, false)
+      end
+    end
+  end
+end
 
 return Dock
