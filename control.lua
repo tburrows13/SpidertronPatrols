@@ -59,11 +59,15 @@ Control = {}
 function get_patrol_data(spidertron)
   local patrol_data = storage.patrol_data[spidertron.unit_number]
   if not patrol_data then
-    --log("No waypoint info found. Creating blank table")
+    local player = spidertron.last_user
+    local hide_gui = false
+    if player then
+      hide_gui = not player.mod_settings["sp-show-schedule-pane-by-default"].value
+    end
     storage.patrol_data[spidertron.unit_number] = {
       spidertron = spidertron,
       waypoints = {},
-      hide_gui = false,
+      hide_gui = hide_gui,
     }
     patrol_data = storage.patrol_data[spidertron.unit_number]
   end
