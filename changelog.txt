@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.6.2
+Date: 17 April 2025
+  Bugfixes:
+    - Actually fixed rare bug where spidertrons would get into a faulty state where they can't dock, caused by multiple spidertrons attempting to dock simultaneously
+---------------------------------------------------------------------------------------------------
 Version: 2.6.1
 Date: 15 April 2025
   Bugfixes:
