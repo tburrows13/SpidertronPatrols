@@ -15,9 +15,9 @@ for _, prototype in pairs(spidertron_prototypes) do
   if (prototype.get_inventory_size(defines.inventory.spider_ammo) or 0) > 0 then
     DockGui.inventories_enabled.ammo = true
   end
-  --if (prototype.get_inventory_size(defines.inventory.spider_trash) or 0) > 0 then  -- Engine bug: always returns nil
-  DockGui.inventories_enabled.trash = true
-  --end
+  if (prototype.get_inventory_size(defines.inventory.spider_trash) or 0) > 0 then
+    DockGui.inventories_enabled.trash = true
+  end
   if (prototype.get_inventory_size(defines.inventory.fuel) or 0) > 0 then
     DockGui.inventories_enabled.fuel = true
   end
@@ -28,6 +28,7 @@ end
 
 ---@class DockGuiElements
 ---@field sp-relative-frame LuaGuiElement
+---@field sp-dock-main-flow LuaGuiElement
 ---@field sp-dock-mode-trunk LuaGuiElement
 ---@field sp-dock-mode-trash LuaGuiElement
 ---@field sp-dock-mode-ammo LuaGuiElement
@@ -36,7 +37,7 @@ end
 
 ---@param player LuaPlayer
 ---@param dock_mode defines.inventory
-local function build_gui(player, dock_mode)
+local function build_gui(player, dock_mode, spidertron)
   local anchor = {
     gui = defines.relative_gui_type.proxy_container_gui,
     position = defines.relative_gui_position.right
@@ -51,15 +52,15 @@ local function build_gui(player, dock_mode)
       anchor = anchor,
       --style_mods = {width = 300},
       children = {
-        {type = "label", style = "frame_title", caption = {"gui-dock.connect-to-inventory"}, ignored_by_interaction = true},
+        {type = "label", style = "frame_title", caption = {"gui-dock.configuration"}, ignored_by_interaction = true},
         {type = "frame", direction = "vertical", style = "inside_shallow_frame_with_padding", children = {
           {
             type = "flow",
             direction = "vertical",
             style = "inset_frame_container_vertical_flow",
             children = {
-              --{type = "label", caption = "My label"},
-              {type = "flow", direction = "vertical", children = {
+              {type = "flow", direction = "vertical", name = "sp-dock-main-flow", children = {
+                {type = "label", style = "bold_label", caption =  {"gui-dock.connect-to-inventory"}},
                 {
                   type = "radiobutton", name = "sp-dock-mode-trunk", caption = {"gui-car.trunk"},
                   state = dock_mode == defines.inventory.spider_trunk,
@@ -97,12 +98,29 @@ local function build_gui(player, dock_mode)
       }
     }
   })
+
+  if spidertron then
+    gui.add(storage.spidertron_dock_guis[player.index]["sp-dock-main-flow"], {
+      {type = "line"},
+      {type = "label", style = "bold_label", caption =  {"gui-dock.connected-spidertron", SPIDERTRON_NAME}},
+      {type = "label", --[[style = "bold_label",]] caption = spidertron.entity_label or "Spidertron"},
+      --{type = "empty-widget", style = "color_indicator", style_mods = {color = spidertron.color}},
+      {
+        type = "sprite-button", style = "quick_bar_page_button", sprite = "entity/" .. spidertron.name,
+        tooltip = {"gui-dock.open-inventory"},
+        handler = {[defines.events.on_gui_click] = DockGui.open_spidertron_gui}
+      },
+    },
+    storage.spidertron_dock_guis[player.index]
+  )
+  end
 end
 
+---@param player LuaPlayer
 ---@param element LuaGuiElement
 ---@param dock LuaEntity
 ---@param gui_elements DockGuiElements
-function DockGui.dock_mode_changed(element, dock, gui_elements)
+function DockGui.dock_mode_changed(player, element, dock, gui_elements)
   if element.name == "sp-dock-mode-trunk" then
     dock.proxy_target_inventory = defines.inventory.spider_trunk
     gui_elements["sp-dock-mode-trash"].state = false
@@ -136,13 +154,26 @@ function DockGui.dock_mode_changed(element, dock, gui_elements)
   end
 end
 
+---@param player LuaPlayer
+---@param element LuaGuiElement
+---@param dock LuaEntity
+---@param gui_elements DockGuiElements
+function DockGui.open_spidertron_gui(player, element, dock, gui_elements)
+  local connected_spidertron
+  local dock_data = storage.spidertron_docks[dock.unit_number]
+  if dock_data and dock_data.connected_spidertron and dock_data.connected_spidertron.valid then
+    connected_spidertron = dock_data.connected_spidertron
+    player.opened = connected_spidertron
+  end
+end
+
 gui.add_handlers(DockGui,
   function(event, handler)
     local player = game.get_player(event.player_index)  ---@cast player -?
     local entity = player.opened
     if not entity or not entity.valid then return end
     local gui_elements = storage.spidertron_dock_guis[player.index]
-    handler(event.element, entity, gui_elements)
+    handler(player, event.element, entity, gui_elements)
   end
 )
 
@@ -152,12 +183,19 @@ local function on_gui_opened(event)
   if not entity or not entity.valid then return end
   if entity.name == "sp-spidertron-dock" or (entity.type == "entity-ghost" and entity.ghost_name == "sp-spidertron-dock") then
     local player = game.get_player(event.player_index)  ---@cast player -?
+
+    local connected_spidertron
+    local dock_data = storage.spidertron_docks[entity.unit_number]
+    if dock_data and dock_data.connected_spidertron and dock_data.connected_spidertron.valid then
+      connected_spidertron = dock_data.connected_spidertron
+    end
+
     local relative_frame = player.gui.relative["sp-dock-relative-frame"]
     if relative_frame then
       relative_frame.destroy()
     end
 
-    build_gui(player, entity.proxy_target_inventory)
+    build_gui(player, entity.proxy_target_inventory, connected_spidertron)
   else
     if entity.type == "proxy-container" then
       local player = game.get_player(event.player_index)  ---@cast player -?
