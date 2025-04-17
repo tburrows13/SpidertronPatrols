@@ -229,7 +229,10 @@ local function update_dock(dock_data)
       if not dock.to_be_deconstructed() then
         local nearby_spidertrons = surface.find_entities_filtered{type = "spider-vehicle", area = increase_bounding_box(dock.bounding_box, 0.4), force = dock.force}
         for _, nearby_spidertron in pairs(nearby_spidertrons) do
-          connect_to_spidertron(dock_data, nearby_spidertron)
+          local connected = connect_to_spidertron(dock_data, nearby_spidertron)
+          if connected then
+            break
+          end
         end
       end
     end
