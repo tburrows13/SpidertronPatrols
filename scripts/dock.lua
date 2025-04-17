@@ -11,6 +11,19 @@ local math2d = require "math2d"
 
 local Dock = {}
 
+---@param entity LuaEntity
+---@param text LocalisedString
+local function create_flying_text_at_entity(entity, text)
+  for _, player in pairs(entity.force.players) do
+    if player.surface == entity.surface then
+      player.create_local_flying_text{
+        text = text,
+        position = entity.position,
+      }
+    end
+  end
+end
+
 ---@param event EventData.on_built_entity|EventData.on_entity_cloned
 local function on_built(event)
   local entity = event.entity or event.destination
@@ -57,9 +70,9 @@ function on_object_destroyed(event)
       if dock_data then
         local dock = dock_data.dock
         if dock.valid then
-          --dock.surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-removed"}}
-          storage.spidertron_docks[dock.unit_number] = {dock = dock}
-          Dock.animate_dock(dock_data, false)
+          --create_flying_text_at_entity(dock, {"flying-text.spidertron-removed"})
+          dock_data.connected_spidertron = nil
+          Dock.animate_dock_closing(dock_data)
         end
       end
     end
@@ -109,6 +122,13 @@ function Dock.animate_dock(dock_data, opening)
   }
 end
 
+function Dock.animate_dock_closing(dock_data)
+  Dock.animate_dock(dock_data, false)
+end
+
+function Dock.animate_dock_opening(dock_data)
+  Dock.animate_dock(dock_data, true)
+end
 
 ---@param bounding_box BoundingBox
 ---@param increase number
@@ -135,16 +155,9 @@ local function connect_to_spidertron(dock_data, spidertron)
     -- Inventory size bonus remains the tick that the toolbelt is removed. This works, and maybe a future `grid.inventory_bonus` would work too
     -- TODO replace with `spidertron.prototype.get_inventory_size(defines.inventory.spider_trunk, spidertron.quality.name)` once fixed
     if inventory_size ~= math.floor(spidertron.prototype.get_inventory_size(defines.inventory.spider_trunk) * (1 + (spidertron.quality.level * 0.3))) then
-      for _, player in pairs(spidertron.force.players) do
         -- Only print warning every 2 seconds. This may fail when more than 20 docks are placed...
-        if game.tick % 120 == 0 then
-          if player.surface == spidertron.surface then
-            player.create_local_flying_text{
-              text = {"flying-text.spidertron-toolbelts-cannot-be-docked", SPIDERTRON_NAME_CAPITALISED},
-              position = dock_data.dock.position,
-            }
-          end
-        end
+      if game.tick % 120 == 0 then
+        create_flying_text_at_entity(dock_data.dock, {"flying-text.spidertron-toolbelts-cannot-be-docked", SPIDERTRON_NAME_CAPITALISED})
       end
     return
     end
@@ -171,8 +184,8 @@ local function connect_to_spidertron(dock_data, spidertron)
   dock_data.connected_spidertron = spidertron
   storage.spidertrons_docked[spidertron.unit_number] = dock_data.dock.unit_number
 
-  Dock.animate_dock(dock_data, true)
-  --surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-docked"}}
+  Dock.animate_dock_opening(dock_data)
+  --create_flying_text_at_entity(dock_data.dock, {"flying-text.spidertron-docked"})
   return true
 end
 
@@ -186,9 +199,10 @@ local function update_dock(dock_data)
     -- Reset stuck animation state
     -- TODO investigate actual cause
     if dock_data.open_port_sprite and not dock_data.connected_spidertron then
+      --game.print("[Spidertron Patrols] Dock stuck in open graphics state. Resetting.")
       dock_data.open_port_sprite.destroy()
       dock_data.open_port_sprite = nil
-      Dock.animate_dock(dock_data, false)
+      Dock.animate_dock_closing(dock_data)
     end
 
     local surface = dock.surface
@@ -200,15 +214,15 @@ local function update_dock(dock_data)
         dock.proxy_target_entity = nil
 
         storage.spidertrons_docked[spidertron.unit_number] = nil
-        storage.spidertron_docks[dock.unit_number] = {dock = dock}
-        Dock.animate_dock(dock_data, false)
-       -- surface.create_entity{name = "flying-text", position = dock.position, text = {"flying-text.spidertron-undocked"}}
+        dock_data.connected_spidertron = nil
+        Dock.animate_dock_closing(dock_data)
+        --create_flying_text_at_entity(dock, {"flying-text.spidertron-undocked"})
       end
     else
       if spidertron then
         -- `spidertron` is not valid
-        storage.spidertron_docks[dock.unit_number] = {dock = dock_data.dock}
-        dock_data = storage.spidertron_docks[dock.unit_number]
+        dock_data.connected_spidertron = nil
+        Dock.animate_dock_closing(dock_data)
       end
 
       -- Check if dock should initiate connection
@@ -302,7 +316,7 @@ Dock.on_configuration_changed = function()
       dock_data.open_port_sprite = nil
       dock_data.connected_spidertron = nil
       if dock_data.dock.valid then
-        Dock.animate_dock(dock_data, false)
+        Dock.animate_dock_closing(dock_data)
       end
     end
   end
