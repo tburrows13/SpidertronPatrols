@@ -60,7 +60,7 @@ local patrol_tech = {
 }
 
 if mods["Krastorio2"] then  -- SE undoes this so don't need to worry about K2+SE
-  table.insert(spiderling_tech.prerequisites, "kr-radar")
+  table.insert(spiderling_tech.prerequisites, "radar")
 end
 
 -- Modify the above if some features are disabled
