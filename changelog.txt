@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.6.3
+Date: 5 May 2025
+  Features:
+    - Added "Show schedule panel by default" mod setting
+  Compatibility:
+    - Fixed compatibility with Krastorio 2
+  Bugfixes:
+    - Fixed crash on load when spidertron docks are disabled in mod settings
+---------------------------------------------------------------------------------------------------
 Version: 2.6.2
 Date: 17 April 2025
   Bugfixes:
