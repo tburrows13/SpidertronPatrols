@@ -293,10 +293,12 @@ local function config_changed_setup(changed_data)
       storage.scheduled_dock_replacements = nil
       storage.spidertron_docks = {}
       storage.scheduled_docks_opening = {}
-      for _, surface in pairs(game.surfaces) do
-        for _, entity in pairs(surface.find_entities_filtered{name="sp-spidertron-dock"}) do
-          ---@diagnostic disable-next-line: missing-fields
-          Dock.events[defines.events.on_built_entity]({entity = entity})
+      if settings.startup["sp-enable-dock"].value then
+        for _, surface in pairs(game.surfaces) do
+          for _, entity in pairs(surface.find_entities_filtered{name="sp-spidertron-dock"}) do
+            ---@diagnostic disable-next-line: missing-fields
+            Dock.events[defines.events.on_built_entity]({entity = entity})
+          end
         end
       end
     end
