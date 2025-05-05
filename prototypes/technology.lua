@@ -16,6 +16,7 @@ local spiderling_tech = {
     "low-density-structure",
     "military-3",
     "rocketry",
+    "radar",
   },
   unit = {
     count = 250,
@@ -58,10 +59,6 @@ local patrol_tech = {
     time = 30
   }
 }
-
-if mods["Krastorio2"] then  -- SE undoes this so don't need to worry about K2+SE
-  table.insert(spiderling_tech.prerequisites, "radar")
-end
 
 -- Modify the above if some features are disabled
 local spiderling_enabled = settings.startup["sp-enable-spiderling"].value
