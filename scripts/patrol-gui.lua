@@ -760,6 +760,7 @@ function PatrolGuiWaypoint.move_waypoint_down(player, spidertron, gui_elements, 
   local waypoints = patrol_data.waypoints
   local index_to_move = index
   local number_of_waypoints = #waypoints
+  if number_of_waypoints == 1 then return end  -- Prevents infinite loop between move_waypoint_up and move_waypoint_down
   if index_to_move == number_of_waypoints then
     -- Wrap around aka move to top with shift = true
     PatrolGuiWaypoint.move_waypoint_up(player, spidertron, gui_elements, patrol_data, index, element, {shift = true, wrap = true})
