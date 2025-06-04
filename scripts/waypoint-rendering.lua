@@ -56,7 +56,7 @@ local function create_render_paths(spidertron, player, create_chart_tags)
 
   for i, waypoint in pairs(waypoints) do
     -- First draw waypoint number like in WaypointRendering.update_render_text() in case alt-mode is not on
-    local render = rendering.draw_text{
+    local render_game = rendering.draw_text{
       text = tostring(i),
       surface = surface,
       target = {waypoint.position.x, waypoint.position.y},
@@ -65,19 +65,25 @@ local function create_render_paths(spidertron, player, create_chart_tags)
       alignment = "center",
       vertical_alignment = "middle",
       players = {player},
+      render_mode = "game",
     }
-    table.insert(path_renders, render)
-    if i == waypoint_index_to_blink then
-      blinking_renders[render.id] = {render = render, toggle_tick = game.tick + BLINK_LENGTH}
-    end
+    local render_chart = rendering.draw_text{
+      text = tostring(i),
+      surface = surface,
+      target = {waypoint.position.x, waypoint.position.y},
+      color = color,
+      scale = 5*5,
+      alignment = "center",
+      vertical_alignment = "middle",
+      players = {player},
+      render_mode = "chart",
+    }
 
-    if create_chart_tags then
-      local tag = force.add_chart_tag(surface, {
-        position = {waypoint.position.x, waypoint.position.y},
-        text = tostring(i),
-        icon = {type = "virtual", name = "signal-waypoint"}
-      })
-      if tag then storage.chart_tags[render.id] = {tag} end
+    table.insert(path_renders, render_game)
+    table.insert(path_renders, render_chart)
+    if i == waypoint_index_to_blink then
+      blinking_renders[render_game.id] = {render = render_game, toggle_tick = game.tick + BLINK_LENGTH}
+      blinking_renders[render_chart.id] = {render = render_chart, toggle_tick = game.tick + BLINK_LENGTH}
     end
 
     local next_waypoint = waypoints[i + 1]
@@ -111,7 +117,7 @@ local function create_render_paths(spidertron, player, create_chart_tags)
       local a2 = math2d.position.add(a, math2d.position.multiply_scalar(vec, d))
       local b2 = math2d.position.subtract(b, math2d.position.multiply_scalar(vec, d))
 
-      render = rendering.draw_line{
+      render_game = rendering.draw_line{
         color = color,
         width = 4,
         gap_length = 0.75,
@@ -119,22 +125,33 @@ local function create_render_paths(spidertron, player, create_chart_tags)
         from = a2,
         to = b2,
         surface = surface,
-        players = {player}
+        players = {player},
+        render_mode = "game",
       }
-
-      table.insert(path_renders, render)
+      table.insert(path_renders, render_game)
       if i == waypoint_index_to_blink then
-        blinking_renders[render.id] = {render = render, toggle_tick = game.tick + BLINK_LENGTH}
+        blinking_renders[render_game.id] = {render = render_game, toggle_tick = game.tick + BLINK_LENGTH}
       end
 
-      if create_chart_tags then
-        -- Show patrol paths in map view using chart tags
-        local tag_spacing = 20
-        if D > tag_spacing * 2 then
-          a2 = math2d.position.add(a, math2d.position.multiply_scalar(vec, tag_spacing))
-          b2 = math2d.position.subtract(b, math2d.position.multiply_scalar(vec, tag_spacing))
+      chart_d = 5
+      if D > chart_d then
+        a2 = math2d.position.add(a, math2d.position.multiply_scalar(vec, chart_d))
+        b2 = math2d.position.subtract(b, math2d.position.multiply_scalar(vec, chart_d))
+        render_chart = rendering.draw_line{
+          color = color,
+          width = 4*chart_d,
+          gap_length = 0.75*chart_d,
+          dash_length = 1.5*chart_d,
+          from = a2,
+          to = b2,
+          surface = surface,
+          players = {player},
+          render_mode = "chart",
+        }
 
-          storage.chart_tags[render.id] = create_chart_tag_path(surface, force, a2, b2, tag_spacing)
+        table.insert(path_renders, render_chart)
+        if i == waypoint_index_to_blink then
+          blinking_renders[render_chart.id] = {render = render_chart, toggle_tick = game.tick + BLINK_LENGTH}
         end
       end
     end
