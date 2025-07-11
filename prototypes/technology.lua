@@ -29,6 +29,9 @@ local spiderling_tech = {
     time = 30
   }
 }
+if mods["space-age"] then
+  table.insert(spiderling_tech.unit.ingredients, {"space-science-pack", 1})
+end
 
 local patrol_tech = {
   type = "technology",
@@ -59,12 +62,19 @@ local patrol_tech = {
     time = 30
   }
 }
+if mods["space-age"] then
+  table.insert(patrol_tech.unit.ingredients, {"space-science-pack", 1})
+end
 
 -- Modify the above if some features are disabled
 local spiderling_enabled = settings.startup["sp-enable-spiderling"].value
 local dock_enabled = settings.startup["sp-enable-dock"].value
 if not spiderling_enabled then
-  patrol_tech.prerequisites = {"chemical-science-pack", "automated-rail-transportation",}
+  if mods["space-age"] then
+    patrol_tech.prerequisites = {"space-science-pack", "automated-rail-transportation", "bulk-inserter"}
+  else
+    patrol_tech.prerequisites = {"chemical-science-pack", "automated-rail-transportation", "bulk-inserter"}
+  end
 end
 
 if spiderling_enabled then
@@ -86,4 +96,7 @@ if spiderling_enabled then
     --"rocketry",
     "efficiency-module-3"
   }
+  if mods["space-age"] then
+    table.insert(spidertron_tech.prerequisites, "rocket-turret")
+  end
 end
