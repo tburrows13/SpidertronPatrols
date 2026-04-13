@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.6.4
+Date: 13 April 2026
+  Bugfixes:
+    - Fixed crash when moving only waypoint up/down in schedule
+    - Fixed some tech tree ingredients/prerequisites when SA is active
+---------------------------------------------------------------------------------------------------
 Version: 2.6.3
 Date: 5 May 2025
   Features:
