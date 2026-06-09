@@ -118,7 +118,7 @@ function Dock.animate_dock(dock_data, opening)
     time_to_live = frames,
     animation_offset = animation_offset,
     animation_speed = animation_speed,
-    render_layer = "object",
+    render_layer = "cargo-hatch",
   }
 end
 
@@ -256,7 +256,7 @@ local function on_tick(event)
             offset = util.by_pixel_hr(-9, -46),
           },
           surface = dock_data.dock.surface,
-          render_layer = "object",
+          render_layer = "cargo-hatch",
         }
         dock_data.open_port_sprite = open_port_sprite
       end
