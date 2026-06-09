@@ -198,7 +198,8 @@ local function handle_wait_timers()
         local circuit_condition_info = waypoint.circuit_condition_info  ---@cast circuit_condition_info -?
         local dock_unit_number = storage.spidertrons_docked[spidertron.unit_number]
         if dock_unit_number then
-          local dock = storage.spidertron_docks[dock_unit_number].dock
+          local dock_data = storage.spidertron_docks[dock_unit_number]
+          local dock = dock_data and dock_data.dock
           if dock and dock.valid then
             local signal_count = 0
             if circuit_condition_info.elem and circuit_condition_info.elem.name then
