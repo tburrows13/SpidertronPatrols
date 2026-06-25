@@ -153,8 +153,7 @@ local function connect_to_spidertron(dock_data, spidertron)
   local grid = spidertron.grid
   if grid then
     -- Inventory size bonus remains the tick that the toolbelt is removed. This works, and maybe a future `grid.inventory_bonus` would work too
-    -- TODO replace with `spidertron.prototype.get_inventory_size(defines.inventory.spider_trunk, spidertron.quality.name)` once fixed
-    if inventory_size ~= math.floor(spidertron.prototype.get_inventory_size(defines.inventory.spider_trunk) * (1 + (spidertron.quality.level * 0.3))) then
+    if inventory_size ~= spidertron.prototype.get_inventory_size(defines.inventory.spider_trunk, spidertron.quality.name) then
         -- Only print warning every 2 seconds. This may fail when more than 20 docks are placed...
       if game.tick % 120 == 0 then
         create_flying_text_at_entity(dock_data.dock, {"flying-text.spidertron-toolbelts-cannot-be-docked", SPIDERTRON_NAME_CAPITALISED})
