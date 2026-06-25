@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.7.0
+Date: 25 June 2026
+  Features:
+    - Factorio 2.1 compatibility
+  Bugfixes:
+    - Improved support for modded quality levels
+    - Fixed crash when a SE ship with a circuit-controlled patrol/dock lands
+    - Fixed crash when removing a player from a multiplayer game
+---------------------------------------------------------------------------------------------------
 Version: 2.6.4
 Date: 13 April 2026
   Bugfixes:

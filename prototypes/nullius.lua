@@ -41,7 +41,7 @@ if spiderling_enabled then
   recipe.group = "equipment"
   recipe.subgroup = "vehicle"
   recipe.order = "nullius-da"
-  recipe.category = "medium-crafting"
+  recipe.categories = {"medium-crafting"}
   recipe.energy_required = 60
   recipe.ingredients = {
     {type="item", name="nullius-car-2", amount=1},
@@ -79,7 +79,7 @@ if dock_enabled and sp_data_stage ~= "data" then
   recipe.group = "equipment"
   recipe.subgroup = "vehicle"
   recipe.order = "nullius-dh"
-  recipe.category = "medium-crafting"
+  recipe.categories = {"medium-crafting"}
   recipe.energy_required = 60
   recipe.ingredients = {
     {type="item", name="nullius-large-chest-2", amount=2},
