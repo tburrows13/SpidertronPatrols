@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.6.5
+Date: ????
+  Changes:
+    - Updated for Factorio 2.1.
+    - Migrated nullius recipe `category` to the new 2.1 `categories` table.
+---------------------------------------------------------------------------------------------------
 Version: 2.6.4
 Date: 13 April 2026
   Bugfixes:
