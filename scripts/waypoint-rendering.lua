@@ -344,6 +344,7 @@ WaypointRendering.events = {
   [defines.events.on_selected_entity_changed] = need_to_update_player_render_paths,
   [defines.events.on_player_changed_surface] = need_to_update_player_render_paths,
   [defines.events.on_player_joined_game] = WaypointRendering.update_render_players,
+  [defines.events.on_player_removed] = WaypointRendering.update_render_players,
   [defines.events.on_runtime_mod_setting_changed] = on_runtime_mod_setting_changed,
   [defines.events.on_entity_color_changed] = on_spidertron_color_changed,
 }
