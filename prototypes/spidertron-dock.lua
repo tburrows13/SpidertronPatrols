@@ -59,7 +59,8 @@ data:extend{
         },
       }
     },
-    circuit_connector = circuit_connector_definitions["artillery-turret"],
+    direction_count = 1,
+    circuit_connector = {circuit_connector_definitions["artillery-turret"]},
     circuit_wire_max_distance = default_circuit_wire_max_distance,
     max_health = 600,
     minable = {mining_time = 1, result = "sp-spidertron-dock"},
