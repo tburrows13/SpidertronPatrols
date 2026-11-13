@@ -204,8 +204,44 @@ local function setup()
   --settings_changed()
 end
 
+local SIGNAL_PROTOTYPES = {
+  item = "item",
+  fluid = "fluid",
+  virtual = "virtual_signal",
+  entity = "entity",
+  recipe = "recipe",
+  ["space-location"] = "space_location",
+  ["asteroid-chunk"] = "asteroid_chunk",
+  quality = "quality",
+}
+
+---@param signal SignalID|ItemIDAndQualityIDPair?
+---@return boolean
+local function signal_exists(signal)
+  if not signal or not signal.name then return true end
+  if signal.quality and not prototypes.quality[signal.quality] then return false end
+  local prototype_type = SIGNAL_PROTOTYPES[signal.type or "item"]
+  return prototype_type ~= nil and prototypes[prototype_type][signal.name] ~= nil
+end
+
+--- Handle the case where items that are used in wait conditions are no longer
+--- present in the game. This can happen when mods are removed or updated.
+local function reset_waypoints_with_missing_signals()
+  for _, patrol_data in pairs(storage.patrol_data or {}) do
+    for _, waypoint in pairs(patrol_data.waypoints) do
+      local condition_info = waypoint.item_condition_info or waypoint.circuit_condition_info
+      if condition_info and not signal_exists(condition_info.elem) then
+        waypoint.type = "none"
+        waypoint.item_condition_info = nil
+        waypoint.circuit_condition_info = nil
+      end
+    end
+  end
+end
+
 local function config_changed_setup(changed_data)
   process_active_mods()
+  reset_waypoints_with_missing_signals()
   -- Only run when this mod was present in the previous save as well. Otherwise, on_init will run.
   local mod_changes = changed_data.mod_changes
   local old_version_string
